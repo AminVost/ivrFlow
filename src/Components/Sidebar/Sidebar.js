@@ -8,6 +8,7 @@ function Sidebar() {
     <aside className="sidebar-wrapper">
       <Menubar />
     </aside>
+
   );
 }
 

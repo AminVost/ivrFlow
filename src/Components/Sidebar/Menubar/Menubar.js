@@ -26,7 +26,7 @@ function Menubar() {
     <div className="menu-wrapper">
       <div>
         <div className="logo">
-          <img src="./assets/logo.svg" />
+          {/* <img src="./assets/logo.svg" /> */}
         </div>
 
         {menus.map((menu, idx) => (

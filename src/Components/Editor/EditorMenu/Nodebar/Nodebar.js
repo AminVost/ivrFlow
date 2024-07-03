@@ -33,6 +33,12 @@ const nodes = [
     icon: "RiCursorLine",
     color: "#85eeab",
   },
+  {
+    title: "Custom Node",
+    type: "default",
+    icon: "RiCursorLine",
+    color: "#85ee2b",
+  },
   { title: "Get Text", type: "default", icon: "RiParagraph", color: "#85eeab" },
 ];
 

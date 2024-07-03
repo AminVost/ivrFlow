@@ -77,7 +77,7 @@ function Editor() {
         return;
       }
 
-      const position = reactFlowInstance.project({
+      const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
@@ -101,7 +101,7 @@ function Editor() {
       };
 
       setNodes((nds) => nds.concat(newNode));
-      setIsUpdated(true);
+      // setIsUpdated(true);
     },
     [reactFlowInstance]
   );
