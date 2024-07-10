@@ -23,7 +23,8 @@ function NodeEditor() {
     isUpdated,
   } = useContext(AppContext);
   const { data } = currentNode;
-  const { label, description, interval, url, screenshot, cssSelecter } = data;
+  // console.log("dataa=> ", data.nodeType);
+  const { label, description, interval, url, screenshot, cssSelecter,nodeType } = data;
 
   const updateEditorNode = (key, value, id) => {
     setNodes((nodes) =>
@@ -113,7 +114,7 @@ function NodeEditor() {
           onChange={handleChange}
         />
 
-        {label === "Trigger" && (
+        {label === "Trigger" || nodeType == "default" && (
           <TextField
             className="interval"
             name="interval"
@@ -123,7 +124,7 @@ function NodeEditor() {
           />
         )}
 
-        {label === "New Window" && (
+        {label === "New Window" || nodeType == "default" && (
           <TextField
             className="url"
             name="url"
@@ -133,9 +134,9 @@ function NodeEditor() {
           />
         )}
 
-        {label === "Take Screenshot" && (
+        {label === "Take Screenshot" || nodeType == "default" && (
           <div className="screenshot-div">
-            <label>Take a screenshot of</label>
+            <label>Select Options</label>
             <Select
               className="screenshot"
               name="screenshot"
@@ -143,20 +144,20 @@ function NodeEditor() {
               onChange={handleChange}
             >
               <MenuItem value={"none"}>none</MenuItem>
-              <MenuItem value={"A page"}>A page</MenuItem>
-              <MenuItem value={"A full page"}>A full page</MenuItem>
-              <MenuItem value={"An element"}>An element</MenuItem>
+              <MenuItem value={"Option 1"}>Option 1</MenuItem>
+              <MenuItem value={"Option 2"}>Option 2</MenuItem>
+              <MenuItem value={"Option 3"}>Option 3</MenuItem>
             </Select>
           </div>
         )}
 
-        {((label === "Take Screenshot" && screenshot !== "none") ||
+        {(((label === "Take Screenshot" || nodeType == "default") && screenshot !== "none") ||
           label === "Click Element" ||
           label === "Get Text") && (
           <TextField
             className="css-selecter"
             name="cssSelecter"
-            placeholder="CSS Selector"
+            placeholder="Option Selector"
             value={cssSelecter}
             onChange={handleChange}
           />

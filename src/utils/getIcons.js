@@ -1,7 +1,7 @@
 import React from "react";
 import { RxLightningBolt } from "react-icons/rx";
-import { RiWindow2Line, RiCursorLine, RiParagraph } from "react-icons/ri";
-import { TbPhoto } from "react-icons/tb";
+import { RiWindow2Line, RiCursorLine, RiParagraph,RiPlayCircleLine,RiCalendarEventFill,RiTimerLine,RiPriceTag3Line,RiPentagonLine,RiMicOffLine,RiMicLine,RiChatVoiceLine,RiStarLine,RiErrorWarningLine,RiMicFill,RiQuestionLine,RiPhoneLine,RiChatNewLine,RiFilePaper2Line,RiFunctionAddLine } from "react-icons/ri";
+import { TbPhoto,TbNumber123,TbSpeakerphone,TbArrowBigDownLine,TbArrowGuide,TbFunction,TbPhoneOff,TbArrowCapsule  } from "react-icons/tb";
 
 function getIcons(requestIcon) {
   const icons = {
@@ -10,6 +10,29 @@ function getIcons(requestIcon) {
     RiCursorLine: <RiCursorLine />,
     RiParagraph: <RiParagraph />,
     TbPhoto: <TbPhoto />,
+    RiPlayCircleLine : <RiPlayCircleLine />,
+    TbNumber123 : <TbNumber123 />,
+    RiCalendarEventFill : <RiCalendarEventFill />,
+    RiTimerLine : <RiTimerLine />,
+    TbSpeakerphone : <TbSpeakerphone />,
+    RiErrorWarningLine : <RiErrorWarningLine />, 
+    TbArrowBigDownLine : <TbArrowBigDownLine />, 
+    RiQuestionLine : <RiQuestionLine />, 
+    RiPentagonLine : <RiPentagonLine />, 
+    RiPhoneLine : <RiPhoneLine />, 
+    RiChatNewLine : <RiChatNewLine />,
+    TbArrowGuide : <TbArrowGuide />, 
+    TbFunction : <TbFunction />, 
+    RiFunctionAddLine : <RiFunctionAddLine />, 
+    RiFilePaper2Line : <RiFilePaper2Line />, 
+    RiMicLine : <RiMicLine />, 
+    RiMicFill : <RiMicFill />, 
+    RiMicOffLine : <RiMicOffLine />, 
+    RiStarLine : <RiStarLine />, 
+    TbPhoneOff : <TbPhoneOff />, 
+    TbArrowCapsule : <TbArrowCapsule />, 
+    RiChatVoiceLine : <RiChatVoiceLine />, 
+    RiPriceTag3Line : <RiPriceTag3Line />,
   };
 
   return icons[requestIcon];

@@ -35,9 +35,9 @@ function NodeComp({ title, type, icon, color }) {
           <AiOutlineInfoCircle />
         </IconButton>
 
-        <IconButton disableRipple>
+        {/* <IconButton disableRipple>
           <VscPinned />
-        </IconButton>
+        </IconButton> */}
       </div>
       {getIcons(icon)}
       <p>{stringReducer(title, 10)}</p>

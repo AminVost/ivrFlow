@@ -13,19 +13,20 @@
   justify-content: flex-start;
   align-items: center;
   padding: 3px;
+  left: 0;
 }
 
-.controls > button {
+.controls>button {
   background-color: #3a3a3d6f;
   border-bottom: none;
   padding: 10px;
 }
 
-.controls > button > svg {
+.controls>button>svg {
   fill: white;
 }
 
-.controls > button:hover {
+.controls>button:hover {
   background-color: #3a3a3d6f;
 }
 
@@ -91,12 +92,12 @@
   display: flex;
 }
 
-.left-panel-button > button {
+.left-panel-button>button {
   border-radius: 8px;
   padding: 10.5px;
 }
 
-.left-panel-button > button:hover {
+.left-panel-button>button:hover {
   background-color: #313134;
   transition: 0.2s;
 }
@@ -109,9 +110,10 @@
 .right-panel-button {
   background-color: white;
   padding: 10px;
+  position: relative;
   display: flex;
   justify-content: flex-start;
-  align-items: flex-end;
+  align-items: center;
   gap: 5px;
   border-radius: 8px;
   color: black;
@@ -129,21 +131,46 @@
   transition: 0.2s;
 }
 
-.right-panel-button > svg {
+.right-panel-button>svg {
   width: 25px;
   height: 25px;
 }
 
-.right-panel-button > p {
-  font-size: 20px;
+.right-panel-button>p {
+  font-size: 17px;
   font-weight: 500;
   margin-right: 5px;
 }
+
+.react-flow__panel.right {
+  display: flex;
+  column-gap: 1rem;
+}
+
+.swal-popup {
+  width: fit-content;
+  padding: 25px;
+  font-size: 16px;
+}
+
+.swal-title {
+  color: #a5dc86;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.swal-icon {
+  font-size: 24px;
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+
 
 @media all and (max-width: 500px) {
   .mini-map {
     display: none;
   }
+
   .controls {
     width: min-content;
   }

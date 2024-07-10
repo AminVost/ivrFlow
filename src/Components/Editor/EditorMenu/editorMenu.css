@@ -1,7 +1,7 @@
 .editor-menu {
   width: 100%;
   height: 100%;
-  padding: 20px;
+  padding: 18px;
   color: white;
 }
 
@@ -90,9 +90,34 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   overflow: hidden;
-  max-height: 500px;
   transition: max-height 0.5s ease-in-out;
+  max-height: 500px;
+  overflow-y: scroll;
+  padding-right: 7px;
+  box-sizing: content-box;
+  scrollbar-width: thin;
+  scrollbar-color: #8888884f #f1f1f100;
 }
+
+/* Webkit Browsers */
+.nodes-wrapper::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.nodes-wrapper::-webkit-scrollbar-track {
+  /* background: #f1f1f1;  */
+}
+
+.nodes-wrapper::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.nodes-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 
 .hidden {
   max-height: 0;
@@ -101,18 +126,19 @@
 .node {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: flex-start;
   background-color: #313134;
   border-radius: 10px;
-  padding: 20px;
+  padding: 12px;
   cursor: grab;
   gap: 8px;
 }
 
 .node > p {
   width: 100%;
+  font-size: 14px;
 }
 
 .node > svg {

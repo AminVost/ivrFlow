@@ -13,9 +13,9 @@ function Home() {
 
   return (
     <div className="container" ref={ref}>
-      <Sidebar />
+      {/* <Sidebar /> */}
       <div className="editor-main">
-        <div className="editor-header">
+        {/* <div className="editor-header">
           <div>
             <p>Testing Workflow</p>
             <IoClose />
@@ -23,7 +23,7 @@ function Home() {
           <div>
             <BiPlus />
           </div>
-        </div>
+        </div> */}
         <div
           className="editor-tab"
           style={{

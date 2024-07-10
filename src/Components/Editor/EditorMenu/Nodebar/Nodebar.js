@@ -9,37 +9,175 @@ import { AppContext } from "../../../../Context/AppContext";
 import { PiSidebarSimpleFill } from "react-icons/pi";
 
 const nodes = [
+  // {
+  //   title: "Trigger",
+  //   type: "input",
+  //   icon: "RxLightningBolt",
+  //   color: "#fde047",
+  // },
+  // {
+  //   title: "New Window",
+  //   type: "default",
+  //   icon: "RiWindow2Line",
+  //   color: "#fdba74",
+  // },
+  // {
+  //   title: "Take Screenshot",
+  //   type: "default",
+  //   icon: "TbPhoto",
+  //   color: "#fcb974",
+  // },
+  // {
+  //   title: "Click Element",
+  //   type: "default",
+  //   icon: "RiCursorLine",
+  //   color: "#85eeab",
+  // },
+  // {
+  //   title: "Custom Node",
+  //   type: "default",
+  //   icon: "RiCursorLine",
+  //   color: "#85ee2b",
+  // },
+  // { title: "Get Text", type: "default", icon: "RiParagraph", color: "#85eeab" },
   {
-    title: "Trigger",
-    type: "input",
-    icon: "RxLightningBolt",
-    color: "#fde047",
-  },
-  {
-    title: "New Window",
+    title: "Playback",
     type: "default",
-    icon: "RiWindow2Line",
-    color: "#fdba74",
+    icon: "RiPlayCircleLine",
+    color: "#ff5733",
   },
   {
-    title: "Take Screenshot",
+    title: "say_num",
     type: "default",
-    icon: "TbPhoto",
-    color: "#fcb974",
+    icon: "TbNumber123",
+    color: "#33ff57",
   },
   {
-    title: "Click Element",
+    title: "say_date",
     type: "default",
-    icon: "RiCursorLine",
-    color: "#85eeab",
+    icon: "RiCalendarEventFill",
+    color: "#3357ff",
   },
   {
-    title: "Custom Node",
+    title: "say_time",
     type: "default",
-    icon: "RiCursorLine",
-    color: "#85ee2b",
+    icon: "RiTimerLine",
+    color: "#f033ff",
   },
-  { title: "Get Text", type: "default", icon: "RiParagraph", color: "#85eeab" },
+  {
+    title: "playTone",
+    type: "default",
+    icon: "TbSpeakerphone",
+    color: "#33fff0",
+  },
+  {
+    title: "play_error",
+    type: "default",
+    icon: "RiErrorWarningLine",
+    color: "#ff33a1",
+  },
+  {
+    title: "Input",
+    type: "default",
+    icon: "TbArrowBigDownLine",
+    color: "#a1ff33",
+  },
+  {
+    title: "If",
+    type: "default",
+    icon: "RiQuestionLine",
+    color: "#ff8333",
+  },
+  {
+    title: "Switch",
+    type: "default",
+    icon: "RiPentagonLine",
+    color: "#3383ff",
+  },
+  {
+    title: "Dial",
+    type: "default",
+    icon: "RiPhoneLine",
+    color: "#f0ff33",
+  },
+  {
+    title: "Set",
+    type: "default",
+    icon: "RiChatNewLine",
+    color: "#ff33f0",
+  },
+  {
+    title: "GoTo",
+    type: "default",
+    icon: "TbArrowGuide",
+    color: "#33ff83",
+  },
+  {
+    title: "CallFunction",
+    type: "default",
+    icon: "TbFunction",
+    color: "#ff3333",
+  },
+  {
+    title: "rpc",
+    type: "default",
+    icon: "RiFunctionAddLine",
+    color: "#3383ff",
+  },
+  {
+    title: "Send Fax",
+    type: "default",
+    icon: "RiFilePaper2Line",
+    color: "#ff5733",
+  },
+  {
+    title: "Record",
+    type: "default",
+    icon: "RiMicLine",
+    color: "#78f096",
+  },
+  {
+    title: "Record Save",
+    type: "default",
+    icon: "RiMicFill",
+    color: "#57ff33",
+  },
+  {
+    title: "Record Delete",
+    type: "default",
+    icon: "RiMicOffLine",
+    color: "#3357ff",
+  },
+  {
+    title: "Asterisk CMD",
+    type: "default",
+    icon: "RiStarLine",
+    color: "#ff33a1",
+  },
+  {
+    title: "HangUp",
+    type: "default",
+    icon: "TbPhoneOff",
+    color: "#a1ff33",
+  },
+  {
+    title: "Return",
+    type: "default",
+    icon: "TbArrowCapsule",
+    color: "#ff8333",
+  },
+  {
+    title: "Input Voice",
+    type: "default",
+    icon: "RiChatVoiceLine",
+    color: "#3383ff",
+  },
+  {
+    title: "GoTo Tag",
+    type: "default",
+    icon: "RiPriceTag3Line",
+    color: "#f0ff33",
+  },
 ];
 
 function Nodebar() {
@@ -51,8 +189,8 @@ function Nodebar() {
     <>
       <div className="nodes-header">
         <div>
-          <GiEarthAmerica />
-          <p>Testing</p>
+          {/* <GiEarthAmerica />
+          <p>Testing</p> */}
           {width <= 815 && (
             <ScreenToggleButton
               setShowSidebar={setShowSidebar}

@@ -26,6 +26,7 @@
     "reactflow": "^11.11.4",
     "short-unique-id": "^5.2.0",
     "svgo": "^3.3.2",
+    "sweetalert2": "^11.12.2",
     "web-vitals": "^4.2.1"
   },
   "scripts": {

@@ -21,6 +21,8 @@ import CustomNode from "./CustomNode/CustomNode";
 import uniqueId from "../../utils/uniqueId";
 import ContextMenu from "./ContextMenu/ContextMenu";
 import { RiSaveLine } from "react-icons/ri";
+import { TbSend } from "react-icons/tb";
+
 import { parse, stringify, toJSON, fromJSON } from "flatted";
 import { IconButton } from "@mui/material";
 import { PiSidebarSimpleFill } from "react-icons/pi";
@@ -28,6 +30,7 @@ import { BiFullscreen } from "react-icons/bi";
 import { AppContext } from "../../Context/AppContext";
 import MenuDrawer from "../Sidebar/MenuDrawer/MenuDrawer";
 import { BsFillCircleFill } from "react-icons/bs";
+import Swal from "sweetalert2";
 
 function Editor() {
   const reactFlowWrapper = useRef(null);
@@ -35,6 +38,7 @@ function Editor() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   // const [reactFlowInstance, setReactFlowInstance] = useState(null);
   const [menu, setMenu] = useState(null);
+  const [isPublish, setVisiblePublish] = useState(false);
   const ref = useRef(null);
 
   const {
@@ -184,8 +188,10 @@ function Editor() {
         <RightPanel
           handleWorkflowData={handleWorkflowData}
           isUpdated={isUpdated}
+          isPublish={isPublish}
           setData={setData}
           setIsUpdated={setIsUpdated}
+          setVisiblePublish={setVisiblePublish}
         />
         <Controls
           className="controls"
@@ -233,20 +239,61 @@ const LeftPanel = memo(
 );
 
 const RightPanel = memo(
-  ({ handleWorkflowData, isUpdated, setIsUpdated, setData }) => {
+  ({
+    handleWorkflowData,
+    isUpdated,
+    setIsUpdated,
+    setData,
+    isPublish,
+    setVisiblePublish,
+  }) => {
     return (
       <Panel position="top-right">
-        {isUpdated && <UpdateBadge />}
+        {isPublish && (
+          <div
+            className="right-panel-button"
+            onClick={() => {
+              console.log("Click Publish");
+              // Swal.fire({
+              //   position: "center",
+              //   icon: "success",
+              //   title: "Publish was successful",
+              //   showConfirmButton: false,
+              //   timer: 1500,
+              // });
+              setVisiblePublish(!isPublish);
+              Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Publish was successful",
+                showConfirmButton: false,
+                timer: 2000,
+                customClass: {
+                  popup: 'swal-popup',
+                  title: 'swal-title',
+                  icon: 'swal-icon'
+                },
+                background: '#27272a' // تغییر رنگ پس‌زمینه پیام
+              });
+            }}
+          >
+            <TbSend />
+            <p>Publish</p>
+          </div>
+        )}
+
         <div
           className="right-panel-button"
           onClick={() => {
             if (isUpdated) {
               handleWorkflowData();
+              setVisiblePublish(true);
               setIsUpdated(false);
               setData((prev) => ({ ...prev, status: false }));
             }
           }}
         >
+          {isUpdated && <UpdateBadge />}
           <RiSaveLine />
           <p>Save</p>
         </div>
@@ -258,7 +305,7 @@ const RightPanel = memo(
 const UpdateBadge = () => {
   return (
     <div
-      style={{ position: "absolute", left: "5px", top: "5px", zIndex: "10" }}
+      style={{ position: "absolute", left: "-6px", top: "-6px", zIndex: "10" }}
     >
       <BsFillCircleFill color="cornflowerblue" />
     </div>
