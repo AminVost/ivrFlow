@@ -1,3 +1,138 @@
+package.json : 
+{
+  "name": "automa",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.15.21",
+    "@mui/material": "^5.15.21",
+    "@reactflow/background": "^11.3.14",
+    "@reactflow/controls": "^11.2.14",
+    "@reactflow/minimap": "^11.7.14",
+    "@reactflow/node-toolbar": "^1.3.14",
+    "@svgr/plugin-svgo": "^8.1.0",
+    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.2",
+    "css-select": "^5.1.0",
+    "flatted": "^3.3.1",
+    "nth-check": "^2.1.1",
+    "postcss": "^8.4.39",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.2.1",
+    "react-resize-detector": "^11.0.1",
+    "reactflow": "^11.11.4",
+    "short-unique-id": "^5.2.0",
+    "svgo": "^3.3.2",
+    "sweetalert2": "^11.12.2",
+    "web-vitals": "^4.2.1"
+  },
+  "scripts": {
+    "start": "webpack serve --mode development",
+    "build": "webpack --mode production"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
+    "@babel/preset-react": "^7.24.7",
+    "babel-loader": "^9.1.3",
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.0",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.92.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
+  }
+}
+
+
+App.js = 
+import React from 'react';
+import "./App.css";
+import "reactflow/dist/style.css";
+import Home from "./Pages/Homepage/Home";
+
+function App() {
+  return (
+    <>
+      <Home />
+    </>
+  );
+}
+
+export default App;
+
+
+index.js = 
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { AppContextProvider } from "./Context/AppContext";
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <React.StrictMode>
+    <AppContextProvider>
+      <App />
+    </AppContextProvider>
+  </React.StrictMode>
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+
+
+reportWebVitals.js = 
+const reportWebVitals = onPerfEntry => {
+  if (onPerfEntry && onPerfEntry instanceof Function) {
+    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+      getCLS(onPerfEntry);
+      getFID(onPerfEntry);
+      getFCP(onPerfEntry);
+      getLCP(onPerfEntry);
+      getTTFB(onPerfEntry);
+    });
+  }
+};
+
+export default reportWebVitals;
+
+
+setupTests.js = 
+// jest-dom adds custom jest matchers for asserting on DOM nodes.
+// allows you to do things like:
+// expect(element).toHaveTextContent(/react/i)
+// learn more: https://github.com/testing-library/jest-dom
+import '@testing-library/jest-dom';
+
+
+
+src\Components\Editor\Editor.js = 
 import React, {
   useState,
   useRef,
@@ -22,6 +157,7 @@ import uniqueId from "../../utils/uniqueId";
 import ContextMenu from "./ContextMenu/ContextMenu";
 import { RiSaveLine } from "react-icons/ri";
 import { TbSend } from "react-icons/tb";
+
 import { parse, stringify, toJSON, fromJSON } from "flatted";
 import { IconButton } from "@mui/material";
 import { PiSidebarSimpleFill } from "react-icons/pi";
@@ -31,31 +167,14 @@ import MenuDrawer from "../Sidebar/MenuDrawer/MenuDrawer";
 import { BsFillCircleFill } from "react-icons/bs";
 import Swal from "sweetalert2";
 
-// Define the default start node
-const defaultStartNode = {
-  id: "start",
-  type: "custom", // Ensure 'custom' matches your node type if needed
-  position: { x: 250, y: 100 }, // Set initial position
-  data: {
-    label: "START",
-    nodeType: "start",
-    description: "",
-    interval: "",
-    url: "",
-    screenshot: "none",
-    cssSelecter: "",
-    Icon: "RiArrowDownFill", // Example icon, use any appropriate icon
-  },
-};
-
 function Editor() {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  // const [reactFlowInstance, setReactFlowInstance] = useState(null);
   const [menu, setMenu] = useState(null);
   const [isPublish, setVisiblePublish] = useState(false);
   const ref = useRef(null);
-  const [initialized, setInitialized] = useState(false);
 
   const {
     width,
@@ -76,7 +195,7 @@ function Editor() {
       setEdges((eds) => addEdge(params, eds));
       setIsUpdated(true);
     },
-    [setEdges, setIsUpdated]
+    [edges]
   );
 
   const onDragOver = useCallback((event) => {
@@ -121,14 +240,17 @@ function Editor() {
       };
 
       setNodes((nds) => nds.concat(newNode));
+      // setIsUpdated(true);
     },
-    [reactFlowInstance, setNodes]
+    [reactFlowInstance]
   );
 
   const handleContextMenu = useCallback(
     (event, node) => {
+      // Prevent native context menu from showing
       event.preventDefault();
 
+      // Calculate position of the node context menu.
       const pane = ref.current.getBoundingClientRect();
 
       setMenu({
@@ -146,6 +268,7 @@ function Editor() {
     [menu]
   );
 
+  // Close the node context menu if it's open whenever the window is clicked.
   const onPaneClick = useCallback(() => setMenu(null), [menu]);
 
   const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
@@ -155,53 +278,9 @@ function Editor() {
   };
 
   const handleWorkflowData = useCallback(() => {
-    const workflowData = {
-      nodes: nodes.map((node) => ({
-        id: node.id,
-        type: node.type,
-        position: node.position,
-        data: {
-          label: node.data.label,
-          nodeType: node.data.nodeType,
-          description: node.data.description,
-          interval: node.data.interval,
-          url: node.data.url,
-          screenshot: node.data.screenshot,
-          cssSelecter: node.data.cssSelecter,
-          Icon: node.data.Icon,
-          color: node.data.color,
-        },
-      })),
-      edges: edges.map((edge) => ({
-        id: edge.id,
-        source: edge.source,
-        target: edge.target,
-        type: edge.type,
-        // Add other necessary properties here
-      })),
-    };
-    console.log("workflowData", workflowData);
+    const workflowData = { nodes, edges };
     localStorage.setItem("workflowData", stringify(workflowData));
   });
-
-  useEffect(() => {
-    if (reactFlowInstance && !initialized) {
-      const { width, height } =
-        reactFlowWrapper.current.getBoundingClientRect();
-      const startX = width / 2;
-      const startY = height / 2;
-
-      setNodes((nodes) =>
-        nodes.map((node) =>
-          node.id === "start"
-            ? { ...node, position: { x: startX, y: startY } }
-            : node
-        )
-      );
-
-      reactFlowInstance.setCenter(startX, startY, { duration: 800, zoom: 1 });
-    }
-  }, [reactFlowInstance]);
 
   useEffect(() => {
     try {
@@ -210,32 +289,8 @@ function Editor() {
         const { nodes, edges } = workflowData;
         setNodes(nodes);
         setEdges(edges);
-        setInitialized(true);
-      } else {
-        // Add default start node if no nodes are loaded from localStorage
-        setNodes([defaultStartNode]);
       }
-    } catch (error) {
-      // Add default start node if an error occurs during loading from localStorage
-      setNodes([defaultStartNode]);
-    }
-  }, [setNodes, setEdges]);
-
-  // useEffect(() => {
-  //   console.log("nodes", nodes);
-  // }, [nodes]);
-
-  const onBeforeDelete = useCallback(({ nodes, edges }) => {
-    const nodesToDelete = nodes.filter((node) => node.id !== "start");
-    const edgesToDelete = edges;
-    if (nodes.length !== nodesToDelete.length) {
-      Swal.fire({
-        icon: "error",
-        title: "Cannot delete 'Start' node",
-        text: "'Start' node cannot be deleted.",
-      });
-    }
-    return { nodes: nodesToDelete, edges: edgesToDelete };
+    } catch (error) {}
   }, []);
 
   return (
@@ -254,7 +309,6 @@ function Editor() {
         onPaneClick={onPaneClick}
         onNodeContextMenu={handleContextMenu}
         onEdgeContextMenu={handleContextMenu}
-        deleteKeyCode={null}
         minZoom={0.3}
         maxZoom={1.2}
       >
@@ -334,6 +388,14 @@ const RightPanel = memo(
           <div
             className="right-panel-button"
             onClick={() => {
+              console.log("Click Publish");
+              // Swal.fire({
+              //   position: "center",
+              //   icon: "success",
+              //   title: "Publish was successful",
+              //   showConfirmButton: false,
+              //   timer: 1500,
+              // });
               setVisiblePublish(!isPublish);
               Swal.fire({
                 position: "center",
@@ -342,11 +404,11 @@ const RightPanel = memo(
                 showConfirmButton: false,
                 timer: 2000,
                 customClass: {
-                  popup: "swal-popup",
-                  title: "swal-title",
-                  icon: "swal-icon",
+                  popup: 'swal-popup',
+                  title: 'swal-title',
+                  icon: 'swal-icon'
                 },
-                background: "#27272a", // تغییر رنگ پس‌زمینه پیام
+                background: '#27272a' // تغییر رنگ پس‌زمینه پیام
               });
             }}
           >
@@ -384,3 +446,96 @@ const UpdateBadge = () => {
     </div>
   );
 };
+
+
+src\Components\Editor\ContextMenu\ContextMenu.js = 
+import React, { memo, useCallback, useContext } from "react";
+import { useReactFlow } from "reactflow";
+import "./contextMenu.css";
+import uniqueId from "../../../utils/uniqueId";
+import findEdgeById from "../../../utils/findEdgeById";
+import { AppContext } from "../../../Context/AppContext";
+
+function ContextMenu({ id, top, left, right, bottom, ...props }) {
+  const { getNode, setNodes, addNodes, setEdges, getNodes } = useReactFlow();
+  const { setIsUpdated } = useContext(AppContext);
+
+  const duplicateNode = useCallback(() => {
+    const node = getNode(id);
+    const position = {
+      x: node.position.x + 50,
+      y: node.position.y + 50,
+    };
+
+    const updatedNodes = getNodes();
+    setNodes(
+      updatedNodes?.map((node) => ({
+        ...node,
+        selected: false,
+      }))
+    );
+    addNodes({ ...node, selected: true, id: uniqueId(7), position });
+  }, [id, getNode, addNodes]);
+
+  const deleteNode = useCallback(() => {
+    setNodes((nodes) => nodes.filter((node) => node.id !== id));
+    setEdges((edges) => edges.filter((edge) => edge.source !== id));
+  }, [id, setNodes, setEdges]);
+
+  return (
+    <div
+      style={{ top, left, right, bottom }}
+      className="context-menu"
+      {...props}
+    >
+      {findEdgeById(id) ? (
+        <EdgesMenu id={id} setEdges={setEdges} setIsUpdated={setIsUpdated} />
+      ) : (
+        <NodesMenu
+          id={id}
+          duplicateNode={duplicateNode}
+          setIsUpdated={setIsUpdated}
+          deleteNode={deleteNode}
+        />
+      )}
+    </div>
+  );
+}
+
+export default ContextMenu;
+
+const NodesMenu = memo(({ id, duplicateNode, deleteNode, setIsUpdated }) => {
+  return (
+    <>
+      <button
+        onClick={() => {
+          duplicateNode();
+          setIsUpdated(true);
+        }}
+      >
+        duplicate
+      </button>
+      <button
+        onClick={() => {
+          deleteNode();
+          setIsUpdated(true);
+        }}
+      >
+        delete
+      </button>
+    </>
+  );
+});
+
+const EdgesMenu = memo(({ id, setEdges, setIsUpdated }) => {
+  const handleDeleteEdge = () => {
+    setEdges((prevEdges) => prevEdges.filter((edge) => edge.id !== id));
+    setIsUpdated(true);
+  };
+
+  return (
+    <>
+      <button onClick={handleDeleteEdge}>Delete</button>
+    </>
+  );
+});

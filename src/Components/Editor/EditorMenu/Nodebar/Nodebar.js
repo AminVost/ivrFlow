@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState,useRef,useEffect } from "react";
 import { GiEarthAmerica } from "react-icons/gi";
 import NodeComp from "./NodeComp";
 import { RiSearch2Line } from "react-icons/ri";
@@ -182,8 +182,32 @@ const nodes = [
 
 function Nodebar() {
   const [isVisible, setIsVisible] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const searchInputRef = useRef(null); // Ref for the search input
   const { setShowSidebar, setShowDrawer, showSidebar, showDrawer, width } =
     useContext(AppContext);
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredNodes = nodes.filter((node) =>
+    node.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && event.key === 'f' || event.ctrlKey && event.key === 'F') {
+        event.preventDefault(); // Prevent the default browser search
+        searchInputRef.current.focus(); // Focus on the search input
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   return (
     <>
@@ -203,11 +227,17 @@ function Nodebar() {
 
         <div>
           <RiSearch2Line />
-          <input type="text" placeholder="Search... (ctrl+f)" />
+          <input
+            type="text"
+            placeholder="Search... (ctrl+f)"
+            onChange={handleSearch}
+            value={searchTerm}
+            ref={searchInputRef}
+          />
         </div>
       </div>
       <div className="nodes-content">
-        <div className="nodes-type">
+        {/* <div className="nodes-type">
           <div>
             <BsFillCircleFill />
             <p>General</p>
@@ -215,9 +245,9 @@ function Nodebar() {
           <IconButton disableRipple onClick={() => setIsVisible(!isVisible)}>
             {!isVisible ? <BiPlus /> : <BiMinus />}
           </IconButton>
-        </div>
+        </div> */}
         <div className={`nodes-wrapper ${!isVisible ? "hidden" : ""}`}>
-          {nodes.map((node, idx) => (
+          {filteredNodes.map((node, idx) => (
             <NodeComp key={idx} {...node} />
           ))}
         </div>

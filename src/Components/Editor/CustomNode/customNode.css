@@ -15,7 +15,7 @@
   border: 3px solid #f1f1e5;
 }
 
-.custom-node-wrapper > div:first-child {
+.custom-node-wrapper>div:first-child {
   padding: 8px;
   margin-right: 8px;
   display: flex;
@@ -25,17 +25,17 @@
   color: black;
 }
 
-.custom-node-wrapper > div:first-child > svg {
+.custom-node-wrapper>div:first-child>svg {
   width: 20px;
   height: 20px;
 }
 
-.custom-node-wrapper > div:last-child > p:first-child {
+.custom-node-wrapper>div:last-child>p:first-child {
   font-weight: 500;
   color: #f1f1e5;
 }
 
-.custom-node-wrapper > div:last-child > p:last-child {
+.custom-node-wrapper>div:last-child>p:last-child {
   font-weight: 400;
   color: #e4e4cf;
 }
@@ -51,7 +51,7 @@
   /* border: 1px solid red; */
 }
 
-.toolbar-wrapper > p {
+.toolbar-wrapper>p {
   cursor: default;
   background-color: #3a3a3d6f;
   border-radius: 5px;
@@ -61,7 +61,7 @@
   color: #f1f1e5;
 }
 
-.toolbar-wrapper > div {
+.toolbar-wrapper>div {
   background-color: #3a3a3d6f;
   padding: 5px 10px;
   display: flex;
@@ -72,7 +72,7 @@
   border-radius: 5px;
 }
 
-.toolbar-wrapper > div > svg {
+.toolbar-wrapper>div>svg {
   cursor: pointer;
   width: 20px;
   height: 20px;
@@ -80,7 +80,7 @@
   transition: 0.3s;
 }
 
-.toolbar-wrapper > div > svg:hover {
+.toolbar-wrapper>div>svg:hover {
   color: cornflowerblue;
   transition: 0.3s;
 }
@@ -92,4 +92,20 @@
 
 .top {
   background-color: white;
+}
+
+.custom-node-wrapper.startClass>div>p.nodeLabel {
+  color: black !important;
+  font-size: 21px;
+}
+
+.custom-node-wrapper.startClass {
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  width: 170px;
+}
+
+.startNodeIcon svg {
+  fill: white;
 }

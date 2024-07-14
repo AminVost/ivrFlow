@@ -1,0 +1,614 @@
+src\Components\Editor\CustomNode\CustomNode.js = 
+import React,{ memo, useCallback, useContext, useState } from "react";
+import "./customNode.css";
+import { Handle, useReactFlow } from "reactflow";
+import { BiPencil } from "react-icons/bi";
+import { AiOutlineDelete } from "react-icons/ai";
+import stringReducer from "../../../utils/stringReducer";
+import getIcons from "../../../utils/getIcons";
+import { AppContext } from "../../../Context/AppContext";
+
+const CustomNode = ({ id }) => {
+  const {
+    setData,
+    setShowSidebar,
+    reactFlowInstance,
+    setShowDrawer,
+    setIsUpdated,
+  } = useContext(AppContext);
+  const [isVisible, setIsVisible] = useState(false);
+  const { setNodes, getNodes } = useReactFlow();
+
+  const currentNode = getNodes()?.filter((node) => node.id === id);
+  const { type, data, selected } = currentNode[0];
+  const { label, nodeType, description, Icon, color, ref } = data;
+
+  const centerSelectedNode = (elementId, reactFlowInstance) => {
+    if (reactFlowInstance) {
+      const element = reactFlowInstance?.getNode(elementId);
+
+      if (element) {
+        const { position, width, height } = element;
+
+        // Calculate the center coordinates
+        const centerX = position.x + width / 2;
+        const centerY = position.y + height / 2;
+
+        // Set the center of the graph to the element's position
+        reactFlowInstance.setCenter(centerX, centerY, {
+          duration: 800,
+          zoom: 1,
+        });
+      }
+    }
+  };
+
+  const deleteNode = useCallback(() => {
+    setNodes((nodes) => nodes.filter((node) => node.id !== id));
+    setData((prev) => ({ ...prev, status: false }));
+  }, []);
+
+  return (
+    <>
+      {nodeType === "default" && (
+        <Handle className="edge-handle top" type="source" position="top" />
+      )}
+
+      <div
+        className="toolbar-wrapper"
+        style={{ display: isVisible ? "flex" : "none" }}
+        onMouseEnter={() => setIsVisible(true)}
+        onMouseLeave={() => setIsVisible(false)}
+      >
+        <p>{id}</p>
+        <div>
+          <AiOutlineDelete
+            onClick={() => {
+              deleteNode();
+              setIsUpdated(true);
+            }}
+          />
+          <BiPencil
+            onClick={() => {
+              setData((prev) => ({
+                ...prev,
+                id,
+                selected,
+                type,
+                data,
+                status: true,
+              }));
+
+              setShowSidebar(true);
+              setShowDrawer((state) => !state);
+            }}
+          />
+        </div>
+      </div>
+
+      <div
+        onMouseEnter={() => setIsVisible(true)}
+        onMouseLeave={() => setIsVisible(false)}
+        className={`custom-node-wrapper ${selected ? "selected" : ""}`}
+        onClick={() => centerSelectedNode(id, reactFlowInstance)}
+      >
+        <div style={{ backgroundColor: color }}>{getIcons(Icon)}</div>
+        <div>
+          <p>{stringReducer(label, 15)}</p>
+          <p>{stringReducer(description, 16)}</p>
+        </div>
+      </div>
+
+      {(nodeType === "default" || nodeType === "input") && (
+        <Handle className="edge-handle" type="target" position="bottom" />
+      )}
+    </>
+  );
+};
+
+export default memo(CustomNode);
+
+
+src\Components\Editor\EditorMenu\EditorMenu.js = 
+import React, { useContext, useState } from "react";
+import Nodebar from "./Nodebar/Nodebar";
+import "./editorMenu.css";
+import NodeEditor from "./NodeEditor/NodeEditor";
+import { AppContext } from "../../../Context/AppContext";
+
+function EditorMenu() {
+  const { data, showSidebar, width } = useContext(AppContext);
+
+  return (
+    <aside
+      className="editor-menu"
+      style={{
+        display: width > "815" && showSidebar ? "block" : "none",
+      }}
+    >
+      {data?.status ? <NodeEditor /> : <Nodebar />}
+    </aside>
+  );
+}
+
+export default EditorMenu;
+
+
+src\Components\Editor\EditorMenu\Nodebar\Nodebar.js = 
+import React, { useContext, useState } from "react";
+import { GiEarthAmerica } from "react-icons/gi";
+import NodeComp from "./NodeComp";
+import { RiSearch2Line } from "react-icons/ri";
+import { BsFillCircleFill } from "react-icons/bs";
+import { IconButton } from "@mui/material";
+import { BiFullscreen, BiMinus, BiPlus } from "react-icons/bi";
+import { AppContext } from "../../../../Context/AppContext";
+import { PiSidebarSimpleFill } from "react-icons/pi";
+
+const nodes = [
+  // {
+  //   title: "Trigger",
+  //   type: "input",
+  //   icon: "RxLightningBolt",
+  //   color: "#fde047",
+  // },
+  // {
+  //   title: "New Window",
+  //   type: "default",
+  //   icon: "RiWindow2Line",
+  //   color: "#fdba74",
+  // },
+  // {
+  //   title: "Take Screenshot",
+  //   type: "default",
+  //   icon: "TbPhoto",
+  //   color: "#fcb974",
+  // },
+  // {
+  //   title: "Click Element",
+  //   type: "default",
+  //   icon: "RiCursorLine",
+  //   color: "#85eeab",
+  // },
+  // {
+  //   title: "Custom Node",
+  //   type: "default",
+  //   icon: "RiCursorLine",
+  //   color: "#85ee2b",
+  // },
+  // { title: "Get Text", type: "default", icon: "RiParagraph", color: "#85eeab" },
+  {
+    title: "Playback",
+    type: "default",
+    icon: "RiPlayCircleLine",
+    color: "#ff5733",
+  },
+  {
+    title: "say_num",
+    type: "default",
+    icon: "TbNumber123",
+    color: "#33ff57",
+  },
+  {
+    title: "say_date",
+    type: "default",
+    icon: "RiCalendarEventFill",
+    color: "#3357ff",
+  },
+  {
+    title: "say_time",
+    type: "default",
+    icon: "RiTimerLine",
+    color: "#f033ff",
+  },
+  {
+    title: "playTone",
+    type: "default",
+    icon: "TbSpeakerphone",
+    color: "#33fff0",
+  },
+  {
+    title: "play_error",
+    type: "default",
+    icon: "RiErrorWarningLine",
+    color: "#ff33a1",
+  },
+  {
+    title: "Input",
+    type: "default",
+    icon: "TbArrowBigDownLine",
+    color: "#a1ff33",
+  },
+  {
+    title: "If",
+    type: "default",
+    icon: "RiQuestionLine",
+    color: "#ff8333",
+  },
+  {
+    title: "Switch",
+    type: "default",
+    icon: "RiPentagonLine",
+    color: "#3383ff",
+  },
+  {
+    title: "Dial",
+    type: "default",
+    icon: "RiPhoneLine",
+    color: "#f0ff33",
+  },
+  {
+    title: "Set",
+    type: "default",
+    icon: "RiChatNewLine",
+    color: "#ff33f0",
+  },
+  {
+    title: "GoTo",
+    type: "default",
+    icon: "TbArrowGuide",
+    color: "#33ff83",
+  },
+  {
+    title: "CallFunction",
+    type: "default",
+    icon: "TbFunction",
+    color: "#ff3333",
+  },
+  {
+    title: "rpc",
+    type: "default",
+    icon: "RiFunctionAddLine",
+    color: "#3383ff",
+  },
+  {
+    title: "Send Fax",
+    type: "default",
+    icon: "RiFilePaper2Line",
+    color: "#ff5733",
+  },
+  {
+    title: "Record",
+    type: "default",
+    icon: "RiMicLine",
+    color: "#78f096",
+  },
+  {
+    title: "Record Save",
+    type: "default",
+    icon: "RiMicFill",
+    color: "#57ff33",
+  },
+  {
+    title: "Record Delete",
+    type: "default",
+    icon: "RiMicOffLine",
+    color: "#3357ff",
+  },
+  {
+    title: "Asterisk CMD",
+    type: "default",
+    icon: "RiStarLine",
+    color: "#ff33a1",
+  },
+  {
+    title: "HangUp",
+    type: "default",
+    icon: "TbPhoneOff",
+    color: "#a1ff33",
+  },
+  {
+    title: "Return",
+    type: "default",
+    icon: "TbArrowCapsule",
+    color: "#ff8333",
+  },
+  {
+    title: "Input Voice",
+    type: "default",
+    icon: "RiChatVoiceLine",
+    color: "#3383ff",
+  },
+  {
+    title: "GoTo Tag",
+    type: "default",
+    icon: "RiPriceTag3Line",
+    color: "#f0ff33",
+  },
+];
+
+function Nodebar() {
+  const [isVisible, setIsVisible] = useState(true);
+  const { setShowSidebar, setShowDrawer, showSidebar, showDrawer, width } =
+    useContext(AppContext);
+
+  return (
+    <>
+      <div className="nodes-header">
+        <div>
+          {/* <GiEarthAmerica />
+          <p>Testing</p> */}
+          {width <= 815 && (
+            <ScreenToggleButton
+              setShowSidebar={setShowSidebar}
+              setShowDrawer={setShowDrawer}
+              showSidebar={showSidebar}
+              showDrawer={showDrawer}
+            />
+          )}
+        </div>
+
+        <div>
+          <RiSearch2Line />
+          <input type="text" placeholder="Search... (ctrl+f)" />
+        </div>
+      </div>
+      <div className="nodes-content">
+        <div className="nodes-type">
+          <div>
+            <BsFillCircleFill />
+            <p>General</p>
+          </div>
+          <IconButton disableRipple onClick={() => setIsVisible(!isVisible)}>
+            {!isVisible ? <BiPlus /> : <BiMinus />}
+          </IconButton>
+        </div>
+        <div className={`nodes-wrapper ${!isVisible ? "hidden" : ""}`}>
+          {nodes.map((node, idx) => (
+            <NodeComp key={idx} {...node} />
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default Nodebar;
+
+const ScreenToggleButton = ({
+  setShowSidebar,
+  setShowDrawer,
+  showSidebar,
+  showDrawer,
+}) => {
+  return (
+    <div className="screen-toggle-button">
+      <IconButton
+        disableTouchRipple
+        onClick={() => {
+          setShowSidebar(!showSidebar);
+          setShowDrawer(!showDrawer);
+        }}
+      >
+        {showSidebar ? <PiSidebarSimpleFill /> : <BiFullscreen />}
+      </IconButton>
+    </div>
+  );
+};
+
+
+
+src\Components\Editor\EditorMenu\Nodebar\NodeComp.js  
+import React, { useState } from "react";
+import stringReducer from "../../../../utils/stringReducer";
+import getIcons from "../../../../utils/getIcons";
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { VscPinned } from "react-icons/vsc";
+import { IconButton } from "@mui/material";
+
+function NodeComp({ title, type, icon, color }) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const onDragStart = (event, type, label, Icon, color) => {
+    const dragData = {
+      type,
+      label,
+      Icon,
+      color,
+    };
+    event.dataTransfer.setData(
+      "application/reactflow",
+      JSON.stringify(dragData)
+    );
+    event.dataTransfer.effectAllowed = "move";
+  };
+
+  return (
+    <div
+      className="node"
+      onDragStart={(event) => onDragStart(event, type, title, icon, color)}
+      draggable
+      onMouseEnter={() => setIsVisible(true)}
+      onMouseLeave={() => setIsVisible(false)}
+    >
+      <div style={{ display: isVisible ? "block" : "none" }}>
+        <IconButton disableRipple>
+          <AiOutlineInfoCircle />
+        </IconButton>
+
+        {/* <IconButton disableRipple>
+          <VscPinned />
+        </IconButton> */}
+      </div>
+      {getIcons(icon)}
+      <p>{stringReducer(title, 10)}</p>
+    </div>
+  );
+}
+
+export default NodeComp;
+
+
+
+src\Components\Editor\EditorMenu\NodeEditor\NodeEditor.js =
+
+import { MenuItem, Select, TextField } from "@mui/material";
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import "./nodeEditor.css";
+import { IoArrowBack } from "react-icons/io5";
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { AppContext } from "../../../../Context/AppContext";
+import { useReactFlow } from "reactflow";
+import { parse } from "flatted";
+
+function NodeEditor() {
+  const { setNodes, getNodes, getEdges } = useReactFlow();
+  const {
+    data: currentNode,
+    setData,
+    width,
+    setIsUpdated,
+    isUpdated,
+  } = useContext(AppContext);
+  const { data } = currentNode;
+  // console.log("dataa=> ", data.nodeType);
+  const { label, description, interval, url, screenshot, cssSelecter,nodeType } = data;
+
+  const updateEditorNode = (key, value, id) => {
+    setNodes((nodes) =>
+      nodes.map((node) => {
+        if (node.id === id) {
+          if (key === "screenshot" && value === "none") {
+            const updatedData = { ...node.data, [key]: value, cssSelecter: "" };
+            return { ...node, data: updatedData };
+          } else {
+            const updatedData = { ...node.data, [key]: value };
+            return { ...node, data: updatedData };
+          }
+        }
+        return node;
+      })
+    );
+  };
+
+  const handleChange = (e) => {
+    const { name: key, value } = e.target;
+
+    const { id, data } = currentNode;
+
+    if (key === "interval" && isNaN(Number(value))) {
+      // If the key is "interval" and the input is not a number, do nothing.
+      return;
+    } else {
+      if (key === "screenshot" && value === "none") {
+        const updatedData = { ...data, [key]: value, cssSelecter: "" };
+        setData((prevData) => ({ ...prevData, data: updatedData }));
+      } else {
+        const updatedData = { ...data, [key]: value };
+        setData((prevData) => ({ ...prevData, data: updatedData }));
+      }
+
+      updateEditorNode(key, value, id);
+    }
+  };
+
+  useEffect(() => {
+    try {
+      const workflowData = parse(localStorage.getItem("workflowData"));
+      if (workflowData?.nodes?.length > 0) {
+        const { nodes, edges } = workflowData;
+        const storedNode = nodes?.filter((node) => node.id === currentNode.id);
+        const allNodes = getNodes();
+        const allEdges = getEdges();
+
+        if (nodes.length !== allNodes.length) {
+          setIsUpdated(true);
+        } else if (edges.length !== allEdges.length) {
+          setIsUpdated(true);
+        } else if (
+          storedNode[0]?.data?.description !== description ||
+          storedNode[0]?.data?.interval !== interval ||
+          storedNode[0]?.data?.url !== url ||
+          storedNode[0]?.data?.screenshot !== screenshot ||
+          storedNode[0]?.data?.cssSelecter !== cssSelecter
+        ) {
+          setIsUpdated(true);
+        } else {
+          setIsUpdated(false);
+        }
+      }
+    } catch (error) {
+      console.log({ error });
+    }
+  }, [description, interval, url, screenshot, cssSelecter, isUpdated]);
+
+  return (
+    <>
+      <div className="node-navigate" style={{ width: width <= 815 && "250px" }}>
+        <div onClick={() => setData((prev) => ({ ...prev, status: false }))}>
+          <IoArrowBack />
+          <p>{label}</p>
+        </div>
+        <AiOutlineInfoCircle />
+      </div>
+      <div className="node-editor">
+        <TextField
+          className="description"
+          name="description"
+          placeholder="Description"
+          multiline
+          rows={2}
+          value={description}
+          onChange={handleChange}
+        />
+
+        {label === "Trigger" || nodeType == "default" && (
+          <TextField
+            className="interval"
+            name="interval"
+            placeholder="Interval (in minutes)"
+            value={interval}
+            onChange={handleChange}
+          />
+        )}
+
+        {label === "New Window" || nodeType == "default" && (
+          <TextField
+            className="url"
+            name="url"
+            placeholder="URL"
+            value={url}
+            onChange={handleChange}
+          />
+        )}
+
+        {label === "Take Screenshot" || nodeType == "default" && (
+          <div className="screenshot-div">
+            <label>Select Options</label>
+            <Select
+              className="screenshot"
+              name="screenshot"
+              value={screenshot}
+              onChange={handleChange}
+            >
+              <MenuItem value={"none"}>none</MenuItem>
+              <MenuItem value={"Option 1"}>Option 1</MenuItem>
+              <MenuItem value={"Option 2"}>Option 2</MenuItem>
+              <MenuItem value={"Option 3"}>Option 3</MenuItem>
+            </Select>
+          </div>
+        )}
+
+        {(((label === "Take Screenshot" || nodeType == "default") && screenshot !== "none") ||
+          label === "Click Element" ||
+          label === "Get Text") && (
+          <TextField
+            className="css-selecter"
+            name="cssSelecter"
+            placeholder="Option Selector"
+            value={cssSelecter}
+            onChange={handleChange}
+          />
+        )}
+      </div>
+    </>
+  );
+}
+
+export default memo(NodeEditor);

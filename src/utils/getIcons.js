@@ -1,6 +1,6 @@
 import React from "react";
 import { RxLightningBolt } from "react-icons/rx";
-import { RiWindow2Line, RiCursorLine, RiParagraph,RiPlayCircleLine,RiCalendarEventFill,RiTimerLine,RiPriceTag3Line,RiPentagonLine,RiMicOffLine,RiMicLine,RiChatVoiceLine,RiStarLine,RiErrorWarningLine,RiMicFill,RiQuestionLine,RiPhoneLine,RiChatNewLine,RiFilePaper2Line,RiFunctionAddLine } from "react-icons/ri";
+import { RiWindow2Line,RiArrowDownFill, RiCursorLine, RiParagraph,RiPlayCircleLine,RiCalendarEventFill,RiTimerLine,RiPriceTag3Line,RiPentagonLine,RiMicOffLine,RiMicLine,RiChatVoiceLine,RiStarLine,RiErrorWarningLine,RiMicFill,RiQuestionLine,RiPhoneLine,RiChatNewLine,RiFilePaper2Line,RiFunctionAddLine } from "react-icons/ri";
 import { TbPhoto,TbNumber123,TbSpeakerphone,TbArrowBigDownLine,TbArrowGuide,TbFunction,TbPhoneOff,TbArrowCapsule  } from "react-icons/tb";
 
 function getIcons(requestIcon) {
@@ -33,6 +33,7 @@ function getIcons(requestIcon) {
     TbArrowCapsule : <TbArrowCapsule />, 
     RiChatVoiceLine : <RiChatVoiceLine />, 
     RiPriceTag3Line : <RiPriceTag3Line />,
+    RiArrowDownFill : <RiArrowDownFill  />,
   };
 
   return icons[requestIcon];

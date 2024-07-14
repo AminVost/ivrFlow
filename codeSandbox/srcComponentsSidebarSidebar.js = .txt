@@ -1,0 +1,283 @@
+src\Components\Sidebar\Sidebar.js = 
+import React from "react";
+import "./sidebar.css";
+
+import Menubar from "./Menubar/Menubar";
+
+function Sidebar() {
+  return (
+    <aside className="sidebar-wrapper">
+      <Menubar />
+    </aside>
+
+  );
+}
+
+export default Sidebar;
+
+
+src\Components\Sidebar\Menubar\Menubar.js  
+import React from "react";
+import "./menubar.css";
+
+import { GoWorkflow, GoHistory } from "react-icons/go";
+import { FiPackage } from "react-icons/fi";
+import { LuClock3 } from "react-icons/lu";
+import { RiHardDrive2Line } from "react-icons/ri";
+import { IoSettingsOutline } from "react-icons/io5";
+import { BiTargetLock } from "react-icons/bi";
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { HiOutlineUsers } from "react-icons/hi2";
+import { IconButton, Tooltip, Typography } from "@mui/material";
+
+const menus = [
+  { title: "Workflows", Icon: <GoWorkflow /> },
+  { title: "Packages", Icon: <FiPackage /> },
+  { title: "Schedule", Icon: <LuClock3 /> },
+  { title: "Storage", Icon: <RiHardDrive2Line /> },
+  { title: "Logs", Icon: <GoHistory /> },
+  { title: "Settings", Icon: <IoSettingsOutline /> },
+  { title: "Element selector", Icon: <BiTargetLock /> },
+];
+
+function Menubar() {
+  return (
+    <div className="menu-wrapper">
+      <div>
+        <div className="logo">
+          {/* <img src="./assets/logo.svg" /> */}
+        </div>
+
+        {menus.map((menu, idx) => (
+          <div className="option" key={idx}>
+            <Tooltip
+              title={<Typography>{menu.title}</Typography>}
+              placement="right"
+              className="menus-tooltip"
+            >
+              <IconButton disableTouchRipple>{menu.Icon}</IconButton>
+            </Tooltip>
+          </div>
+        ))}
+      </div>
+
+      <div>
+        <div className="option">
+          <IconButton disableTouchRipple>
+            <HiOutlineUsers />
+          </IconButton>
+        </div>
+        <div className="option">
+          <Tooltip
+            title={<Typography>About</Typography>}
+            placement="right"
+            className="menus-tooltip"
+          >
+            <IconButton disableTouchRipple>
+              <AiOutlineInfoCircle />
+            </IconButton>
+          </Tooltip>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Menubar;
+
+
+src\Components\Sidebar\MenuDrawer\MenuDrawer.js  
+import Drawer from "@mui/material/Drawer";
+import Button from "@mui/material/Button";
+import "./menuDrawer.css";
+import React,{ useContext } from "react";
+import { AppContext } from "../../../Context/AppContext";
+import NodeEditor from "../../Editor/EditorMenu/NodeEditor/NodeEditor";
+import Nodebar from "../../Editor/EditorMenu/Nodebar/Nodebar";
+
+function MenuDrawer() {
+  const { showDrawer, data, setShowDrawer, width } = useContext(AppContext);
+  return (
+    <div>
+      <>
+        <Drawer open={showDrawer} onClose={() => setShowDrawer(false)}>
+          <aside
+            className="menu-drawer"
+            style={{
+              display: width <= "815" ? "block" : "none",
+            }}
+          >
+            {data?.status ? <NodeEditor /> : <Nodebar />}
+          </aside>
+        </Drawer>
+      </>
+    </div>
+  );
+}
+
+export default MenuDrawer;
+
+
+src\Context\AppContext.js = 
+import React,{ createContext, useEffect, useState } from "react";
+import { useResizeDetector } from "react-resize-detector";
+
+export const AppContext = createContext();
+
+export const AppContextProvider = ({ children }) => {
+  const [data, setData] = useState({ status: false });
+  const [showSidebar, setShowSidebar] = useState(true);
+  const [showDrawer, setShowDrawer] = useState(false);
+  const { width, ref } = useResizeDetector();
+  const [nodesUpdated, setNodesUpdated] = useState(false);
+  const [isUpdated, setIsUpdated] = useState(false);
+
+  const [reactFlowInstance, setReactFlowInstance] = useState(null);
+
+  return (
+    <AppContext.Provider
+      value={{
+        data,
+        setData,
+        showSidebar,
+        setShowSidebar,
+        width,
+        ref,
+        reactFlowInstance,
+        setReactFlowInstance,
+        showDrawer,
+        setShowDrawer,
+        nodesUpdated,
+        setNodesUpdated,
+        isUpdated,
+        setIsUpdated,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
+};
+
+
+src\Pages\Homepage\Home.js = 
+import React, { useContext, useEffect } from "react";
+import Editor from "../../Components/Editor/Editor";
+import Sidebar from "../../Components/Sidebar/Sidebar";
+import "./home.css";
+import { ReactFlowProvider } from "reactflow";
+import { IoClose } from "react-icons/io5";
+import { BiPlus } from "react-icons/bi";
+import EditorMenu from "../../Components/Editor/EditorMenu/EditorMenu";
+import { AppContext } from "../../Context/AppContext";
+
+function Home() {
+  const { showSidebar, ref } = useContext(AppContext);
+
+  return (
+    <div className="container" ref={ref}>
+      {/* <Sidebar /> */}
+      <div className="editor-main">
+        {/* <div className="editor-header">
+          <div>
+            <p>Testing Workflow</p>
+            <IoClose />
+          </div>
+          <div>
+            <BiPlus />
+          </div>
+        </div> */}
+        <div
+          className="editor-tab"
+          style={{
+            gridTemplateColumns: !showSidebar && "100%",
+          }}
+        >
+          <ReactFlowProvider>
+            <EditorMenu />
+            <Editor />
+          </ReactFlowProvider>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Home;
+
+
+src\utils\findEdgeById.js = 
+function findEdgeById(id) {
+  // Check if the string contains the pattern "reactflow__edge"
+  const pattern = /reactflow__edge/i; // Use the "i" flag for case-insensitive matching
+  return pattern.test(id);
+}
+
+export default findEdgeById;
+
+
+src\utils\getIcons.js = 
+import React from "react";
+import { RxLightningBolt } from "react-icons/rx";
+import { RiWindow2Line, RiCursorLine, RiParagraph,RiPlayCircleLine,RiCalendarEventFill,RiTimerLine,RiPriceTag3Line,RiPentagonLine,RiMicOffLine,RiMicLine,RiChatVoiceLine,RiStarLine,RiErrorWarningLine,RiMicFill,RiQuestionLine,RiPhoneLine,RiChatNewLine,RiFilePaper2Line,RiFunctionAddLine } from "react-icons/ri";
+import { TbPhoto,TbNumber123,TbSpeakerphone,TbArrowBigDownLine,TbArrowGuide,TbFunction,TbPhoneOff,TbArrowCapsule  } from "react-icons/tb";
+
+function getIcons(requestIcon) {
+  const icons = {
+    RxLightningBolt: <RxLightningBolt />,
+    RiWindow2Line: <RiWindow2Line />,
+    RiCursorLine: <RiCursorLine />,
+    RiParagraph: <RiParagraph />,
+    TbPhoto: <TbPhoto />,
+    RiPlayCircleLine : <RiPlayCircleLine />,
+    TbNumber123 : <TbNumber123 />,
+    RiCalendarEventFill : <RiCalendarEventFill />,
+    RiTimerLine : <RiTimerLine />,
+    TbSpeakerphone : <TbSpeakerphone />,
+    RiErrorWarningLine : <RiErrorWarningLine />, 
+    TbArrowBigDownLine : <TbArrowBigDownLine />, 
+    RiQuestionLine : <RiQuestionLine />, 
+    RiPentagonLine : <RiPentagonLine />, 
+    RiPhoneLine : <RiPhoneLine />, 
+    RiChatNewLine : <RiChatNewLine />,
+    TbArrowGuide : <TbArrowGuide />, 
+    TbFunction : <TbFunction />, 
+    RiFunctionAddLine : <RiFunctionAddLine />, 
+    RiFilePaper2Line : <RiFilePaper2Line />, 
+    RiMicLine : <RiMicLine />, 
+    RiMicFill : <RiMicFill />, 
+    RiMicOffLine : <RiMicOffLine />, 
+    RiStarLine : <RiStarLine />, 
+    TbPhoneOff : <TbPhoneOff />, 
+    TbArrowCapsule : <TbArrowCapsule />, 
+    RiChatVoiceLine : <RiChatVoiceLine />, 
+    RiPriceTag3Line : <RiPriceTag3Line />,
+  };
+
+  return icons[requestIcon];
+}
+
+export default getIcons;
+
+
+src\utils\stringReducer.js = 
+import React from "react";
+
+function stringReducer(text, maxLength) {
+  if (text?.length > maxLength) {
+    return text.slice(0, maxLength) + "...";
+  }
+  return text;
+}
+
+export default stringReducer;
+
+
+src\utils\uniqueId.js = 
+import ShortUniqueId from "short-unique-id";
+
+function uniqueId(length) {
+  const uid = new ShortUniqueId({ length });
+  return uid.randomUUID();
+}
+
+export default uniqueId;
