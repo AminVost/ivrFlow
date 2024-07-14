@@ -142,14 +142,45 @@ function Editor() {
     return node.data.color;
   };
 
+  // const handleWorkflowData = useCallback(() => {
+  //   const workflowData = { nodes, edges };
+  //   console.log('workflowData' , workflowData)
+  //   localStorage.setItem("workflowData", stringify(workflowData));
+  // });
   const handleWorkflowData = useCallback(() => {
-    const workflowData = { nodes, edges };
+    const workflowData = {
+      nodes: nodes.map((node) => ({
+        id: node.id,
+        type: node.type,
+        position: node.position,
+        data: {
+          label: node.data.label,
+          nodeType: node.data.nodeType,
+          description: node.data.description,
+          interval: node.data.interval,
+          url: node.data.url,
+          screenshot: node.data.screenshot,
+          cssSelecter: node.data.cssSelecter,
+          Icon: node.data.Icon,
+          color: node.data.color,
+        },
+      })),
+      edges: edges.map((edge) => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        type: edge.type,
+        // Add other necessary properties here
+      })),
+    };
+    console.log("workflowData", workflowData);
     localStorage.setItem("workflowData", stringify(workflowData));
   });
 
   useEffect(() => {
     try {
       const workflowData = parse(localStorage.getItem("workflowData"));
+      console.log("get workflowData", workflowData);
       if (workflowData?.nodes?.length > 0) {
         const { nodes, edges } = workflowData;
         setNodes(nodes);
@@ -254,13 +285,6 @@ const RightPanel = memo(
             className="right-panel-button"
             onClick={() => {
               console.log("Click Publish");
-              // Swal.fire({
-              //   position: "center",
-              //   icon: "success",
-              //   title: "Publish was successful",
-              //   showConfirmButton: false,
-              //   timer: 1500,
-              // });
               setVisiblePublish(!isPublish);
               Swal.fire({
                 position: "center",
@@ -269,11 +293,11 @@ const RightPanel = memo(
                 showConfirmButton: false,
                 timer: 2000,
                 customClass: {
-                  popup: 'swal-popup',
-                  title: 'swal-title',
-                  icon: 'swal-icon'
+                  popup: "swal-popup",
+                  title: "swal-title",
+                  icon: "swal-icon",
                 },
-                background: '#27272a' // تغییر رنگ پس‌زمینه پیام
+                background: "#27272a",
               });
             }}
           >
