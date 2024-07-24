@@ -4,13 +4,17 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { AppContextProvider } from "./Context/AppContext";
+import { ThemeProvider } from '@mui/material/styles';
+import formTheme from './utils/formTheme'; // Import the custom theme
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <AppContextProvider>
-      <App />
-    </AppContextProvider>
+    <ThemeProvider theme={formTheme}>
+      <AppContextProvider>
+        <App />
+      </AppContextProvider>
+    </ThemeProvider>
   </React.StrictMode>
 );
 

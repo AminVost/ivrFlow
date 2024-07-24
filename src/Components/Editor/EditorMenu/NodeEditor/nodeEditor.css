@@ -11,23 +11,34 @@
   cursor: pointer;
 }
 
-.node-navigate > div {
+.node-navigate>div {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.node-navigate > div > p {
+.node-navigate>div>p {
   font-weight: 500;
 }
 
-.node-editor {
+/* .node-editor {
   display: flex;
   flex-direction: column;
   gap: 20px;
+} */
+
+.node-editor {
+  overflow: hidden;
+  transition: max-height 0.5s ease-in-out;
+  max-height: 84vh;
+  overflow-y: scroll;
+  padding-right: 7px;
+  box-sizing: content-box;
+  scrollbar-width: thin;
+  scrollbar-color: #8888884f #f1f1f100;
 }
 
-.description,
+.inputText,
 .interval,
 .url,
 .screenshot,
@@ -35,14 +46,14 @@
   width: 100%;
 }
 
-.description > div {
+.inputText>div {
   width: 100%;
   border: none;
   outline: none;
   color: white;
   border-radius: 8px;
   transition: 0.2s;
-  padding: 8px 16px;
+  /* padding: 8px 16px; */
   background-color: #313134;
 }
 
@@ -54,18 +65,19 @@
   background-color: transparent;
 }
 
-.description > div:hover {
+.inputText>div:hover {
   background-color: #39393d;
   transition: 0.2s;
 }
 
-.description > div > textarea {
+.inputText>div>textarea,
+.inputText>div>input {
   color: white;
 }
 
-.interval > div,
-.url > div,
-.css-selecter > div {
+.interval>div,
+.url>div,
+.css-selecter>div {
   width: 100%;
   border: none;
   outline: none;
@@ -79,13 +91,13 @@
   width: 100%;
 }
 
-.screenshot-div > label {
+.screenshot-div>label {
   position: relative;
   font-size: 14px;
   bottom: 3px;
 }
 
-.screenshot > div {
+.screenshot>div {
   width: 100%;
   border: none;
   outline: none;

@@ -1,11 +1,4 @@
-import { MenuItem, Select, TextField } from "@mui/material";
-import React, {
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { memo, useCallback, useContext, useEffect } from "react";
 import "./nodeEditor.css";
 import { IoArrowBack } from "react-icons/io5";
 import { AiOutlineInfoCircle } from "react-icons/ai";
@@ -13,7 +6,31 @@ import { AppContext } from "../../../../Context/AppContext";
 import { useReactFlow } from "reactflow";
 import { parse } from "flatted";
 
-function NodeEditor() {
+import SayNumNodeEditor          from "./nodesType/SayNumNodeEditor";
+import PlaybackNodeEditor        from "./nodesType/PlaybackNodeEditor";
+import PlayErrorNodeEditor       from "./nodesType/PlayErrorNodeEditor";
+import SayDateNodeEditor         from "./nodesType/SayDateNodeEditor";
+import SayTimeNodeEditor         from "./nodesType/SayTimeNodeEditor";
+import PlayToneNodeEditor        from "./nodesType/PlayToneNodeEditor";
+import InputNodeEditor           from "./nodesType/InputNodeEditor";
+import IfNodeEditor              from "./nodesType/IfNodeEditor";
+import SwitchNodeEditor          from "./nodesType/SwitchNodeEditor";
+import DialNodeEditor            from "./nodesType/DialNodeEditor";
+import SetNodeEditor             from "./nodesType/SetNodeEditor";
+import GoToNodeEditor            from "./nodesType/GoToNodeEditor";
+import CallFunctionNodeEditor    from "./nodesType/CallFunctionNodeEditor";
+import RpcNodeEditor             from "./nodesType/RpcNodeEditor";
+import SendFaxNodeEditor         from "./nodesType/SendFaxNodeEditor";
+import RecordNodeEditor          from "./nodesType/RecordNodeEditor";
+import RecordSaveNodeEditor      from "./nodesType/RecordSaveNodeEditor";
+import RecordDeleteNodeEditor    from "./nodesType/RecordDeleteNodeEditor";
+import AsteriskCmdNodeEditor     from "./nodesType/AsteriskCmdNodeEditor";
+import HangUpNodeEditor          from "./nodesType/HangUpNodeEditor";
+import ReturnNodeEditor          from "./nodesType/ReturnNodeEditor";
+import InputVoiceNodeEditor      from "./nodesType/InputVoiceNodeEditor";
+import GoToTagNodeEditor         from "./nodesType/GoToTagNodeEditor";
+
+const NodeEditor = () => {
   const { setNodes, getNodes, getEdges } = useReactFlow();
   const {
     data: currentNode,
@@ -23,20 +40,26 @@ function NodeEditor() {
     isUpdated,
   } = useContext(AppContext);
   const { data } = currentNode;
-  // console.log("dataa=> ", data.nodeType);
-  const { label, description, interval, url, screenshot, cssSelecter,nodeType } = data;
+  // const { title, nodeType } = data;
+  // console.log('currentNode=> ' , currentNode);
+  // console.log('data=> ' , data);
+  const {
+    title,
+    description,
+    interval,
+    url,
+    screenshot,
+    cssSelecter,
+    nodeType,
+  } = data;
+  console.log('data=>' , data)
 
   const updateEditorNode = (key, value, id) => {
     setNodes((nodes) =>
       nodes.map((node) => {
         if (node.id === id) {
-          if (key === "screenshot" && value === "none") {
-            const updatedData = { ...node.data, [key]: value, cssSelecter: "" };
-            return { ...node, data: updatedData };
-          } else {
-            const updatedData = { ...node.data, [key]: value };
-            return { ...node, data: updatedData };
-          }
+          const updatedData = { ...node.data, [key]: value };
+          return { ...node, data: updatedData };
         }
         return node;
       })
@@ -44,24 +67,18 @@ function NodeEditor() {
   };
 
   const handleChange = (e) => {
+    // console.log('e =>', e);
     const { name: key, value } = e.target;
-
+    console.log('key, value =>', key, value);
     const { id, data } = currentNode;
 
     if (key === "interval" && isNaN(Number(value))) {
-      // If the key is "interval" and the input is not a number, do nothing.
       return;
-    } else {
-      if (key === "screenshot" && value === "none") {
-        const updatedData = { ...data, [key]: value, cssSelecter: "" };
-        setData((prevData) => ({ ...prevData, data: updatedData }));
-      } else {
-        const updatedData = { ...data, [key]: value };
-        setData((prevData) => ({ ...prevData, data: updatedData }));
-      }
-
-      updateEditorNode(key, value, id);
     }
+
+    const updatedData = { ...data, [key]: value };
+    setData((prevData) => ({ ...prevData, data: updatedData }));
+    updateEditorNode(key, value, id);
   };
 
   useEffect(() => {
@@ -73,16 +90,12 @@ function NodeEditor() {
         const allNodes = getNodes();
         const allEdges = getEdges();
 
-        if (nodes.length !== allNodes.length) {
-          setIsUpdated(true);
-        } else if (edges.length !== allEdges.length) {
-          setIsUpdated(true);
-        } else if (
-          storedNode[0]?.data?.description !== description ||
-          storedNode[0]?.data?.interval !== interval ||
-          storedNode[0]?.data?.url !== url ||
-          storedNode[0]?.data?.screenshot !== screenshot ||
-          storedNode[0]?.data?.cssSelecter !== cssSelecter
+        if (
+          nodes.length !== allNodes.length ||
+          edges.length !== allEdges.length ||
+          storedNode[0]?.data?.description !== data.description ||
+          storedNode[0]?.data?.interval !== data.interval ||
+          storedNode[0]?.data?.url !== data.url
         ) {
           setIsUpdated(true);
         } else {
@@ -92,79 +105,74 @@ function NodeEditor() {
     } catch (error) {
       console.log({ error });
     }
-  }, [description, interval, url, screenshot, cssSelecter, isUpdated]);
+  }, [data, isUpdated, setIsUpdated, currentNode.id, getNodes, getEdges]);
+
+  const renderNodeEditor = () => {
+    // console.log('nodeType ' , nodeType)
+    switch (nodeType) {
+      case "Playback":
+        return <PlaybackNodeEditor data={data} handleChange={handleChange} />;
+      case "sayNum":
+        return <SayNumNodeEditor data={data} handleChange={handleChange} />;
+      case "playError":
+        return <PlayErrorNodeEditor data={data} handleChange={handleChange} />;
+      case "sayDate":
+        return <SayDateNodeEditor data={data} handleChange={handleChange} />;
+      case "sayTime":
+        return <SayTimeNodeEditor data={data} handleChange={handleChange} />;
+      case "playTone":
+        return <PlayToneNodeEditor data={data} handleChange={handleChange} />;
+      case "Input":
+        return <InputNodeEditor data={data} handleChange={handleChange} />;
+      case "If":
+        return <IfNodeEditor data={data} handleChange={handleChange} />;
+      case "Switch":
+        return <SwitchNodeEditor data={data} handleChange={handleChange} />;
+      case "Dial":
+        return <DialNodeEditor data={data} handleChange={handleChange} />;
+      case "Set":
+        return <SetNodeEditor data={data} handleChange={handleChange} />;
+      case "GoTo":
+        return <GoToNodeEditor data={data} handleChange={handleChange} />;
+      case "CallFunction":
+        return <CallFunctionNodeEditor data={data} handleChange={handleChange} />;
+      case "Rpc":
+        return <RpcNodeEditor data={data} handleChange={handleChange} />;
+      case "SendFax":
+        return <SendFaxNodeEditor data={data} handleChange={handleChange} />;
+      case "Record":
+        return <RecordNodeEditor data={data} handleChange={handleChange} />;
+      case "RecordSave":
+        return <RecordSaveNodeEditor data={data} handleChange={handleChange} />;
+      case "RecordDelete":
+        return <RecordDeleteNodeEditor data={data} handleChange={handleChange} />;
+      case "AsteriskCmd":
+        return <AsteriskCmdNodeEditor data={data} handleChange={handleChange} />;
+      case "HangUp":
+        return <HangUpNodeEditor data={data} handleChange={handleChange} />;
+      case "Return":
+        return <ReturnNodeEditor data={data} handleChange={handleChange} />;
+      case "inputVoice":
+        return <InputVoiceNodeEditor data={data} handleChange={handleChange} />;
+      case "GoToTag":
+        return <GoToTagNodeEditor data={data} handleChange={handleChange} />;
+      default:
+        return <div>Select a node to edit</div>;
+    }
+  };
 
   return (
     <>
       <div className="node-navigate" style={{ width: width <= 815 && "250px" }}>
         <div onClick={() => setData((prev) => ({ ...prev, status: false }))}>
           <IoArrowBack />
-          <p>{label}</p>
+          <p>{title}</p>
         </div>
         <AiOutlineInfoCircle />
       </div>
-      <div className="node-editor">
-        <TextField
-          className="description"
-          name="description"
-          placeholder="Description"
-          multiline
-          rows={2}
-          value={description}
-          onChange={handleChange}
-        />
-
-        {label === "Trigger" || nodeType == "default" && (
-          <TextField
-            className="interval"
-            name="interval"
-            placeholder="Interval (in minutes)"
-            value={interval}
-            onChange={handleChange}
-          />
-        )}
-
-        {label === "New Window" || nodeType == "default" && (
-          <TextField
-            className="url"
-            name="url"
-            placeholder="URL"
-            value={url}
-            onChange={handleChange}
-          />
-        )}
-
-        {label === "Take Screenshot" || nodeType == "default" && (
-          <div className="screenshot-div">
-            <label>Select Options</label>
-            <Select
-              className="screenshot"
-              name="screenshot"
-              value={screenshot}
-              onChange={handleChange}
-            >
-              <MenuItem value={"none"}>none</MenuItem>
-              <MenuItem value={"Option 1"}>Option 1</MenuItem>
-              <MenuItem value={"Option 2"}>Option 2</MenuItem>
-              <MenuItem value={"Option 3"}>Option 3</MenuItem>
-            </Select>
-          </div>
-        )}
-
-        {(((label === "Take Screenshot" || nodeType == "default") && screenshot !== "none") ||
-          label === "Click Element" ||
-          label === "Get Text") && (
-          <TextField
-            className="css-selecter"
-            name="cssSelecter"
-            placeholder="Option Selector"
-            value={cssSelecter}
-            onChange={handleChange}
-          />
-        )}
-      </div>
+      <div className="node-editor">{renderNodeEditor()}</div>
     </>
   );
-}
+};
 
 export default memo(NodeEditor);

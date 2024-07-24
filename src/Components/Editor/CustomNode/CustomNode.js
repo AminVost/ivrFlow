@@ -20,7 +20,7 @@ const CustomNode = ({ id }) => {
 
   const currentNode = getNodes()?.filter((node) => node.id === id);
   const { type, data, selected } = currentNode[0];
-  const { label, nodeType, description, Icon, color, ref } = data;
+  const { title, nodeType, description, Icon, color, ref } = data;
 
   const centerSelectedNode = (elementId, reactFlowInstance) => {
     if (reactFlowInstance) {
@@ -51,9 +51,8 @@ const CustomNode = ({ id }) => {
 
   return (
     <>
-      {nodeType === "default" && (
+      {nodeType !== "start" && (
         <Handle className="edge-handle top" type="source" position="top" />
-        // ''
       )}
       {nodeType !== "start" && (
         <div
@@ -99,22 +98,22 @@ const CustomNode = ({ id }) => {
       >
         <div
           className={`${nodeType === "start" ? "startNodeIcon" : ""}`}
-          style={{ backgroundColor: color }}
+          style={{ backgroundColor: nodeType == "start" ? "white" : color }}
         >
           {getIcons(Icon)}
         </div>
         <div>
-          <p className="nodeLabel">{stringReducer(label, 15)}</p>
+          <p className="nodeLabel">{stringReducer(title, 15)}</p>
           <p className="nodeDesc">{stringReducer(description, 16)}</p>
         </div>
       </div>
 
-      {(nodeType === "default" || nodeType === "input") && (
+      {/* {(nodeType === "default" || nodeType === "input") && (
         <Handle className="edge-handle" type="target" position="bottom" />
-      )}
-      {nodeType === "start" && (
+      )} */}
+      {/* {nodeType === "start" && ( */}
         <Handle className="edge-handle" type="target" position="bottom" />
-      )}
+      {/* // )} */}
     </>
   );
 };

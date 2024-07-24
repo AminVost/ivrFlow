@@ -8,10 +8,10 @@ import { IconButton } from "@mui/material";
 function NodeComp({ title, type, icon, color }) {
   const [isVisible, setIsVisible] = useState(false);
 
-  const onDragStart = (event, type, label, Icon, color) => {
+  const onDragStart = (event, type, title, Icon, color) => {
     const dragData = {
       type,
-      label,
+      title,
       Icon,
       color,
     };

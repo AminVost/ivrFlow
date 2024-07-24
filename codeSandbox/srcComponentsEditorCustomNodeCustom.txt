@@ -44,62 +44,76 @@ const CustomNode = ({ id }) => {
   };
 
   const deleteNode = useCallback(() => {
-    setNodes((nodes) => nodes.filter((node) => node.id !== id));
-    setData((prev) => ({ ...prev, status: false }));
+    if (id !== "start") {
+      setNodes((nodes) => nodes.filter((node) => node.id !== id));
+      setData((prev) => ({ ...prev, status: false }));
+    }
   }, []);
 
   return (
     <>
       {nodeType === "default" && (
         <Handle className="edge-handle top" type="source" position="top" />
+        // ''
+      )}
+      {nodeType !== "start" && (
+        <div
+          className={`toolbar-wrapper ${nodeType === "start" ? "hidden" : ""}`}
+          style={{ display: isVisible ? "flex" : "none" }}
+          onMouseEnter={() => setIsVisible(true)}
+          onMouseLeave={() => setIsVisible(false)}
+        >
+          <p>{id}</p>
+          <div>
+            <AiOutlineDelete
+              onClick={() => {
+                deleteNode();
+                setIsUpdated(true);
+              }}
+            />
+            <BiPencil
+              onClick={() => {
+                setData((prev) => ({
+                  ...prev,
+                  id,
+                  selected,
+                  type,
+                  data,
+                  status: true,
+                }));
+
+                setShowSidebar(true);
+                setShowDrawer((state) => !state);
+              }}
+            />
+          </div>
+        </div>
       )}
 
       <div
-        className="toolbar-wrapper"
-        style={{ display: isVisible ? "flex" : "none" }}
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
-      >
-        <p>{id}</p>
-        <div>
-          <AiOutlineDelete
-            onClick={() => {
-              deleteNode();
-              setIsUpdated(true);
-            }}
-          />
-          <BiPencil
-            onClick={() => {
-              setData((prev) => ({
-                ...prev,
-                id,
-                selected,
-                type,
-                data,
-                status: true,
-              }));
-
-              setShowSidebar(true);
-              setShowDrawer((state) => !state);
-            }}
-          />
-        </div>
-      </div>
-
-      <div
-        onMouseEnter={() => setIsVisible(true)}
-        onMouseLeave={() => setIsVisible(false)}
-        className={`custom-node-wrapper ${selected ? "selected" : ""}`}
+        className={`custom-node-wrapper ${selected ? "selected" : ""} ${
+          nodeType === "start" ? "startClass" : ""
+        }`}
         onClick={() => centerSelectedNode(id, reactFlowInstance)}
       >
-        <div style={{ backgroundColor: color }}>{getIcons(Icon)}</div>
+        <div
+          className={`${nodeType === "start" ? "startNodeIcon" : ""}`}
+          style={{ backgroundColor: color }}
+        >
+          {getIcons(Icon)}
+        </div>
         <div>
-          <p>{stringReducer(label, 15)}</p>
-          <p>{stringReducer(description, 16)}</p>
+          <p className="nodeLabel">{stringReducer(label, 15)}</p>
+          <p className="nodeDesc">{stringReducer(description, 16)}</p>
         </div>
       </div>
 
       {(nodeType === "default" || nodeType === "input") && (
+        <Handle className="edge-handle" type="target" position="bottom" />
+      )}
+      {nodeType === "start" && (
         <Handle className="edge-handle" type="target" position="bottom" />
       )}
     </>

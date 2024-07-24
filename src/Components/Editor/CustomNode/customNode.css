@@ -16,7 +16,7 @@
 }
 
 .custom-node-wrapper>div:first-child {
-  padding: 8px;
+  padding: 6px;
   margin-right: 8px;
   display: flex;
   justify-content: center;
@@ -95,17 +95,17 @@
 }
 
 .custom-node-wrapper.startClass>div>p.nodeLabel {
-  color: black !important;
+  color: white !important;
   font-size: 21px;
 }
 
 .custom-node-wrapper.startClass {
   justify-content: center;
-  background: white;
+  background: #ffffff26;
   border-radius: 50%;
   width: 170px;
 }
 
 .startNodeIcon svg {
-  fill: white;
+  fill: rgb(0, 0, 0);
 }

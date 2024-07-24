@@ -23,7 +23,7 @@ import ContextMenu from "./ContextMenu/ContextMenu";
 import { RiSaveLine } from "react-icons/ri";
 import { TbSend } from "react-icons/tb";
 import { parse, stringify, toJSON, fromJSON } from "flatted";
-import { IconButton } from "@mui/material";
+import { colors, IconButton } from "@mui/material";
 import { PiSidebarSimpleFill } from "react-icons/pi";
 import { BiFullscreen } from "react-icons/bi";
 import { AppContext } from "../../Context/AppContext";
@@ -36,14 +36,10 @@ const defaultStartNode = {
   id: "start",
   type: "custom", // Ensure 'custom' matches your node type if needed
   position: { x: 250, y: 100 }, // Set initial position
+  color : 'white',
   data: {
-    label: "START",
+    title: "START",
     nodeType: "start",
-    description: "",
-    interval: "",
-    url: "",
-    screenshot: "none",
-    cssSelecter: "",
     Icon: "RiArrowDownFill", // Example icon, use any appropriate icon
   },
 };
@@ -90,7 +86,7 @@ function Editor() {
 
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
       const data = event.dataTransfer.getData("application/reactflow");
-      const { type, label, Icon, color } = JSON.parse(data);
+      const { type, title, Icon, color } = JSON.parse(data);
 
       // check if the dropped element is valid
       if (typeof type === "undefined" || !type) {
@@ -107,16 +103,16 @@ function Editor() {
         type: "custom",
         position,
         data: {
-          label,
+          title,
           nodeType: type,
-          description: "",
-          interval: "",
-          url: "",
-          screenshot: "none",
-          cssSelecter: "",
+          // description: "",
+          // interval: "",
+          // url: "",
+          // screenshot: "none",
+          // cssSelecter: "",
           Icon,
           color,
-          ref,
+          // ref,
         },
       };
 
@@ -161,15 +157,12 @@ function Editor() {
         type: node.type,
         position: node.position,
         data: {
-          label: node.data.label,
-          nodeType: node.data.nodeType,
-          description: node.data.description,
-          interval: node.data.interval,
-          url: node.data.url,
-          screenshot: node.data.screenshot,
-          cssSelecter: node.data.cssSelecter,
-          Icon: node.data.Icon,
-          color: node.data.color,
+          // title: node.data.title,
+          // nodeType: node.data.nodeType,
+          // description: node.data.description,
+          // Icon: node.data.Icon,
+          // color: node.data.color,
+          ...node.data,
         },
       })),
       edges: edges.map((edge) => ({
@@ -225,18 +218,6 @@ function Editor() {
   //   console.log("nodes", nodes);
   // }, [nodes]);
 
-  const onBeforeDelete = useCallback(({ nodes, edges }) => {
-    const nodesToDelete = nodes.filter((node) => node.id !== "start");
-    const edgesToDelete = edges;
-    if (nodes.length !== nodesToDelete.length) {
-      Swal.fire({
-        icon: "error",
-        title: "Cannot delete 'Start' node",
-        text: "'Start' node cannot be deleted.",
-      });
-    }
-    return { nodes: nodesToDelete, edges: edgesToDelete };
-  }, []);
 
   return (
     <section className="editor-wrapper" ref={reactFlowWrapper}>
@@ -346,7 +327,7 @@ const RightPanel = memo(
                   title: "swal-title",
                   icon: "swal-icon",
                 },
-                background: "#27272a", // تغییر رنگ پس‌زمینه پیام
+                background: "#27272a",
               });
             }}
           >
