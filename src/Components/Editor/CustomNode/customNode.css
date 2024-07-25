@@ -39,6 +39,11 @@
   font-weight: 400;
   color: #e4e4cf;
 }
+.custom-node-wrapper>div p.nodeDesc {
+  margin-top: .3rem;
+  font-size: 15px;
+  color: #9E9E9E !important;
+}
 
 .toolbar-wrapper {
   position: absolute;

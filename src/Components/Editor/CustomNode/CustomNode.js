@@ -20,7 +20,7 @@ const CustomNode = ({ id }) => {
 
   const currentNode = getNodes()?.filter((node) => node.id === id);
   const { type, data, selected } = currentNode[0];
-  const { title, nodeType, description, Icon, color, ref } = data;
+  const { title, nodeType, description, Icon, color, ref ,label} = data;
 
   const centerSelectedNode = (elementId, reactFlowInstance) => {
     if (reactFlowInstance) {
@@ -61,7 +61,7 @@ const CustomNode = ({ id }) => {
           onMouseEnter={() => setIsVisible(true)}
           onMouseLeave={() => setIsVisible(false)}
         >
-          <p>{id}</p>
+          {/* <p>{id}</p> */}
           <div>
             <AiOutlineDelete
               onClick={() => {
@@ -104,7 +104,7 @@ const CustomNode = ({ id }) => {
         </div>
         <div>
           <p className="nodeLabel">{stringReducer(title, 15)}</p>
-          <p className="nodeDesc">{stringReducer(description, 16)}</p>
+          <p className="nodeDesc">{stringReducer(label, 16)}</p>
         </div>
       </div>
 

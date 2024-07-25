@@ -30,12 +30,13 @@
 .node-editor {
   overflow: hidden;
   transition: max-height 0.5s ease-in-out;
-  max-height: 84vh;
+  max-height: 87vh;
   overflow-y: scroll;
   padding-right: 7px;
   box-sizing: content-box;
   scrollbar-width: thin;
   scrollbar-color: #8888884f #f1f1f100;
+  padding-top: .5rem;
 }
 
 .inputText,

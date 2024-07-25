@@ -1,14 +1,11 @@
 import React from "react";
 import { TextField, Box, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import InfoTooltipAdornment from '../../../../../utils/InfoTooltipAdornment'; // Adjust the import path accordingly
+import InfoTooltipAdornment from '../../../../../utils/InfoTooltipAdornment';
 
 const PlayErrorNodeEditor = ({ data, handleChange }) => {
   return (
     <Box
       component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '100%' },
-      }}
       noValidate
       autoComplete="off"
     >
@@ -71,7 +68,7 @@ const PlayErrorNodeEditor = ({ data, handleChange }) => {
       />
 
 
-      <FormControl sx={{ m: 1, width: '100%' }}>
+      <FormControl>
         <InputLabel id="error-group-label">Error Group</InputLabel>
         <Select
           labelId="error-group-label"
@@ -80,11 +77,6 @@ const PlayErrorNodeEditor = ({ data, handleChange }) => {
           value={data.errorGroup || ''}
           onChange={handleChange}
           endAdornment={<InfoTooltipAdornment tooltipText="This is the error group" />}
-          sx={{
-            '& .MuiSelect-select': {
-              paddingRight: '60px'
-            }
-          }}
         >
           <MenuItem value="group1">Group 1</MenuItem>
           <MenuItem value="group2">Group 2</MenuItem>

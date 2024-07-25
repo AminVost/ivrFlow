@@ -1,5 +1,5 @@
 // theme.js
-import { Padding } from '@mui/icons-material';
+import { Padding, PaddingOutlined } from '@mui/icons-material';
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -48,6 +48,7 @@ const theme = createTheme({
           color: '#ffffff3d',
           '&.Mui-focused': {
             color: '#1976d2',
+            // backgroundColor: '#1976d2',
           },
         },
       },
@@ -59,6 +60,14 @@ const theme = createTheme({
         },
       },
     },
+    MuiFormControl: {
+      styleOverrides: {
+        root: {
+          marginBottom: 13,
+          width: '100%'
+          },          
+        },
+      },
   },
 });
 
