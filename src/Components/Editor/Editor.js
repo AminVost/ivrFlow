@@ -36,7 +36,7 @@ const defaultStartNode = {
   id: "start",
   type: "custom", // Ensure 'custom' matches your node type if needed
   position: { x: 250, y: 100 }, // Set initial position
-  color : 'white',
+  color: 'white',
   data: {
     title: "START",
     nodeType: "start",
@@ -115,7 +115,7 @@ function Editor() {
           // ref,
         },
       };
-
+      setIsUpdated(true);
       setNodes((nds) => nds.concat(newNode));
     },
     [reactFlowInstance, setNodes]
