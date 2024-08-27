@@ -15,7 +15,6 @@ const PlaybackNodeEditor = ({ data, handleChange }) => {
   const [playbackSecondSelectValue, setPlaybackSecondSelectValue] = useState(
     data?.fileSecondSelect
   );
-  console.log("data.fileSecondSelect ", data.fileSecondSelect);
 
   const handleFirstSelectChange = (event) => {
     const value = event.target.value;

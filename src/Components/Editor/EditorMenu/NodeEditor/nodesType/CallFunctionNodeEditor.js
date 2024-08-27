@@ -1,25 +1,60 @@
 import React from "react";
-import { TextField } from "@mui/material";
+import { TextField, Box, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
 const CallFunctionNodeEditor = ({ data, handleChange }) => {
   return (
     <>
-      <TextField
-        className="description"
-        name="description"
-        placeholder="Description"
-        multiline
-        rows={2}
-        value={data.description}
-        onChange={handleChange}
-      />
-      <TextField
-        className="interval"
-        name="interval"
-        placeholder="Interval (in minutes)"
-        value={data.interval}
-        onChange={handleChange}
-      />
+      <Box component="form" noValidate autoComplete="off">
+        <TextField
+          label="Label"
+          name="label"
+          value={data.label || ''}
+          onChange={handleChange}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
+        <TextField
+          label="Priority"
+          name="priority"
+          type="number"
+          value={data.priority || ''}
+          onChange={handleChange}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
+        <TextField
+          label="Action"
+          name="action"
+          value="call_function"
+          InputProps={{ readOnly: true }}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
+        <FormControl sx={{ mb: 1.2, width: '100%' }}>
+          <InputLabel id="advanceIvr-label">Advance IVR</InputLabel>
+          <Select
+            labelId="advanceIvr-label"
+            id="advanceIvr-select"
+            name="advanceIvr"
+            value={data.advanceIvr || ''}
+            onChange={handleChange}
+          >
+            {['iv1', 'iv2', 'iv3', 'iv4'].map((ext) => (
+              <MenuItem key={ext} value={ext}>{ext}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <TextField
+          label="Comments"
+          name="comments"
+          multiline
+          rows={3}
+          value={data.comments || ''}
+          onChange={handleChange}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
+      </Box>
     </>
   );
 };

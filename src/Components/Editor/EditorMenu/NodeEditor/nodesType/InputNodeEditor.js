@@ -1,8 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import { TextField, Box, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import InfoTooltipAdornment from '../../../../../utils/InfoTooltipAdornment';
 
 const InputNodeEditor = ({ data, handleChange }) => {
+  const [file, setFile] = useState('');
+  const [fileGroup, setFileGroup] = useState('');
+
+  const fileOptions = [
+    { value: 'file1', label: 'File 1', groups: ['Group 1A', 'Group 1B'] },
+    { value: 'file2', label: 'File 2', groups: ['Group 2A', 'Group 2B'] },
+    { value: 'file3', label: 'File 3', groups: ['Group 3A', 'Group 3B'] },
+  ];
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.value;
+    setFile(selectedFile);
+
+    // Reset fileGroup when the file changes
+    setFileGroup('');
+    handleFileGroupChange({ target: { name: 'fileGroup', value: null } });
+    handleChange(event);
+  };
+
+  const handleFileGroupChange = (event) => {
+    console.log('event ' , event)
+    setFileGroup(event.target.value);
+    handleChange(event);
+  };
+
+  const currentFileGroups = fileOptions.find((option) => option.value === file)?.groups || [];
+
   return (
     <Box
       component="form"
@@ -81,25 +108,49 @@ const InputNodeEditor = ({ data, handleChange }) => {
         }}
       />
 
-
       <FormControl sx={{ mb: 1.2, width: '100%' }}>
-        <InputLabel id="error-group-label">Error Group</InputLabel>
+        <InputLabel id="file-label">File</InputLabel>
         <Select
-          labelId="error-group-label"
-          id="error-group-select"
-          name="errorGroup"
-          value={data.errorGroup || ''}
-          onChange={handleChange}
-          endAdornment={<InfoTooltipAdornment tooltipText="This is the error group" />}
+          labelId="file-label"
+          id="file-select"
+          name="file"
+          value={file}
+          onChange={handleFileChange}
+          endAdornment={<InfoTooltipAdornment tooltipText="This is the file" />}
           sx={{
             '& .MuiSelect-select': {
               paddingRight: '60px'
             }
           }}
         >
-          <MenuItem value="group1">Group 1</MenuItem>
-          <MenuItem value="group2">Group 2</MenuItem>
-          <MenuItem value="group3">Group 3</MenuItem>
+          {fileOptions.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <FormControl sx={{ mb: 1.2, width: '100%' }} disabled={!file}>
+        <InputLabel id="file-group-label">File Group</InputLabel>
+        <Select
+          labelId="file-group-label"
+          id="file-group-select"
+          name="fileGroup"
+          value={fileGroup}
+          onChange={handleFileGroupChange}
+          endAdornment={<InfoTooltipAdornment tooltipText="This is the file group" />}
+          sx={{
+            '& .MuiSelect-select': {
+              paddingRight: '60px'
+            }
+          }}
+        >
+          {currentFileGroups.map((group, index) => (
+            <MenuItem key={index} value={group}>
+              {group}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
 

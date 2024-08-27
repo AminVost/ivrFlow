@@ -1,7 +1,7 @@
 import React from "react";
 import { TextField, Box, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
-const GoToTagNodeEditor = ({ data, handleChange }) => {
+const SetRecordPlanNodeEditor = ({ data, handleChange }) => {
   return (
     <>
       <Box component="form" noValidate autoComplete="off">
@@ -25,29 +25,21 @@ const GoToTagNodeEditor = ({ data, handleChange }) => {
         <TextField
           label="Action"
           name="action"
-          value="goto_tag"
+          value="set_record_plan"
           InputProps={{ readOnly: true }}
           fullWidth
           sx={{ mb: 1.2 }}
         />
-        <TextField
-          label="Var Name"
-          name="varName"
-          value={data.varName || ''}
-          onChange={handleChange}
-          fullWidth
-          sx={{ mb: 1.2 }}
-        />
         <FormControl sx={{ mb: 1.2, width: '100%' }}>
-          <InputLabel id="ivrTagGroup-label">Ivr Tag Group</InputLabel>
+          <InputLabel id="setRecordPlan-label">set_record_plan</InputLabel>
           <Select
-            labelId="ivrTagGroup-label"
-            id="ivrTagGroup-select"
-            name="ivrTagGroup"
-            value={data.ivrTagGroup || ''}
+            labelId="setRecordPlan-label"
+            id="setRecordPlan-select"
+            name="setRecordPlan"
+            value={data.setRecordPlan || ''}
             onChange={handleChange}
           >
-            {['Ivr Tag Group 1', 'Ivr Tag Group 2', 'Ivr Tag Group 3'].map((ext) => (
+            {['Record Plan 1', 'Record Plan 2'].map((ext) => (
               <MenuItem key={ext} value={ext}>{ext}</MenuItem>
             ))}
           </Select>
@@ -67,4 +59,4 @@ const GoToTagNodeEditor = ({ data, handleChange }) => {
   );
 };
 
-export default GoToTagNodeEditor;
+export default SetRecordPlanNodeEditor;

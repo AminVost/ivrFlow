@@ -1,25 +1,46 @@
 import React from "react";
-import { TextField } from "@mui/material";
+import { TextField, Box} from "@mui/material";
 
 const RecordDeleteNodeEditor = ({ data, handleChange }) => {
   return (
     <>
-      <TextField
-        className="description"
-        name="description"
-        placeholder="Description"
-        multiline
-        rows={2}
-        value={data.description}
-        onChange={handleChange}
-      />
-      <TextField
-        className="interval"
-        name="interval"
-        placeholder="Interval (in minutes)"
-        value={data.interval}
-        onChange={handleChange}
-      />
+      <Box component="form" noValidate autoComplete="off">
+        <TextField
+          label="Label"
+          name="label"
+          value={data.label || ''}
+          onChange={handleChange}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
+        <TextField
+          label="Priority"
+          name="priority"
+          type="number"
+          value={data.priority || ''}
+          onChange={handleChange}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
+        <TextField
+          label="Action"
+          name="action"
+          value="record_delete"
+          InputProps={{ readOnly: true }}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
+        <TextField
+          label="Comments"
+          name="comments"
+          multiline
+          rows={3}
+          value={data.comments || ''}
+          onChange={handleChange}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
+      </Box>
     </>
   );
 };

@@ -147,6 +147,12 @@ const nodes = [
     icon: "RiPriceTag3Line",
     color: "#f0ff33",
   },
+  {
+    title: "Set Record Plan",
+    type: "SetRecordPlan",
+    icon: "RiPriceTag3Line",
+    color: "#b90f13",
+  },
 ];
 
 function Nodebar() {

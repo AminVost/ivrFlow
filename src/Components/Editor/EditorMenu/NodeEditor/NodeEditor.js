@@ -29,6 +29,7 @@ import HangUpNodeEditor from "./nodesType/HangUpNodeEditor";
 import ReturnNodeEditor from "./nodesType/ReturnNodeEditor";
 import InputVoiceNodeEditor from "./nodesType/InputVoiceNodeEditor";
 import GoToTagNodeEditor from "./nodesType/GoToTagNodeEditor";
+import SetRecordPlanNodeEditor from "./nodesType/SetRecordPlanNodeEditor";
 
 const NodeEditor = () => {
   const { setNodes, getNodes, getEdges } = useReactFlow();
@@ -40,9 +41,6 @@ const NodeEditor = () => {
     isUpdated,
   } = useContext(AppContext);
   const { data } = currentNode;
-  // const { title, nodeType } = data;
-  // console.log('currentNode=> ' , currentNode);
-  // console.log('data=> ' , data);
   const {
     title,
     nodeType,
@@ -53,13 +51,8 @@ const NodeEditor = () => {
     setNodes((nodes) =>
       nodes.map((node) => {
         if (node.id === id) {
-          if (key !== 'data') {
-            const updatedData = { ...node.data, [key]: value };
-            return { ...node, data: updatedData };
-          } else {
-            const updatedData = { ...node.data, [key]: value};
-            return { ...node, data: updatedData };
-          }
+          const updatedData = { ...node.data, [key]: value };
+          return { ...node, data: updatedData };
         }
         return node;
       })
@@ -70,14 +63,8 @@ const NodeEditor = () => {
     const { name: key, value } = e.target;
     console.log('key, value =>', key, value);
     const { id, data } = currentNode;
-    // if (key !== 'data') {
-      // console.log('key !== data')
-      const updatedData = { ...data, [key]: value };
-      setData((prevData) => ({ ...prevData, data: updatedData }));
-    // } else {
-    //   console.log('key == data')
-    //   setData((prevData) => ({ ...prevData, data: value }));
-    // }
+    const updatedData = { ...data, [key]: value };
+    setData((prevData) => ({ ...prevData, data: updatedData }));
     updateEditorNode(key, value, id);
   };
 
@@ -156,6 +143,8 @@ const NodeEditor = () => {
         return <InputVoiceNodeEditor data={data} handleChange={handleChange} />;
       case "GoToTag":
         return <GoToTagNodeEditor data={data} handleChange={handleChange} />;
+      case "SetRecordPlan":
+        return <SetRecordPlanNodeEditor data={data} handleChange={handleChange} />;
       default:
         return <div>Select a node to edit</div>;
     }
