@@ -2,6 +2,16 @@ import React from "react";
 import { TextField, MenuItem, FormControl, Select, InputLabel, Box } from "@mui/material";
 
 const SayDateNodeEditor = ({ data, handleChange }) => {
+
+  const handleDateChange = (event) => {
+    const value = event.target.value;
+    // Allow partial matches to enable typing step by step
+    const regex = /^\d{0,4}(\/\d{0,2})?(\/\d{0,2})?$/;
+    if (regex.test(value)) {
+      handleChange({ target: { name: 'date', value } });
+    }
+  };
+
   return (
     <Box component="form" noValidate autoComplete="off">
       <TextField
@@ -32,14 +42,12 @@ const SayDateNodeEditor = ({ data, handleChange }) => {
       <TextField
         label="Date"
         name="date"
-        type="date"
+        type="text"
         value={data.date || ''}
-        onChange={handleChange}
+        onChange={handleDateChange}
         fullWidth
         sx={{ mb: 1.2 }}
-        InputLabelProps={{
-          shrink: true,
-        }}
+        placeholder="YYYY/MM/DD"
       />
       <FormControl fullWidth sx={{ mb: 1.2 }}>
         <InputLabel>Date Type</InputLabel>
