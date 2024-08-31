@@ -1,0 +1,12 @@
+-eslahe object node switch
+
+-label bayad bere dakhele parantez kenare type
+
+-jaye felie label bayad brief info mokhtase har action 
+ (kholase amaliate un action)
+
+-eslaahe node if . ezafe kardane eage true false dar samte chapo rast box
+
+-node start & End faghat bayad yek eadge va yek path
+
+-delete all node button
