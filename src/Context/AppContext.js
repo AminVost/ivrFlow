@@ -10,6 +10,7 @@ export const AppContextProvider = ({ children }) => {
   const { width, ref } = useResizeDetector();
   const [nodesUpdated, setNodesUpdated] = useState(false);
   const [isUpdated, setIsUpdated] = useState(false);
+  const [activeEditor, setActiveEditor] = useState(false);
 
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
@@ -30,6 +31,8 @@ export const AppContextProvider = ({ children }) => {
         setNodesUpdated,
         isUpdated,
         setIsUpdated,
+        setActiveEditor,
+        activeEditor,
       }}
     >
       {children}

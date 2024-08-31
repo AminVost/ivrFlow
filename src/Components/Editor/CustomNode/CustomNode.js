@@ -14,13 +14,14 @@ const CustomNode = ({ id }) => {
     reactFlowInstance,
     setShowDrawer,
     setIsUpdated,
+    setActiveEditor,
   } = useContext(AppContext);
   const [isVisible, setIsVisible] = useState(false);
   const { setNodes, getNodes } = useReactFlow();
 
   const currentNode = getNodes()?.filter((node) => node.id === id);
   const { type, data, selected } = currentNode[0];
-  const { title, nodeType, description, Icon, color, ref ,label} = data;
+  const { title, nodeType, description, Icon, color, ref, label } = data;
 
   const centerSelectedNode = (elementId, reactFlowInstance) => {
     if (reactFlowInstance) {
@@ -80,6 +81,7 @@ const CustomNode = ({ id }) => {
                   status: true,
                 }));
 
+                setActiveEditor(true);
                 setShowSidebar(true);
                 setShowDrawer((state) => !state);
               }}
@@ -91,9 +93,8 @@ const CustomNode = ({ id }) => {
       <div
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
-        className={`custom-node-wrapper ${selected ? "selected" : ""} ${
-          nodeType === "start" ? "startClass" : ""
-        }`}
+        className={`custom-node-wrapper ${selected ? "selected" : ""} ${nodeType === "start" ? "startClass" : ""
+          }`}
         onClick={() => centerSelectedNode(id, reactFlowInstance)}
       >
         <div
@@ -103,7 +104,7 @@ const CustomNode = ({ id }) => {
           {getIcons(Icon)}
         </div>
         <div>
-          <p className="nodeLabel">{stringReducer(title, 15)}</p>
+          <p className="nodeLabel">{stringReducer(title, 15)} {label ? (stringReducer(label, 16)) : ''}</p>
           <p className="nodeDesc">{stringReducer(label, 16)}</p>
         </div>
       </div>
@@ -112,7 +113,7 @@ const CustomNode = ({ id }) => {
         <Handle className="edge-handle" type="target" position="bottom" />
       )} */}
       {/* {nodeType === "start" && ( */}
-        <Handle className="edge-handle" type="target" position="bottom" />
+      <Handle className="edge-handle" type="target" position="bottom" />
       {/* // )} */}
     </>
   );

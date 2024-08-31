@@ -1,16 +1,10 @@
-import React, { useState, useEffect } from "react";
-import './css/SwitchNodeEditor.css';
+import React, { useState } from "react";
+import './css/SwitchNodeEditor.css'
 import { TextField, Button, Box, FormControl, Select, MenuItem, InputLabel, IconButton } from "@mui/material";
-import { Add, Delete } from '@mui/icons-material';
+import { Add, Remove, Delete, Margin } from '@mui/icons-material';
 
 const SwitchNodeEditor = ({ data, handleChange }) => {
-  // Initialize cases from data or create a default case
-  const [cases, setCases] = useState(data.cases || [{ id: 1, operand: '', value: '' }]);
-
-  useEffect(() => {
-    // Update the parent component with the new cases array whenever it changes
-    handleChange({ target: { name: 'cases', value: cases } });
-  }, [cases]);
+  const [cases, setCases] = useState([{ id: 1, operand: '', value: '' }]);
 
   const handleAddCase = () => {
     setCases([...cases, { id: cases.length + 1, operand: '', value: '' }]);
@@ -226,6 +220,7 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
 };
 
 export default SwitchNodeEditor;
+
 
 const removeButtonStyle = {
   width: '1.5rem',

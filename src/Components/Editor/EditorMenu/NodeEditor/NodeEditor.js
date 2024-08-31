@@ -39,6 +39,7 @@ const NodeEditor = () => {
     width,
     setIsUpdated,
     isUpdated,
+    setActiveEditor,
   } = useContext(AppContext);
   const { data } = currentNode;
   const {
@@ -153,7 +154,17 @@ const NodeEditor = () => {
   return (
     <>
       <div className="node-navigate" style={{ width: width <= 815 && "250px" }}>
-        <div onClick={() => setData((prev) => ({ ...prev, status: false }))}>
+        {/* <div onClick={() => setData((prev) => ({ ...prev, status: false }))}> */}
+        <div
+          onClick={() => {
+            setData((prev) => ({
+              ...prev,
+              status: false,
+            }));
+
+            setActiveEditor(false)
+          }}
+        >
           <IoArrowBack />
           <p>{title}</p>
         </div>

@@ -9,7 +9,7 @@ import EditorMenu from "../../Components/Editor/EditorMenu/EditorMenu";
 import { AppContext } from "../../Context/AppContext";
 
 function Home() {
-  const { showSidebar, ref } = useContext(AppContext);
+  const { showSidebar, activeEditor, ref } = useContext(AppContext);
 
   return (
     <div className="container" ref={ref}>
@@ -25,7 +25,7 @@ function Home() {
           </div>
         </div> */}
         <div
-          className="editor-tab"
+          className={activeEditor ? 'editor-tab activeEditor' : 'editor-tab'}
           style={{
             gridTemplateColumns: !showSidebar && "100%",
           }}
