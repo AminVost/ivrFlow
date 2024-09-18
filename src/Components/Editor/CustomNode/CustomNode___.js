@@ -63,6 +63,7 @@ const CustomNode = ({ id }) => {
             onMouseEnter={() => setIsVisible(true)}
             onMouseLeave={() => setIsVisible(false)}
           >
+            {/* <p>{id}</p> */}
             <div>
               <AiOutlineDelete
                 onClick={() => {
@@ -89,36 +90,49 @@ const CustomNode = ({ id }) => {
             </div>
           </div>
         )}
+        {nodeType == "If" ? (
+          <>
+            <div
+              onMouseEnter={() => setIsVisible(true)}
+              onMouseLeave={() => setIsVisible(false)}
+              className={`triangle ${selected ? "selected" : ""}`}
+              onClick={() => centerSelectedNode(id, reactFlowInstance)}
+            >
+              <div
+                className={'iconContainer'}
+                style={{ backgroundColor:color }}
+              >
+                {getIcons(Icon)}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div
+              onMouseEnter={() => setIsVisible(true)} 
+              onMouseLeave={() => setIsVisible(false)}
+              className={`custom-node-wrapper ${selected ? "selected" : ""} ${nodeType === "start" ? "startClass" : ""}`}
+              onClick={() => centerSelectedNode(id, reactFlowInstance)}
+            >
+              <div
+                className={`${nodeType === "start" ? "startNodeIcon" : ""}`}
+                style={{ backgroundColor: nodeType === "start" ? "white" : color }}
+              >
+                {getIcons(Icon)}
+              </div>
+              <div>
+                <p className="nodeLabel">
+                  {stringReducer(title, 15)} {label ? '(' + stringReducer(label, 16) + ')' : ''}
+                </p>
+                {/* <p className="nodeDesc">
+                  {stringReducer(label, 16)}
+                </p> */}
+              </div>
+            </div>
 
-        <div
-          onMouseEnter={() => setIsVisible(true)}
-          onMouseLeave={() => setIsVisible(false)}
-          className={`custom-node-wrapper ${selected ? "selected" : ""} ${nodeType === "start" ? "startClass" : ""
-            }`}
-          onClick={() => centerSelectedNode(id, reactFlowInstance)}
-        >
-          <div
-            className={`${nodeType === "start" ? "startNodeIcon" : ""}`}
-            style={{ backgroundColor: nodeType == "start" ? "white" : color }}
-          >
-            {getIcons(Icon)}
-          </div>
-          <div>
-            <p className="nodeLabel">
-              {stringReducer(title, 15)} {label ? '(' + stringReducer(label, 16) + ')' : ''}</p>
-            {/* <p className="nodeDesc">
-              {stringReducer(label, 16)}
-            </p> */}
-            
-          </div>
-        </div>
-
-        {/* {(nodeType === "default" || nodeType === "input") && (
-        <Handle className="edge-handle" type="target" position="bottom" />
-        )} */}
-        {/* {nodeType === "start" && ( */}
-        <Handle className="edge-handle" type="target" position="bottom" />
-        {/* // )} */}
+            <Handle className="edge-handle" type="target" position="bottom" />
+          </>
+        )}
       </div>
     </>
   );

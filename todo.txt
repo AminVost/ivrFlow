@@ -1,6 +1,6 @@
--eslahe object node switch
 
--label bayad bere dakhele parantez kenare type
+
+-label bayad bere dakhele parantez kenare type - Done
 
 -jaye felie label bayad brief info mokhtase har action 
  (kholase amaliate un action)
@@ -9,4 +9,7 @@
 
 -node start & End faghat bayad yek eadge va yek path
 
+-eslahe object node switch
+
 -delete all node button
+

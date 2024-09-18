@@ -1,7 +1,9 @@
 .custom-node-wrapper {
-  width: 210px;
+  /* width: 210px; */
+  min-width: 210px;
+  width: auto;
   background-color: #27272a;
-  padding: 16px;
+  padding: 13px;
   border-radius: 10px;
   display: flex;
   justify-content: flex-start;
@@ -40,10 +42,12 @@
   color: #e4e4cf;
 }
 
-.custom-node-wrapper>div p.nodeDesc {
-  margin-top: .3rem;
-  font-size: 15px;
+.custom-node-wrapper>div .nodeBrief {
+  /* margin-top: .3rem; */
+  font-size: 14px;
   color: #9E9E9E !important;
+  display: flex;
+  flex-direction: column;
 }
 
 .toolbar-wrapper {
@@ -100,12 +104,13 @@
   background-color: white;
 }
 
-.custom-node-wrapper.startClass>div>p.nodeLabel {
+.custom-node-wrapper.startClass>div>p.nodeLabel,.custom-node-wrapper.endClass>div>p.nodeLabel {
   color: white !important;
-  font-size: 21px;
+  font-size: 17px;
+  font-weight: 500;
 }
 
-.custom-node-wrapper.startClass {
+.custom-node-wrapper.startClass,.custom-node-wrapper.endClass {
   justify-content: center;
   background: #ffffff26;
   border-radius: 50%;
@@ -115,11 +120,16 @@
 .startNodeIcon svg {
   fill: rgb(0, 0, 0);
 }
-.triangle {
-  width: 0px;
-  height: 0px;
-  border-style: solid;
-  border-width: 0 77px 154px 77px;
-  border-color: transparent transparent #27272a transparent;
-  transform: rotate(0deg);
+.nodInfo {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.nodeBrief p:not(:last-child) {
+  border-bottom: 1px solid #8080804f;
+  padding-bottom: .3rem;
+  margin-bottom: .3rem;
+}
+.nodeBrief p {
+  line-height: 1.4rem;
 }

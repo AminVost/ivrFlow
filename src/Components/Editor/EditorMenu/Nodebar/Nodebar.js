@@ -127,7 +127,7 @@ const nodes = [
     title: "HangUp",
     type: "HangUp",
     icon: "TbPhoneOff",
-    color: "#a1ff33",
+    color: "#71869b",
   },
   {
     title: "Return",

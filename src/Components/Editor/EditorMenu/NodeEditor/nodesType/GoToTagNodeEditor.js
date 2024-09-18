@@ -53,6 +53,14 @@ const GoToTagNodeEditor = ({ data, handleChange }) => {
           </Select>
         </FormControl>
         <TextField
+          label="Value"
+          name="value"
+          value={data.value || ''}
+          onChange={handleChange}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
+        <TextField
           label="Comments"
           name="comments"
           multiline

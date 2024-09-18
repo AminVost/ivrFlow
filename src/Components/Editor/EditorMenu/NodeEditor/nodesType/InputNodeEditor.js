@@ -3,22 +3,22 @@ import { TextField, Box, FormControl, InputLabel, Select, MenuItem } from "@mui/
 import InfoTooltipAdornment from '../../../../../utils/InfoTooltipAdornment';
 
 const InputNodeEditor = ({ data, handleChange }) => {
-  const [file, setFile] = useState('');
-  const [fileGroup, setFileGroup] = useState('');
+  const [fileType, setFile] = useState('');
+  const [fileItem, setFileGroup] = useState('');
 
   const fileOptions = [
-    { value: 'file1', label: 'File 1', groups: ['Group 1A', 'Group 1B'] },
-    { value: 'file2', label: 'File 2', groups: ['Group 2A', 'Group 2B'] },
-    { value: 'file3', label: 'File 3', groups: ['Group 3A', 'Group 3B'] },
+    { value: 'fileType1', label: 'File Type 1', groups: ['FileItem1A', 'FileItem1B'] },
+    { value: 'fileType2', label: 'File Type 2', groups: ['FileItem2A', 'FileItem2B'] },
+    { value: 'fileType3', label: 'File Type 3', groups: ['FileItem3A', 'FileItem3B'] },
   ];
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.value;
     setFile(selectedFile);
 
-    // Reset fileGroup when the file changes
+    // Reset fileItem when the fileType changes
     setFileGroup('');
-    handleFileGroupChange({ target: { name: 'fileGroup', value: null } });
+    handleFileGroupChange({ target: { name: 'fileItem', value: null } });
     handleChange(event);
   };
 
@@ -28,7 +28,7 @@ const InputNodeEditor = ({ data, handleChange }) => {
     handleChange(event);
   };
 
-  const currentFileGroups = fileOptions.find((option) => option.value === file)?.groups || [];
+  const currentFileGroups = fileOptions.find((option) => option.value === fileType)?.groups || [];
 
   return (
     <Box
@@ -109,14 +109,14 @@ const InputNodeEditor = ({ data, handleChange }) => {
       />
 
       <FormControl sx={{ mb: 1.2, width: '100%' }}>
-        <InputLabel id="file-label">File</InputLabel>
+        <InputLabel id="fileType-label">File Type</InputLabel>
         <Select
-          labelId="file-label"
-          id="file-select"
-          name="file"
-          value={file}
+          labelId="fileType-label"
+          id="fileType-select"
+          name="fileType"
+          value={fileType}
           onChange={handleFileChange}
-          endAdornment={<InfoTooltipAdornment tooltipText="This is the file" />}
+          endAdornment={<InfoTooltipAdornment tooltipText="This is the fileType" />}
           sx={{
             '& .MuiSelect-select': {
               paddingRight: '60px'
@@ -131,13 +131,13 @@ const InputNodeEditor = ({ data, handleChange }) => {
         </Select>
       </FormControl>
 
-      <FormControl sx={{ mb: 1.2, width: '100%' }} disabled={!file}>
-        <InputLabel id="file-group-label">File Group</InputLabel>
+      <FormControl sx={{ mb: 1.2, width: '100%' }} disabled={!fileType}>
+        <InputLabel id="file-group-label">File Item</InputLabel>
         <Select
           labelId="file-group-label"
           id="file-group-select"
-          name="fileGroup"
-          value={fileGroup}
+          name="fileItem"
+          value={fileItem}
           onChange={handleFileGroupChange}
           endAdornment={<InfoTooltipAdornment tooltipText="This is the file group" />}
           sx={{

@@ -10,10 +10,10 @@ import {
 import InfoTooltipAdornment from "../../../../../utils/InfoTooltipAdornment";
 
 const PlaybackNodeEditor = ({ data, handleChange }) => {
-  const [playbackFirstSelectValue, setPlaybackFirstSelectValue] = useState(data?.fileFirstSelect);
+  const [playbackFirstSelectValue, setPlaybackFirstSelectValue] = useState(data?.fileType);
   const [playbackSecondOptions, setPlaybackSecondOptions] = useState([]);
   const [playbackSecondSelectValue, setPlaybackSecondSelectValue] = useState(
-    data?.fileSecondSelect
+    data?.fileItem
   );
 
   const handleFirstSelectChange = (event) => {
@@ -22,33 +22,33 @@ const PlaybackNodeEditor = ({ data, handleChange }) => {
 
     let options = [];
     switch (value) {
-      case "group1":
-        options = ["Option 1-1", "Option 1-2", "Option 1-3"];
+      case "type1":
+        options = ["File 1-1", "File 1-2", "File 1-3"];
         break;
-      case "group2":
-        options = ["Option 2-1", "Option 2-2", "Option 2-3"];
+      case "type2":
+        options = ["File 2-1", "File 2-2", "File 2-3"];
         break;
-      case "group3":
-        options = ["Option 3-1", "Option 3-2", "Option 3-3"];
+      case "type3":
+        options = ["File 3-1", "File 3-2", "File 3-3"];
         break;
       default:
         options = [];
     }
     setPlaybackSecondOptions(options);
 
-    // Reset the second select value if it's not in the new options
+    // Reset the File Item value if it's not in the new options
     if (!options.includes(playbackSecondSelectValue)) {
       console.log("! options ");
       setPlaybackSecondSelectValue("");
-      handleChange({ target: { name: "fileSecondSelect", value: "" } });
+      handleChange({ target: { name: "fileItem", value: "" } });
     }
-    handleChange({ target: { name: "fileFirstSelect", value } });
+    handleChange({ target: { name: "fileType", value } });
   };
 
   const handleSecondSelectChange = (event) => {
     const value = event.target.value;
     setPlaybackSecondSelectValue(value);
-    handleChange({ target: { name: "fileSecondSelect", value } });
+    handleChange({ target: { name: "fileItem", value } });
   };
 
   useEffect(() => {
@@ -138,36 +138,36 @@ const PlaybackNodeEditor = ({ data, handleChange }) => {
       />
 
       <FormControl fullWidth>
-        <InputLabel id="first-select-playback-label">First Select</InputLabel>
+        <InputLabel id="first-select-playback-label">File Type</InputLabel>
         <Select
           labelId="first-select-playback-label"
           id="first-select-playback"
-          name="fileFirstSelect"
+          name="fileType"
           value={playbackFirstSelectValue}
-          label="First Select"
+          label="File Type"
           variant="outlined"
           onChange={handleFirstSelectChange}
           endAdornment={
-            <InfoTooltipAdornment tooltipText="This is the first select" />
+            <InfoTooltipAdornment tooltipText="This is the File Type" />
           }
         >
-          <MenuItem value="group1">Group 1</MenuItem>
-          <MenuItem value="group2">Group 2</MenuItem>
-          <MenuItem value="group3">Group 3</MenuItem>
+          <MenuItem value="type1">Type 1</MenuItem>
+          <MenuItem value="type2">Type 2</MenuItem>
+          <MenuItem value="type3">Type 3</MenuItem>
         </Select>
       </FormControl>
 
       <FormControl>
-        <InputLabel id="second-select-playback-label">Second Select</InputLabel>
+        <InputLabel id="second-select-playback-label">File Item</InputLabel>
         <Select
           labelId="second-select-playback-label"
           id="second-select-playback"
-          name="fileSecondSelect"
+          name="fileItem"
           value={playbackSecondSelectValue}
-          label="Second Select"
+          label="File Item"
           onChange={handleSecondSelectChange}
           endAdornment={
-            <InfoTooltipAdornment tooltipText="This is the second select" />
+            <InfoTooltipAdornment tooltipText="This is the File Item" />
           }
         >
           {playbackSecondOptions.map((option, index) => (

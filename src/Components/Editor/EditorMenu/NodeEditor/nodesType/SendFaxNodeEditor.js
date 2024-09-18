@@ -2,22 +2,22 @@ import React, { useState } from "react";
 import { TextField, Box, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 
 const SendFaxNodeEditor = ({ data, handleChange }) => {
-  const [file, setFile] = useState('');
-  const [fileGroup, setFileGroup] = useState('');
+  const [fileType, setFile] = useState('');
+  const [fileItem, setFileGroup] = useState('');
 
   const fileOptions = [
-    { value: 'file1', label: 'File 1', groups: ['Group 1A', 'Group 1B'] },
-    { value: 'file2', label: 'File 2', groups: ['Group 2A', 'Group 2B'] },
-    { value: 'file3', label: 'File 3', groups: ['Group 3A', 'Group 3B'] },
+    { value: 'fileType1', label: 'File Type 1', groups: ['fileItem1A', 'fileItem1B'] },
+    { value: 'fileType2', label: 'File Type 2', groups: ['fileItem2A', 'fileItem2B'] },
+    { value: 'fileType3', label: 'File Type 3', groups: ['fileItem3A', 'fileItem3B'] },
   ];
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.value;
     setFile(selectedFile);
 
-    // Reset fileGroup when the file changes
+    // Reset fileItem when the fileType changes
     setFileGroup('');
-    handleFileGroupChange({ target: { name: 'fileGroup', value: null } });
+    handleFileGroupChange({ target: { name: 'fileItem', value: null } });
     handleChange(event);
   };
 
@@ -26,7 +26,7 @@ const SendFaxNodeEditor = ({ data, handleChange }) => {
     handleChange(event);
   };
 
-  const selectedFile = fileOptions.find(option => option.value === file);
+  const selectedFile = fileOptions.find(option => option.value === fileType);
 
   return (
     <Box component="form" noValidate autoComplete="off">
@@ -65,10 +65,10 @@ const SendFaxNodeEditor = ({ data, handleChange }) => {
         sx={{ mb: 1.2 }}
       />
       <FormControl fullWidth sx={{ mb: 1.2 }}>
-        <InputLabel>File</InputLabel>
+        <InputLabel>File Type</InputLabel>
         <Select
-          name="file"
-          value={file}
+          name="fileType"
+          value={fileType}
           onChange={handleFileChange}
         >
           {fileOptions.map((option) => (
@@ -79,10 +79,10 @@ const SendFaxNodeEditor = ({ data, handleChange }) => {
         </Select>
       </FormControl>
       <FormControl fullWidth sx={{ mb: 1.2 }}>
-        <InputLabel>File Group</InputLabel>
+        <InputLabel>File Item</InputLabel>
         <Select
-          name="fileGroup"
-          value={fileGroup}
+          name="fileItem"
+          value={fileItem}
           onChange={handleFileGroupChange}
           disabled={!selectedFile}
         >

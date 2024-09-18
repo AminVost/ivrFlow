@@ -8,7 +8,7 @@ const SayDateNodeEditor = ({ data, handleChange }) => {
 
     // Only update the state if the input is partially valid
     if (regexPartial.test(value)) {
-      handleChange({ target: { name: 'date', value } });
+      handleChange({ target: { name: 'time', value } });
     }
   };
 
@@ -41,9 +41,9 @@ const SayDateNodeEditor = ({ data, handleChange }) => {
       />
       <TextField
         label="Time"
-        name="date"
+        name="time"
         type="text"
-        value={data.date || ''}
+        value={data.time || ''}
         onChange={handleDateChange}
         fullWidth
         sx={{ mb: 1.2 }}

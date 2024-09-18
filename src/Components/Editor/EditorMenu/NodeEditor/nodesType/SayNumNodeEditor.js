@@ -86,7 +86,7 @@ const SayNumNodeEditor = ({ data, handleChange }) => {
         type="number"
         variant="outlined"
         onChange={handleChange}
-        value={data.step || 0}
+        value={data?.step}
         InputProps={{
           endAdornment: (
             <InfoTooltipAdornment tooltipText="This is the step" />

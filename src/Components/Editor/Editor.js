@@ -44,6 +44,18 @@ const defaultStartNode = {
   },
 };
 
+const defaultEndNode = {
+  id: "end",
+  type: "custom", // Ensure 'custom' matches your node type if needed
+  position: { x: 250, y: 400 }, // Set initial position, adjust as needed
+  color: 'red',
+  data: {
+    title: "END",
+    nodeType: "end",
+    Icon: "RiArrowUpFill", // Example icon, use any appropriate icon
+  },
+};
+
 function Editor() {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -187,8 +199,10 @@ function Editor() {
       setNodes((nodes) =>
         nodes.map((node) =>
           node.id === "start"
-            ? { ...node, position: { x: startX, y: startY } }
-            : node
+            ? { ...node, position: { x: startX, y: startY - 100 } } // Adjust start node position
+            : node.id === "end"
+              ? { ...node, position: { x: startX, y: startY + 100 } } // Adjust end node position
+              : node
         )
       );
 
@@ -206,11 +220,11 @@ function Editor() {
         setInitialized(true);
       } else {
         // Add default start node if no nodes are loaded from localStorage
-        setNodes([defaultStartNode]);
+        setNodes([defaultStartNode, defaultEndNode]);
       }
     } catch (error) {
       // Add default start node if an error occurs during loading from localStorage
-      setNodes([defaultStartNode]);
+      setNodes([defaultStartNode, defaultEndNode]);
     }
   }, [setNodes, setEdges]);
 

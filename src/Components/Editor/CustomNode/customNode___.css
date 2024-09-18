@@ -115,3 +115,11 @@
 .startNodeIcon svg {
   fill: rgb(0, 0, 0);
 }
+.triangle {
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 0 77px 154px 77px;
+  border-color: transparent transparent #27272a transparent;
+  transform: rotate(0deg);
+}
