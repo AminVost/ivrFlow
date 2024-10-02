@@ -65,23 +65,6 @@ const IfNodeEditor = ({ data, handleChange }) => {
 
       <TextField
         className="inputText"
-        id="priorityIf"
-        name="priority"
-        label="Priority"
-        type="number"
-        variant="outlined"
-        onChange={handleChange}
-        value={data.priority || ""}
-        InputProps={{
-          endAdornment: (
-            <InfoTooltipAdornment tooltipText="This is the priority" />
-          ),
-          sx: { paddingRight: 0 },
-        }}
-      />
-
-      <TextField
-        className="inputText"
         id="actionIf"
         name="action"
         label="Action"

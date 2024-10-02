@@ -22,15 +22,7 @@ const SayDateNodeEditor = ({ data, handleChange }) => {
         fullWidth
         sx={{ mb: 1.2 }}
       />
-      <TextField
-        label="Priority"
-        name="priority"
-        type="number"
-        value={data.priority || ''}
-        onChange={handleChange}
-        fullWidth
-        sx={{ mb: 1.2 }}
-      />
+
       <TextField
         label="Action"
         name="action"

@@ -1,7 +1,7 @@
 import React from "react";
-import { TextField, Box} from "@mui/material";
+import { TextField, Box, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
-const RecordSaveNodeEditor = ({ data, handleChange }) => {
+const GoToNodeEditor = ({ data, handleChange }) => {
   return (
     <>
       <Box component="form" noValidate autoComplete="off">
@@ -16,11 +16,25 @@ const RecordSaveNodeEditor = ({ data, handleChange }) => {
         <TextField
           label="Action"
           name="action"
-          value="record_save"
+          value="Go_to"
           InputProps={{ readOnly: true }}
           fullWidth
           sx={{ mb: 1.2 }}
         />
+        <FormControl sx={{ mb: 1.2, width: '100%' }}>
+          <InputLabel id="advanceIvr-label">Advance IVR</InputLabel>
+          <Select
+            labelId="advanceIvr-label"
+            id="advanceIvr-select"
+            name="advanceIvr"
+            value={data.advanceIvr || ''}
+            onChange={handleChange}
+          >
+            {['iv1', 'iv2', 'iv3', 'iv4'].map((ext) => (
+              <MenuItem key={ext} value={ext}>{ext}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <TextField
           label="Comments"
           name="comments"
@@ -36,4 +50,4 @@ const RecordSaveNodeEditor = ({ data, handleChange }) => {
   );
 };
 
-export default RecordSaveNodeEditor;
+export default GoToNodeEditor;

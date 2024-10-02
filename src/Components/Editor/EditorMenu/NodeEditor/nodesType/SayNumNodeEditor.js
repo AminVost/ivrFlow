@@ -28,22 +28,7 @@ const SayNumNodeEditor = ({ data, handleChange }) => {
         }}
       />
 
-      <TextField
-        className="inputText"
-        id="prioritySayNum"
-        name="priority"
-        label="Priority"
-        type="number"
-        variant="outlined"
-        onChange={handleChange}
-        value={data.priority || 0}
-        InputProps={{
-          endAdornment: (
-            <InfoTooltipAdornment tooltipText="This is the priority" />
-          ),
-          sx: { paddingRight: 0 },
-        }}
-      />
+
 
       <TextField
         className="inputText"

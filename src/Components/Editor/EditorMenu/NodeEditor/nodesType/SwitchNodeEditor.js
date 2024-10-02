@@ -38,7 +38,6 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
                 value={caseItem.value}
                 onChange={(e) => handleCaseChange(index, 'value', e.target.value)}
               >
-                {/* Add Time Frame options here */}
                 <MenuItem value="Time Frame 1">Time Frame 1</MenuItem>
                 <MenuItem value="Time Frame 2">Time Frame 2</MenuItem>
               </Select>
@@ -158,15 +157,7 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
         fullWidth
         sx={{ mb: 1.2 }}
       />
-      <TextField
-        label="Priority"
-        name="priority"
-        type="number"
-        value={data.priority || ''}
-        onChange={handleChange}
-        fullWidth
-        sx={{ mb: 1.2 }}
-      />
+
       <TextField
         label="Action"
         name="action"
@@ -196,7 +187,6 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
                 <MenuItem value="=>">Greater or Equal</MenuItem>
                 <MenuItem value="=">Equal</MenuItem>
                 <MenuItem value="!=">Not Equal</MenuItem>
-                {/* Add more options as needed */}
               </Select>
             </FormControl>
             {renderCaseElements(caseItem, index)}

@@ -24,16 +24,6 @@ const PlayErrorNodeEditor = ({ data = {}, handleChange }) => {
       </div>
       <div>
         <TextField
-          label="Priority"
-          id="outlined-priority"
-          placeholder="Enter priority"
-          size="normal"
-          value={data.priority || ''}
-          onChange={(e) => handleChange(e.target.value, 'priority')}
-        />
-      </div>
-      <div>
-        <TextField
           label="Action"
           id="outlined-action"
           placeholder="Action"
