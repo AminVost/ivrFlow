@@ -48,6 +48,10 @@ const NodeEditor = () => {
   } = data;
   console.log('data=>', data)
 
+  const addNode = (newNode) => {
+    setNodes((prevNodes) => [...prevNodes, newNode]);
+  };
+
   const updateEditorNode = (key, value, id) => {
     setNodes((nodes) =>
       nodes.map((node) => {
@@ -121,7 +125,7 @@ const NodeEditor = () => {
       case "Set":
         return <SetNodeEditor data={data} handleChange={handleChange} />;
       case "GoTo":
-        return <GoToNodeEditor data={data} handleChange={handleChange} />;
+        return <GoToNodeEditor data={data} handleChange={handleChange} addNode={addNode} />;
       case "CallFunction":
         return <CallFunctionNodeEditor data={data} handleChange={handleChange} />;
       case "Rpc":

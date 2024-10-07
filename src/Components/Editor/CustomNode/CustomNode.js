@@ -56,6 +56,10 @@ const CustomNode = ({ id }) => {
         {nodeType !== "start" && (
           <Handle className="edge-handle top" type="source" position="top" />
         )}
+
+        {nodeType == "GoTo" && (
+          <Handle className="edge-handle left" type="source" position="left" />
+        )}
         {nodeType !== "start" && nodeType !== "end" && (
           <div
             className={`toolbar-wrapper ${nodeType === "start" ? "hidden" : ""}`}
@@ -93,18 +97,9 @@ const CustomNode = ({ id }) => {
         <div
           onMouseEnter={() => setIsVisible(true)}
           onMouseLeave={() => setIsVisible(false)}
-          // className={`custom-node-wrapper ${selected ? "selected" : ""} ${nodeType === "start" ? "startClass" : ""
-          //   }`}
           className={`custom-node-wrapper ${selected ? "selected" : ""} ${nodeType === "start" ? "startClass" : ""} ${nodeType === "end" ? "endClass" : ""}`}
           onClick={() => centerSelectedNode(id, reactFlowInstance)}
         >
-
-          {/* <div
-            className={`${nodeType === "start" ? "startNodeIcon" : ""}`}
-            style={{ backgroundColor: nodeType == "start" ? "white" : color }}
-          >
-            {getIcons(Icon)}
-          </div> */}
           {nodeType !== "end" && (
             <div
               className={`${nodeType === "start" ? "startNodeIcon" : ""}`}
@@ -415,6 +410,21 @@ const CustomNode = ({ id }) => {
                         )}
                       </div>
                     )
+                  );
+                case 'customNodeType':
+                  return (
+                   
+                      <div className="nodeBrief">
+                 
+                          <p>
+                            <b>hey hey</b>
+                          </p>
+                    
+                        {data?.comments && (
+                          <p>Comment: {stringReducer(data.comments, 35)}</p>
+                        )}
+                      </div>
+              
                   );
                 default:
                   return (

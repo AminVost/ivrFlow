@@ -21,21 +21,49 @@ import CustomNode from "./CustomNode/CustomNode";
 import uniqueId from "../../utils/uniqueId";
 import ContextMenu from "./ContextMenu/ContextMenu";
 import { RiSaveLine } from "react-icons/ri";
+import { TbSend } from "react-icons/tb";
 import { parse, stringify, toJSON, fromJSON } from "flatted";
-import { IconButton } from "@mui/material";
+import { colors, IconButton } from "@mui/material";
 import { PiSidebarSimpleFill } from "react-icons/pi";
 import { BiFullscreen } from "react-icons/bi";
 import { AppContext } from "../../Context/AppContext";
 import MenuDrawer from "../Sidebar/MenuDrawer/MenuDrawer";
 import { BsFillCircleFill } from "react-icons/bs";
+import Swal from "sweetalert2";
+
+// Define the default start node
+const defaultStartNode = {
+  id: "start",
+  type: "custom", // Ensure 'custom' matches your node type if needed
+  position: { x: 250, y: 100 }, // Set initial position
+  color: 'white',
+  data: {
+    title: "START",
+    nodeType: "start",
+    Icon: "RiArrowDownFill", // Example icon, use any appropriate icon
+  },
+};
+
+const defaultEndNode = {
+  id: "end",
+  type: "custom", // Ensure 'custom' matches your node type if needed
+  position: { x: 250, y: 400 }, // Set initial position, adjust as needed
+  color: 'red',
+  data: {
+    title: "END",
+    nodeType: "end",
+    Icon: "RiArrowUpFill", // Example icon, use any appropriate icon
+  },
+};
 
 function Editor() {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  // const [reactFlowInstance, setReactFlowInstance] = useState(null);
   const [menu, setMenu] = useState(null);
+  const [isPublish, setVisiblePublish] = useState(false);
   const ref = useRef(null);
+  const [initialized, setInitialized] = useState(false);
 
   const {
     width,
@@ -56,7 +84,7 @@ function Editor() {
       setEdges((eds) => addEdge(params, eds));
       setIsUpdated(true);
     },
-    [edges]
+    [setEdges, setIsUpdated]
   );
 
   const onDragOver = useCallback((event) => {
@@ -70,7 +98,7 @@ function Editor() {
 
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
       const data = event.dataTransfer.getData("application/reactflow");
-      const { type, label, Icon, color } = JSON.parse(data);
+      const { type, title, Icon, color } = JSON.parse(data);
 
       // check if the dropped element is valid
       if (typeof type === "undefined" || !type) {
@@ -87,31 +115,28 @@ function Editor() {
         type: "custom",
         position,
         data: {
-          label,
+          title,
           nodeType: type,
-          description: "",
-          interval: "",
-          url: "",
-          screenshot: "none",
-          cssSelecter: "",
+          // description: "",
+          // interval: "",
+          // url: "",
+          // screenshot: "none",
+          // cssSelecter: "",
           Icon,
           color,
-          ref,
+          // ref,
         },
       };
-
+      setIsUpdated(true);
       setNodes((nds) => nds.concat(newNode));
-      // setIsUpdated(true);
     },
-    [reactFlowInstance]
+    [reactFlowInstance, setNodes]
   );
 
   const handleContextMenu = useCallback(
     (event, node) => {
-      // Prevent native context menu from showing
       event.preventDefault();
 
-      // Calculate position of the node context menu.
       const pane = ref.current.getBoundingClientRect();
 
       setMenu({
@@ -129,7 +154,6 @@ function Editor() {
     [menu]
   );
 
-  // Close the node context menu if it's open whenever the window is clicked.
   const onPaneClick = useCallback(() => setMenu(null), [menu]);
 
   const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
@@ -139,9 +163,52 @@ function Editor() {
   };
 
   const handleWorkflowData = useCallback(() => {
-    const workflowData = { nodes, edges };
+    const workflowData = {
+      nodes: nodes.map((node) => ({
+        id: node.id,
+        type: node.type,
+        position: node.position,
+        data: {
+          // title: node.data.title,
+          // nodeType: node.data.nodeType,
+          // description: node.data.description,
+          // Icon: node.data.Icon,
+          // color: node.data.color,
+          ...node.data,
+        },
+      })),
+      edges: edges.map((edge) => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        type: edge.type,
+        // Add other necessary properties here
+      })),
+    };
+    console.log("workflowData", workflowData);
     localStorage.setItem("workflowData", stringify(workflowData));
   });
+
+  useEffect(() => {
+    if (reactFlowInstance && !initialized) {
+      const { width, height } =
+        reactFlowWrapper.current.getBoundingClientRect();
+      const startX = width / 2;
+      const startY = height / 2;
+
+      setNodes((nodes) =>
+        nodes.map((node) =>
+          node.id === "start"
+            ? { ...node, position: { x: startX, y: startY - 100 } } // Adjust start node position
+            : node.id === "end"
+              ? { ...node, position: { x: startX, y: startY + 100 } } // Adjust end node position
+              : node
+        )
+      );
+
+      reactFlowInstance.setCenter(startX, startY, { duration: 800, zoom: 1 });
+    }
+  }, [reactFlowInstance]);
 
   useEffect(() => {
     try {
@@ -150,9 +217,22 @@ function Editor() {
         const { nodes, edges } = workflowData;
         setNodes(nodes);
         setEdges(edges);
+        setInitialized(true);
+        console.log('nodesss' ,nodes )
+      } else {
+        // Add default start node if no nodes are loaded from localStorage
+        setNodes([defaultStartNode, defaultEndNode]);
       }
-    } catch (error) {}
-  }, []);
+    } catch (error) {
+      // Add default start node if an error occurs during loading from localStorage
+      setNodes([defaultStartNode, defaultEndNode]);
+    }
+  }, [setNodes, setEdges]);
+
+  // useEffect(() => {
+  //   console.log("nodes", nodes);
+  // }, [nodes]);
+
 
   return (
     <section className="editor-wrapper" ref={reactFlowWrapper}>
@@ -170,6 +250,7 @@ function Editor() {
         onPaneClick={onPaneClick}
         onNodeContextMenu={handleContextMenu}
         onEdgeContextMenu={handleContextMenu}
+        deleteKeyCode={null}
         minZoom={0.3}
         maxZoom={1.2}
       >
@@ -184,8 +265,10 @@ function Editor() {
         <RightPanel
           handleWorkflowData={handleWorkflowData}
           isUpdated={isUpdated}
+          isPublish={isPublish}
           setData={setData}
           setIsUpdated={setIsUpdated}
+          setVisiblePublish={setVisiblePublish}
         />
         <Controls
           className="controls"
@@ -233,20 +316,53 @@ const LeftPanel = memo(
 );
 
 const RightPanel = memo(
-  ({ handleWorkflowData, isUpdated, setIsUpdated, setData }) => {
+  ({
+    handleWorkflowData,
+    isUpdated,
+    setIsUpdated,
+    setData,
+    isPublish,
+    setVisiblePublish,
+  }) => {
     return (
       <Panel position="top-right">
-        {isUpdated && <UpdateBadge />}
+        {isPublish && (
+          <div
+            className="right-panel-button"
+            onClick={() => {
+              setVisiblePublish(!isPublish);
+              Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Publish was successful",
+                showConfirmButton: false,
+                timer: 2000,
+                customClass: {
+                  popup: "swal-popup",
+                  title: "swal-title",
+                  icon: "swal-icon",
+                },
+                background: "#27272a",
+              });
+            }}
+          >
+            <TbSend />
+            <p>Publish</p>
+          </div>
+        )}
+
         <div
           className="right-panel-button"
           onClick={() => {
             if (isUpdated) {
               handleWorkflowData();
+              setVisiblePublish(true);
               setIsUpdated(false);
               setData((prev) => ({ ...prev, status: false }));
             }
           }}
         >
+          {isUpdated && <UpdateBadge />}
           <RiSaveLine />
           <p>Save</p>
         </div>
@@ -258,7 +374,7 @@ const RightPanel = memo(
 const UpdateBadge = () => {
   return (
     <div
-      style={{ position: "absolute", left: "5px", top: "5px", zIndex: "10" }}
+      style={{ position: "absolute", left: "-6px", top: "-6px", zIndex: "10" }}
     >
       <BsFillCircleFill color="cornflowerblue" />
     </div>

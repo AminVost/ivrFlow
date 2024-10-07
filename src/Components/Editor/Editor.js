@@ -95,7 +95,7 @@ function Editor() {
   const onDrop = useCallback(
     (event) => {
       event.preventDefault();
-
+      let uniqId = uniqueId(7);
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
       const data = event.dataTransfer.getData("application/reactflow");
       const { type, title, Icon, color } = JSON.parse(data);
@@ -111,10 +111,11 @@ function Editor() {
       });
 
       const newNode = {
-        id: uniqueId(7),
+        id: uniqId,
         type: "custom",
         position,
         data: {
+          currentId: uniqId,
           title,
           nodeType: type,
           // description: "",
@@ -218,6 +219,7 @@ function Editor() {
         setNodes(nodes);
         setEdges(edges);
         setInitialized(true);
+        console.log('nodesss', nodes)
       } else {
         // Add default start node if no nodes are loaded from localStorage
         setNodes([defaultStartNode, defaultEndNode]);
