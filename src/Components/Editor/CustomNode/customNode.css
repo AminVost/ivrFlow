@@ -104,13 +104,13 @@
   background-color: white;
 }
 
-.custom-node-wrapper.startClass>div>p.nodeLabel,.custom-node-wrapper.endClass>div>p.nodeLabel {
+.custom-node-wrapper.startClass>div>p.nodeLabel, .custom-node-wrapper.endClass>div>p.nodeLabel {
   color: white !important;
   font-size: 17px;
   font-weight: 500;
 }
 
-.custom-node-wrapper.startClass,.custom-node-wrapper.endClass {
+.custom-node-wrapper.startClass, .custom-node-wrapper.endClass {
   justify-content: center;
   background: #ffffff26;
   border-radius: 50%;
@@ -120,16 +120,38 @@
 .startNodeIcon svg {
   fill: rgb(0, 0, 0);
 }
+
 .nodInfo {
   display: flex;
   flex-direction: column;
   gap: .5rem;
 }
+
 .nodeBrief p:not(:last-child) {
   border-bottom: 1px solid #8080804f;
   padding-bottom: .3rem;
   margin-bottom: .3rem;
 }
+
 .nodeBrief p {
   line-height: 1.4rem;
+}
+
+.nodInfo a {
+  text-decoration: none;
+  font-weight: 500;
+  color: white;
+}
+
+.nodInfo a:hover {
+  text-decoration: underline;
+}
+
+.custom-node-wrapper.gotoIvr {
+  border-color: #30e276;
+  border-width: thin;
+}
+.custom-node-wrapper.ifIvr {
+  border-color: #a85b2a;
+  border-width: thin;
 }

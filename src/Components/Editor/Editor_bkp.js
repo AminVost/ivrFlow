@@ -18,6 +18,7 @@ import ReactFlow, {
 } from "reactflow";
 import "./editor.css";
 import CustomNode from "./CustomNode/CustomNode";
+import CustomEdge from './CustomEdge/CustomEdge';
 import uniqueId from "../../utils/uniqueId";
 import ContextMenu from "./ContextMenu/ContextMenu";
 import { RiSaveLine } from "react-icons/ri";
@@ -76,11 +77,19 @@ function Editor() {
     isUpdated,
     setIsUpdated,
     setData,
+    createdNodes,
+    setCreatedNodes
   } = useContext(AppContext);
+
+  useEffect(() => {
+   console.log('editor createdNodes' , createdNodes)
+  }, [createdNodes, setCreatedNodes]);
 
   const onConnect = useCallback(
     (params) => {
+      console.log('paramsss', params);
       params.type = "smoothstep";
+      // params.label ='label';
       setEdges((eds) => addEdge(params, eds));
       setIsUpdated(true);
     },
@@ -95,7 +104,7 @@ function Editor() {
   const onDrop = useCallback(
     (event) => {
       event.preventDefault();
-
+      let uniqId = uniqueId(7);
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
       const data = event.dataTransfer.getData("application/reactflow");
       const { type, title, Icon, color } = JSON.parse(data);
@@ -104,24 +113,24 @@ function Editor() {
       if (typeof type === "undefined" || !type) {
         return;
       }
-
+      // console.log('event', event)
       const position = reactFlowInstance.screenToFlowPosition({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
+        x: event.clientX - 105,
+        y: event.clientY,
       });
+      // const position = reactFlowInstance.screenToFlowPosition({
+      //   x: event.clientX - reactFlowBounds.left,
+      //   y: event.clientY - reactFlowBounds.top,
+      // });
 
       const newNode = {
-        id: uniqueId(7),
+        id: uniqId,
         type: "custom",
         position,
         data: {
+          currentId: uniqId,
           title,
           nodeType: type,
-          // description: "",
-          // interval: "",
-          // url: "",
-          // screenshot: "none",
-          // cssSelecter: "",
           Icon,
           color,
           // ref,
@@ -157,7 +166,7 @@ function Editor() {
   const onPaneClick = useCallback(() => setMenu(null), [menu]);
 
   const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
-
+  const edgeTypes = useMemo(() => ({ 'custom-edge': CustomEdge }), []);
   const nodeColor = (node) => {
     return node.data.color;
   };
@@ -180,8 +189,12 @@ function Editor() {
       edges: edges.map((edge) => ({
         id: edge.id,
         source: edge.source,
+        sourceHandle: edge.sourceHandle ?? null,
         target: edge.target,
+        targetHandle: edge.targetHandle ?? null,
         type: edge.type,
+        animated: edge.animated ?? false,
+        style: edge.style ?? {},
         // Add other necessary properties here
       })),
     };
@@ -218,7 +231,7 @@ function Editor() {
         setNodes(nodes);
         setEdges(edges);
         setInitialized(true);
-        console.log('nodesss' ,nodes )
+        console.log('nodesss', nodes)
       } else {
         // Add default start node if no nodes are loaded from localStorage
         setNodes([defaultStartNode, defaultEndNode]);
@@ -229,10 +242,9 @@ function Editor() {
     }
   }, [setNodes, setEdges]);
 
-  // useEffect(() => {
-  //   console.log("nodes", nodes);
-  // }, [nodes]);
-
+  const onNodesDelete = useCallback((deletedNodes) => {
+    console.log("Deleted nodes: ", deletedNodes);
+  }, []);
 
   return (
     <section className="editor-wrapper" ref={reactFlowWrapper}>
@@ -240,6 +252,7 @@ function Editor() {
         ref={ref}
         nodes={nodes}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -253,6 +266,7 @@ function Editor() {
         deleteKeyCode={null}
         minZoom={0.3}
         maxZoom={1.2}
+        onNodesDelete={onNodesDelete}
       >
         <Background variant="dots" className="editor-bg" />
         <LeftPanel

@@ -46,7 +46,7 @@ const NodeEditor = () => {
     title,
     nodeType,
   } = data;
-  console.log('data=>', data)
+  // console.log('data=>', data)
 
   const addNode = (newNode) => {
     setNodes((prevNodes) => [...prevNodes, newNode]);
@@ -85,17 +85,15 @@ const NodeEditor = () => {
         if (
           nodes.length !== allNodes.length ||
           edges.length !== allEdges.length ||
-          storedNode[0]?.data?.description !== data.description ||
-          storedNode[0]?.data?.interval !== data.interval ||
-          storedNode[0]?.data?.url !== data.url
+          storedNode[0]?.data !== data
         ) {
           setIsUpdated(true);
         } else {
-          setIsUpdated(false);
+          // setIsUpdated(false);
         }
       }
     } catch (error) {
-      console.log({ error });
+      // console.log({ error });
     }
   }, [data, isUpdated, setIsUpdated, currentNode.id, getNodes, getEdges]);
 
@@ -117,7 +115,7 @@ const NodeEditor = () => {
       case "Input":
         return <InputNodeEditor data={data} handleChange={handleChange} />;
       case "If":
-        return <IfNodeEditor data={data} handleChange={handleChange} />;
+        return <IfNodeEditor data={data} handleChange={handleChange} addNode={addNode} />;
       case "Switch":
         return <SwitchNodeEditor data={data} handleChange={handleChange} />;
       case "Dial":

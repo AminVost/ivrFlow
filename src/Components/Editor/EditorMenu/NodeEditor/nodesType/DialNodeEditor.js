@@ -1,7 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField, Box, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel } from "@mui/material";
 
 const DialNodeEditor = ({ data, handleChange }) => {
+  const [showDetails, setShowDetails] = useState(false);
+
+  useEffect(() => {
+    data.showInfo = showDetails;
+  }, [showDetails, data]);
+
+  const handleCheckboxChange = (event) => {
+    setShowDetails(event.target.checked);
+
+    const modifiedEvent = {
+      ...event,
+      target: {
+        ...event.target,
+        name: event.target.name,
+        value: event.target.checked ? "on" : "off"
+      }
+    };
+
+    handleChange(modifiedEvent);
+  };
   const [extensionType, setExtensionType] = useState('');
 
   const handleExtensionTypeChange = (event) => {
@@ -512,39 +532,54 @@ const DialNodeEditor = ({ data, handleChange }) => {
   };
 
   return (
-    <Box component="form" noValidate autoComplete="off">
-      <TextField
-        label="Label"
-        name="label"
-        value={data.label || ''}
-        onChange={handleChange}
-        fullWidth
-        sx={{ mb: 1.2 }}
-      />
-      <TextField
-        label="Action"
-        name="action"
-        value="dial"
-        InputProps={{ readOnly: true }}
-        fullWidth
-        sx={{ mb: 1.2 }}
-      />
-      <FormControl sx={{ mb: 1.2, width: '100%' }}>
-        <InputLabel id="extension-type-label">Extension Type</InputLabel>
-        <Select
-          labelId="extension-type-label"
-          id="extension-type-select"
-          name="extensionType"
-          value={extensionType}
-          onChange={handleExtensionTypeChange}
-        >
-          {['Dial Out', 'Direct', 'Extension', 'Advance IVR', 'Simple IVR', 'Queue', 'Agent Login', 'Agent Logout', 'Agent Pause', 'Agent Unpause', 'Fax', 'Voicemail', 'Conference'].map((type) => (
-            <MenuItem key={type} value={type}>{type}</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      {renderExtensionTypeFields()}
-    </Box>
+    <>
+      <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              name="showInfo"
+              checked={showDetails}
+              onChange={handleCheckboxChange}
+              color="primary"
+            />
+          }
+          label="Show Info"
+        />
+      </Box>
+      <Box component="form" noValidate autoComplete="off">
+        <TextField
+          label="Label"
+          name="label"
+          value={data.label || ''}
+          onChange={handleChange}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
+        <TextField
+          label="Action"
+          name="action"
+          value="dial"
+          InputProps={{ readOnly: true }}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
+        <FormControl sx={{ mb: 1.2, width: '100%' }}>
+          <InputLabel id="extension-type-label">Extension Type</InputLabel>
+          <Select
+            labelId="extension-type-label"
+            id="extension-type-select"
+            name="extensionType"
+            value={extensionType}
+            onChange={handleExtensionTypeChange}
+          >
+            {['Dial Out', 'Direct', 'Extension', 'Advance IVR', 'Simple IVR', 'Queue', 'Agent Login', 'Agent Logout', 'Agent Pause', 'Agent Unpause', 'Fax', 'Voicemail', 'Conference'].map((type) => (
+              <MenuItem key={type} value={type}>{type}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        {renderExtensionTypeFields()}
+      </Box>
+    </>
   );
 };
 

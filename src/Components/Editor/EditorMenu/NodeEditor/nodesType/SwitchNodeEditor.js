@@ -1,9 +1,29 @@
 import React, { useState, useEffect } from "react";
 import './css/SwitchNodeEditor.css';
-import { TextField, Button, Box, FormControl, Select, MenuItem, InputLabel, IconButton } from "@mui/material";
+import { TextField, Button, Box, FormControl, Select, MenuItem, InputLabel, IconButton, Checkbox, FormControlLabel } from "@mui/material";
 import { Add, Delete } from '@mui/icons-material';
 
 const SwitchNodeEditor = ({ data, handleChange }) => {
+  const [showDetails, setShowDetails] = useState(false);
+
+  useEffect(() => {
+    data.showInfo = showDetails;
+  }, [showDetails, data]);
+
+  const handleCheckboxChange = (event) => {
+    setShowDetails(event.target.checked);
+
+    const modifiedEvent = {
+      ...event,
+      target: {
+        ...event.target,
+        name: event.target.name,
+        value: event.target.checked ? "on" : "off"
+      }
+    };
+
+    handleChange(modifiedEvent);
+  };
   // Initialize cases from data or create a default case
   const [cases, setCases] = useState(data.cases || [{ id: 1, operand: '', value: '' }]);
 
@@ -148,70 +168,85 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
   };
 
   return (
-    <Box component="form" noValidate autoComplete="off">
-      <TextField
-        label="Label"
-        name="label"
-        value={data.label || ''}
-        onChange={handleChange}
-        fullWidth
-        sx={{ mb: 1.2 }}
-      />
-
-      <TextField
-        label="Action"
-        name="action"
-        value="switch"
-        InputProps={{ readOnly: true }}
-        fullWidth
-        sx={{ mb: 1.2 }}
-      />
-
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 1.2 }}>
-        <h6 className="switchCaseTitle">
-          Switch Cases
-        </h6>
-        {cases.map((caseItem, index) => (
-          <Box key={caseItem.id} sx={{ flex: '1 1 auto', minWidth: '300px', display: 'flex', flexDirection: 'column', border: '1px solid #ccc', position: 'relative', borderRadius: '4px', padding: 2 }}>
-            <FormControl fullWidth sx={{ mb: 1 }}>
-              <InputLabel>Operand</InputLabel>
-              <Select
-                value={caseItem.operand}
-                onChange={(e) => handleCaseChange(index, 'operand', e.target.value)}
-              >
-                <MenuItem value="Time Frame">Time Frame</MenuItem>
-                <MenuItem value="List">List</MenuItem>
-                <MenuItem value="Pattern">Pattern</MenuItem>
-                <MenuItem value=">">Greater Than</MenuItem>
-                <MenuItem value="<">Less Than</MenuItem>
-                <MenuItem value="=>">Greater or Equal</MenuItem>
-                <MenuItem value="=">Equal</MenuItem>
-                <MenuItem value="!=">Not Equal</MenuItem>
-              </Select>
-            </FormControl>
-            {renderCaseElements(caseItem, index)}
-            <IconButton onClick={() => handleRemoveCase(index)} sx={removeButtonStyle}>
-              <Delete sx={{ color: '#1976d2', fontSize: '1.2rem' }} />
-            </IconButton>
-          </Box>
-        ))}
+    <>
+      <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              name="showInfo"
+              checked={showDetails}
+              onChange={handleCheckboxChange}
+              color="primary"
+            />
+          }
+          label="Show Info"
+        />
       </Box>
+      <Box component="form" noValidate autoComplete="off">
+        <TextField
+          label="Label"
+          name="label"
+          value={data.label || ''}
+          onChange={handleChange}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
 
-      <Button variant="outlined" onClick={handleAddCase} startIcon={<Add sx={{ color: '#1976d2' }} />}>
-        Add Case
-      </Button>
+        <TextField
+          label="Action"
+          name="action"
+          value="switch"
+          InputProps={{ readOnly: true }}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
 
-      <TextField
-        label="Comments"
-        name="comments"
-        multiline
-        rows={3}
-        value={data.comments || ''}
-        onChange={handleChange}
-        fullWidth
-        sx={{ mt: 2 }}
-      />
-    </Box>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 1.2 }}>
+          <h6 className="switchCaseTitle">
+            Switch Cases
+          </h6>
+          {cases.map((caseItem, index) => (
+            <Box key={caseItem.id} sx={{ flex: '1 1 auto', minWidth: '300px', display: 'flex', flexDirection: 'column', border: '1px solid #ccc', position: 'relative', borderRadius: '4px', padding: 2 }}>
+              <FormControl fullWidth sx={{ mb: 1 }}>
+                <InputLabel>Operand</InputLabel>
+                <Select
+                  value={caseItem.operand}
+                  onChange={(e) => handleCaseChange(index, 'operand', e.target.value)}
+                >
+                  <MenuItem value="Time Frame">Time Frame</MenuItem>
+                  <MenuItem value="List">List</MenuItem>
+                  <MenuItem value="Pattern">Pattern</MenuItem>
+                  <MenuItem value=">">Greater Than</MenuItem>
+                  <MenuItem value="<">Less Than</MenuItem>
+                  <MenuItem value="=>">Greater or Equal</MenuItem>
+                  <MenuItem value="=">Equal</MenuItem>
+                  <MenuItem value="!=">Not Equal</MenuItem>
+                </Select>
+              </FormControl>
+              {renderCaseElements(caseItem, index)}
+              <IconButton onClick={() => handleRemoveCase(index)} sx={removeButtonStyle}>
+                <Delete sx={{ color: '#1976d2', fontSize: '1.2rem' }} />
+              </IconButton>
+            </Box>
+          ))}
+        </Box>
+
+        <Button variant="outlined" onClick={handleAddCase} startIcon={<Add sx={{ color: '#1976d2' }} />}>
+          Add Case
+        </Button>
+
+        <TextField
+          label="Comments"
+          name="comments"
+          multiline
+          rows={3}
+          value={data.comments || ''}
+          onChange={handleChange}
+          fullWidth
+          sx={{ mt: 2 }}
+        />
+      </Box>
+    </>
   );
 };
 

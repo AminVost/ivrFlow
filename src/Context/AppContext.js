@@ -11,8 +11,9 @@ export const AppContextProvider = ({ children }) => {
   const [nodesUpdated, setNodesUpdated] = useState(false);
   const [isUpdated, setIsUpdated] = useState(false);
   const [activeEditor, setActiveEditor] = useState(false);
-
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
+  const [createdNodes, setCreatedNodes] = useState({});
+
 
   return (
     <AppContext.Provider
@@ -33,6 +34,8 @@ export const AppContextProvider = ({ children }) => {
         setIsUpdated,
         setActiveEditor,
         activeEditor,
+        createdNodes,
+        setCreatedNodes,
       }}
     >
       {children}

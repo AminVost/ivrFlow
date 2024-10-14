@@ -18,8 +18,9 @@ import ReactFlow, {
 } from "reactflow";
 import "./editor.css";
 import CustomNode from "./CustomNode/CustomNode";
+import CustomEdge from './CustomEdge/CustomEdge';
 import uniqueId from "../../utils/uniqueId";
-import ContextMenu from "./ContextMenu/ContextMenu";
+// import ContextMenu from "./ContextMenu/ContextMenu";
 import { RiSaveLine } from "react-icons/ri";
 import { TbSend } from "react-icons/tb";
 import { parse, stringify, toJSON, fromJSON } from "flatted";
@@ -76,11 +77,15 @@ function Editor() {
     isUpdated,
     setIsUpdated,
     setData,
+    setActiveEditor
   } = useContext(AppContext);
+
 
   const onConnect = useCallback(
     (params) => {
+      console.log('paramsss', params);
       params.type = "smoothstep";
+      // params.label ='label';
       setEdges((eds) => addEdge(params, eds));
       setIsUpdated(true);
     },
@@ -104,11 +109,15 @@ function Editor() {
       if (typeof type === "undefined" || !type) {
         return;
       }
-
+      // console.log('event', event)
       const position = reactFlowInstance.screenToFlowPosition({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
+        x: event.clientX - 105,
+        y: event.clientY,
       });
+      // const position = reactFlowInstance.screenToFlowPosition({
+      //   x: event.clientX - reactFlowBounds.left,
+      //   y: event.clientY - reactFlowBounds.top,
+      // });
 
       const newNode = {
         id: uniqId,
@@ -118,11 +127,6 @@ function Editor() {
           currentId: uniqId,
           title,
           nodeType: type,
-          // description: "",
-          // interval: "",
-          // url: "",
-          // screenshot: "none",
-          // cssSelecter: "",
           Icon,
           color,
           // ref,
@@ -158,7 +162,7 @@ function Editor() {
   const onPaneClick = useCallback(() => setMenu(null), [menu]);
 
   const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
-
+  const edgeTypes = useMemo(() => ({ 'custom-edge': CustomEdge }), []);
   const nodeColor = (node) => {
     return node.data.color;
   };
@@ -181,16 +185,21 @@ function Editor() {
       edges: edges.map((edge) => ({
         id: edge.id,
         source: edge.source,
+        sourceHandle: edge.sourceHandle ?? null,
         target: edge.target,
+        targetHandle: edge.targetHandle ?? null,
         type: edge.type,
+        animated: edge.animated ?? false,
+        style: edge.style ?? {},
         // Add other necessary properties here
       })),
     };
     console.log("workflowData", workflowData);
     localStorage.setItem("workflowData", stringify(workflowData));
   });
+  
 
-  useEffect(() => {
+  useEffect(() => {    
     if (reactFlowInstance && !initialized) {
       const { width, height } =
         reactFlowWrapper.current.getBoundingClientRect();
@@ -219,7 +228,6 @@ function Editor() {
         setNodes(nodes);
         setEdges(edges);
         setInitialized(true);
-        console.log('nodesss', nodes)
       } else {
         // Add default start node if no nodes are loaded from localStorage
         setNodes([defaultStartNode, defaultEndNode]);
@@ -230,17 +238,13 @@ function Editor() {
     }
   }, [setNodes, setEdges]);
 
-  // useEffect(() => {
-  //   console.log("nodes", nodes);
-  // }, [nodes]);
-
-
   return (
     <section className="editor-wrapper" ref={reactFlowWrapper}>
       <ReactFlow
         ref={ref}
         nodes={nodes}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -270,6 +274,7 @@ function Editor() {
           setData={setData}
           setIsUpdated={setIsUpdated}
           setVisiblePublish={setVisiblePublish}
+          setActiveEditor={setActiveEditor}
         />
         <Controls
           className="controls"
@@ -277,7 +282,7 @@ function Editor() {
           fitViewOptions={{ duration: 800 }}
         />
         <MiniMap nodeColor={nodeColor} className="mini-map" />
-        {menu && <ContextMenu onClick={onPaneClick} {...menu} />}
+        {/* {menu && <ContextMenu onClick={onPaneClick} {...menu} />} */}
         {width <= "815" && <MenuDrawer />}
       </ReactFlow>
     </section>
@@ -324,6 +329,7 @@ const RightPanel = memo(
     setData,
     isPublish,
     setVisiblePublish,
+    setActiveEditor
   }) => {
     return (
       <Panel position="top-right">
@@ -360,6 +366,7 @@ const RightPanel = memo(
               setVisiblePublish(true);
               setIsUpdated(false);
               setData((prev) => ({ ...prev, status: false }));
+              setActiveEditor(false)
             }
           }}
         >

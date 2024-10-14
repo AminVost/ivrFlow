@@ -6,10 +6,32 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Checkbox,
+  FormControlLabel
 } from "@mui/material";
 import InfoTooltipAdornment from "../../../../../utils/InfoTooltipAdornment";
 
 const PlaybackNodeEditor = ({ data, handleChange }) => {
+  const [showDetails, setShowDetails] = useState(false);
+
+  useEffect(() => {
+    data.showInfo = showDetails;
+  }, [showDetails, data]);
+
+  const handleCheckboxChange = (event) => {
+    setShowDetails(event.target.checked);
+
+    const modifiedEvent = {
+      ...event,
+      target: {
+        ...event.target,
+        name: event.target.name,
+        value: event.target.checked ? "on" : "off"
+      }
+    };
+
+    handleChange(modifiedEvent);
+  };
   const [playbackFirstSelectValue, setPlaybackFirstSelectValue] = useState(data?.fileType);
   const [playbackSecondOptions, setPlaybackSecondOptions] = useState([]);
   const [playbackSecondSelectValue, setPlaybackSecondSelectValue] = useState(
@@ -70,115 +92,130 @@ const PlaybackNodeEditor = ({ data, handleChange }) => {
   }, [playbackSecondOptions]);
 
   return (
-    <Box component="form" noValidate autoComplete="off">
-      <TextField
-        className="inputText"
-        id="labelPlayback"
-        name="label"
-        label="Label"
-        variant="outlined"
-        onChange={handleChange}
-        value={data.label || ""}
-        InputProps={{
-          endAdornment: (
-            <InfoTooltipAdornment tooltipText="This is the label" />
-          ),
-          sx: { paddingRight: 0 },
-        }}
-      />
-
-      <TextField
-        className="inputText"
-        id="actionPlayback"
-        name="action"
-        label="Action"
-        variant="outlined"
-        onChange={handleChange}
-        value="playback"
-        InputProps={{
-          readOnly: true,
-          endAdornment: (
-            <InfoTooltipAdornment tooltipText="This is the action" />
-          ),
-          sx: { paddingRight: 0 },
-        }}
-      />
-
-      <TextField
-        className="inputText"
-        id="varNamePlayback"
-        name="filePath"
-        label="File Path"
-        variant="outlined"
-        onChange={handleChange}
-        value={data.filePath || ""}
-        InputProps={{
-          endAdornment: (
-            <InfoTooltipAdornment tooltipText="This is the File Path Component" />
-          ),
-          sx: { paddingRight: 0 },
-        }}
-      />
-
-      <FormControl fullWidth>
-        <InputLabel id="first-select-playback-label">File Type</InputLabel>
-        <Select
-          labelId="first-select-playback-label"
-          id="first-select-playback"
-          name="fileType"
-          value={playbackFirstSelectValue}
-          label="File Type"
+    <>
+      <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              name="showInfo"
+              checked={showDetails}
+              onChange={handleCheckboxChange}
+              color="primary"
+            />
+          }
+          label="Show Info"
+        />
+      </Box>
+      <Box component="form" noValidate autoComplete="off">
+        <TextField
+          className="inputText"
+          id="labelPlayback"
+          name="label"
+          label="Label"
           variant="outlined"
-          onChange={handleFirstSelectChange}
-          endAdornment={
-            <InfoTooltipAdornment tooltipText="This is the File Type" />
-          }
-        >
-          <MenuItem value="type1">Type 1</MenuItem>
-          <MenuItem value="type2">Type 2</MenuItem>
-          <MenuItem value="type3">Type 3</MenuItem>
-        </Select>
-      </FormControl>
+          onChange={handleChange}
+          value={data.label || ""}
+          InputProps={{
+            endAdornment: (
+              <InfoTooltipAdornment tooltipText="This is the label" />
+            ),
+            sx: { paddingRight: 0 },
+          }}
+        />
 
-      <FormControl>
-        <InputLabel id="second-select-playback-label">File Item</InputLabel>
-        <Select
-          labelId="second-select-playback-label"
-          id="second-select-playback"
-          name="fileItem"
-          value={playbackSecondSelectValue}
-          label="File Item"
-          onChange={handleSecondSelectChange}
-          endAdornment={
-            <InfoTooltipAdornment tooltipText="This is the File Item" />
-          }
-        >
-          {playbackSecondOptions.map((option, index) => (
-            <MenuItem key={index} value={option}>
-              {option}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+        <TextField
+          className="inputText"
+          id="actionPlayback"
+          name="action"
+          label="Action"
+          variant="outlined"
+          onChange={handleChange}
+          value="playback"
+          InputProps={{
+            readOnly: true,
+            endAdornment: (
+              <InfoTooltipAdornment tooltipText="This is the action" />
+            ),
+            sx: { paddingRight: 0 },
+          }}
+        />
 
-      <TextField
-        className="inputText"
-        id="commentsPlayback"
-        multiline
-        rows={3}
-        name="comments"
-        label="Comments"
-        variant="outlined"
-        onChange={handleChange}
-        value={data.comments || ""}
-        InputProps={{
-          endAdornment: (
-            <InfoTooltipAdornment tooltipText="These are the comments" />
-          ),
-          sx: { paddingRight: 0 },
-        }}
-      />
-    </Box>
+        <TextField
+          className="inputText"
+          id="varNamePlayback"
+          name="filePath"
+          label="File Path"
+          variant="outlined"
+          onChange={handleChange}
+          value={data.filePath || ""}
+          InputProps={{
+            endAdornment: (
+              <InfoTooltipAdornment tooltipText="This is the File Path Component" />
+            ),
+            sx: { paddingRight: 0 },
+          }}
+        />
+
+        <FormControl fullWidth>
+          <InputLabel id="first-select-playback-label">File Type</InputLabel>
+          <Select
+            labelId="first-select-playback-label"
+            id="first-select-playback"
+            name="fileType"
+            value={playbackFirstSelectValue}
+            label="File Type"
+            variant="outlined"
+            onChange={handleFirstSelectChange}
+            endAdornment={
+              <InfoTooltipAdornment tooltipText="This is the File Type" />
+            }
+          >
+            <MenuItem value="type1">Type 1</MenuItem>
+            <MenuItem value="type2">Type 2</MenuItem>
+            <MenuItem value="type3">Type 3</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl>
+          <InputLabel id="second-select-playback-label">File Item</InputLabel>
+          <Select
+            labelId="second-select-playback-label"
+            id="second-select-playback"
+            name="fileItem"
+            value={playbackSecondSelectValue}
+            label="File Item"
+            onChange={handleSecondSelectChange}
+            endAdornment={
+              <InfoTooltipAdornment tooltipText="This is the File Item" />
+            }
+          >
+            {playbackSecondOptions.map((option, index) => (
+              <MenuItem key={index} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <TextField
+          className="inputText"
+          id="commentsPlayback"
+          multiline
+          rows={3}
+          name="comments"
+          label="Comments"
+          variant="outlined"
+          onChange={handleChange}
+          value={data.comments || ""}
+          InputProps={{
+            endAdornment: (
+              <InfoTooltipAdornment tooltipText="These are the comments" />
+            ),
+            sx: { paddingRight: 0 },
+          }}
+        />
+      </Box>
+    </>
   );
 };
 

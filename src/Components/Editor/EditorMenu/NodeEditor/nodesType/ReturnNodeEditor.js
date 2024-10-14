@@ -1,9 +1,42 @@
-import React from "react";
-import { TextField, Box } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { TextField, Box, Checkbox, FormControlLabel } from "@mui/material";
 
 const ReturnNodeEditor = ({ data, handleChange }) => {
+  const [showDetails, setShowDetails] = useState(false);
+
+  useEffect(() => {
+    data.showInfo = showDetails;
+  }, [showDetails, data]);
+
+  const handleCheckboxChange = (event) => {
+    setShowDetails(event.target.checked);
+
+    const modifiedEvent = {
+      ...event,
+      target: {
+        ...event.target,
+        name: event.target.name,
+        value: event.target.checked ? "on" : "off"
+      }
+    };
+
+    handleChange(modifiedEvent);
+  };
   return (
     <>
+      <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              name="showInfo"
+              checked={showDetails}
+              onChange={handleCheckboxChange}
+              color="primary"
+            />
+          }
+          label="Show Info"
+        />
+      </Box>
       <Box component="form" noValidate autoComplete="off">
         <TextField
           label="Label"
