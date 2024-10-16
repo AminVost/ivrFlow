@@ -155,3 +155,11 @@
   border-color: #a85b2a;
   border-width: thin;
 }
+.custom-node-wrapper.ivrCallFunction {
+  border-color: #ff3333;
+  border-width: thin;
+}
+.custom-node-wrapper.switchIvr {
+  border-color: #3383ff;
+  border-width: thin;
+}

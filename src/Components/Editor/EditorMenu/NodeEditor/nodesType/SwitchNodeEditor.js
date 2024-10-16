@@ -1,14 +1,132 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import './css/SwitchNodeEditor.css';
 import { TextField, Button, Box, FormControl, Select, MenuItem, InputLabel, IconButton, Checkbox, FormControlLabel } from "@mui/material";
 import { Add, Delete } from '@mui/icons-material';
+import { AppContext } from "../../../../../Context/AppContext";
+import { Handle, useReactFlow, addEdge } from "reactflow";
 
-const SwitchNodeEditor = ({ data, handleChange }) => {
+const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
+  console.log("data=>", data);
+  const { setNodes, getNodes,getNode ,setEdges } = useReactFlow();
+
+  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, setData } =
+    useContext(AppContext);
+  const reactFlowWrapper = useRef(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [updateNewNode, setUpdateNewNode] = useState(false);
+  const [cases, setCases] = useState(data.cases || [{ id: 1, operand: '', value: '' }]);
 
   useEffect(() => {
     data.showInfo = showDetails;
   }, [showDetails, data]);
+
+  useEffect(() => {
+    if (createdNodes && Object.keys(createdNodes).length !== 0) {
+      localStorage.setItem("createdNodes", JSON.stringify(createdNodes));
+    }
+  }, [createdNodes, updateNewNode]);
+
+  const handleSelectChange = (index, event) => {
+    const { value, name } = event.target;
+    
+    handleChange(event);
+
+    if (!reactFlowInstance || !reactFlowWrapper.current) {
+      console.log("Flow instance or wrapper not available.");
+      return;
+    }
+
+    const currentNode = reactFlowInstance?.getNode(data.currentId);
+    console.log("currentNode", currentNode);
+
+    const createOrUpdateNode = (
+      index,
+      value,
+      nodeId
+    ) => {
+      if (!createdNodes[nodeId]) {
+        const position = {
+          // x: currentNode.position.x + currentNode.width * 1.5 ,
+          x: currentNode.position.x + (index % 2 === 0
+            ? + currentNode.width * 1.5
+            : - currentNode.width * 1.5),
+          y: currentNode.position.y,
+        };
+
+        const newNode = {
+          id: `${nodeId}`,
+          type: "custom",
+          position,
+          data: {
+            title: `Go To IVR ${value}`,
+            nodeType: `switchIvr`,
+            Icon: "RiExternalLinkLine",
+            color: "#3383ff",
+          },
+        };
+
+        setIsUpdated(true);
+        addNode(newNode);
+        setCreatedNodes((prevNodes) => ({
+          ...prevNodes,
+          [nodeId]: newNode,
+        }));
+
+        const newEdge = {
+          id: `edge-${currentNode.id}-${newNode.id}`,
+          source: currentNode.id,
+          sourceHandle: index % 2 === 0 ? 'switch-source-right' : 'switch-source-left',
+          target: newNode.id,
+          type: "smoothstep",
+          animated: true,
+          style: { stroke: "#3383ff" },
+        };
+
+        reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
+        console.log(
+          `New node and edge added:`,
+          newNode,
+          newEdge
+        );
+      } else {
+        reactFlowInstance.setNodes((nds) =>
+          nds.map((node) => {
+            if (node.id === createdNodes[nodeId].id) {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  title: `Go To IVR ${value}`,
+                },
+              };
+            }
+            return node;
+          })
+        );
+        setCreatedNodes((prevNodes) => ({
+          ...prevNodes,
+          [nodeId]: {
+            ...prevNodes[nodeId],
+            data: {
+              ...prevNodes[nodeId].data,
+              title: `Go To IVR ${value}`,
+            },
+          },
+        }));
+        setUpdateNewNode(!updateNewNode);
+        setIsUpdated(true);
+      }
+    };
+
+    const switchNodeId = `${data.currentId}-${index}`;
+
+    createOrUpdateNode(
+      index,
+      value,
+      switchNodeId
+    );
+
+  };
 
   const handleCheckboxChange = (event) => {
     setShowDetails(event.target.checked);
@@ -24,11 +142,8 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
 
     handleChange(modifiedEvent);
   };
-  // Initialize cases from data or create a default case
-  const [cases, setCases] = useState(data.cases || [{ id: 1, operand: '', value: '' }]);
 
   useEffect(() => {
-    // Update the parent component with the new cases array whenever it changes
     handleChange({ target: { name: 'cases', value: cases } });
   }, [cases]);
 
@@ -38,8 +153,32 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
 
   const handleRemoveCase = (index) => {
     setCases(cases.filter((_, i) => i !== index));
-  };
+    console.log('casess' , cases);
+    console.log('data after remove' , data)
+    let nodeIdToDelete = data.currentId + '-' + index;
+    let nodeToDelete = getNode(nodeIdToDelete);
 
+    if (nodeToDelete != undefined && nodeToDelete.hasOwnProperty('id')) {
+
+      setNodes((nodes) => nodes.filter((node) => node.id !== nodeToDelete.id));
+      setEdges((edges) =>
+        edges.filter(
+          (edge) => edge.id !== `edge-${data.currentId}-${nodeToDelete.id}`
+        )
+      );
+      const updatedNodes = { ...createdNodes };
+      const nodeKey = Object.keys(updatedNodes).find((key) => key == nodeToDelete.id);
+
+      if (nodeKey) {
+        delete updatedNodes[nodeKey];
+        console.log('Updated Nodes:', updatedNodes);
+        localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
+        setCreatedNodes(updatedNodes);
+      }
+      setData((prev) => ({ ...prev, status: false }));
+    }
+  };
+  
   const handleCaseChange = (index, field, value) => {
     const updatedCases = cases.map((caseItem, i) =>
       i === index ? { ...caseItem, [field]: value } : caseItem
@@ -48,6 +187,7 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
   };
 
   const renderCaseElements = (caseItem, index) => {
+    console.log('caseItem', caseItem);    
     switch (caseItem.operand) {
       case 'Time Frame':
         return (
@@ -63,10 +203,15 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
               </Select>
             </FormControl>
             <FormControl fullWidth sx={{ mr: 1 }}>
-              <InputLabel>IvrFlow</InputLabel>
+              <InputLabel id={'switchIvrLabel-' + index}>IvrFlow</InputLabel>
               <Select
+                labelId={'switchIvrLabel-' + index}
+                id={'switchIvr-' + index}
+                name={'switchIvr-' + index}
+                label='ivrItem'
+                variant="outlined"
                 value={caseItem.ivrFlow || ''}
-                onChange={(e) => handleCaseChange(index, 'ivrFlow', e.target.value)}
+                onChange={(e) => handleSelectChange(index, e)}
               >
                 {/* Add IvrFlow options here */}
                 <MenuItem value="Flow 1">Flow 1</MenuItem>
@@ -92,21 +237,31 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
               sx={{ mr: 1 }}
             />
             <FormControl fullWidth sx={{ mr: 1 }}>
-              <InputLabel>List</InputLabel>
+              <InputLabel>IvrFlow</InputLabel>
               <Select
-                value={caseItem.list || ''}
-                onChange={(e) => handleCaseChange(index, 'list', e.target.value)}
+                labelId={'switchIvrLabel-' + index}
+                id={'switchIvr-' + index}
+                name={'switchIvr-' + index}
+                label='ivrItem'
+                variant="outlined"
+                value={caseItem.ivrFlow || ''}
+                onChange={(e) => handleSelectChange(index, e)}
               >
-                {/* Add List options here */}
-                <MenuItem value="List 1">List 1</MenuItem>
-                <MenuItem value="List 2">List 2</MenuItem>
+                {/* Add IvrFlow options here */}
+                <MenuItem value="Flow 1">Flow 1</MenuItem>
+                <MenuItem value="Flow 2">Flow 2</MenuItem>
               </Select>
             </FormControl>
             <FormControl fullWidth sx={{ mr: 1 }}>
-              <InputLabel>IvrFlow</InputLabel>
+              <InputLabel id={'switchIvrLabel-' + index}>IvrFlow</InputLabel>
               <Select
+                labelId={'switchIvrLabel-' + index}
+                id={'switchIvr-' + index}
+                name={'switchIvr-' + index}
+                label='ivrItem'
+                variant="outlined"
                 value={caseItem.ivrFlow || ''}
-                onChange={(e) => handleCaseChange(index, 'ivrFlow', e.target.value)}
+                onChange={(e) => handleSelectChange(index, e)}
               >
                 {/* Add IvrFlow options here */}
                 <MenuItem value="Flow 1">Flow 1</MenuItem>
@@ -147,13 +302,22 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
                 <MenuItem value="Option 2">Option 2</MenuItem>
               </Select>
             </FormControl>
-            <TextField
-              placeholder="IvrFlow"
-              value={caseItem.ivrFlow || ''}
-              onChange={(e) => handleCaseChange(index, 'ivrFlow', e.target.value)}
-              fullWidth
-              sx={{ mr: 1 }}
-            />
+            <FormControl fullWidth sx={{ mr: 1 }}>
+              <InputLabel id={'switchIvrLabel-' + index}>IvrFlow</InputLabel>
+              <Select
+                labelId={'switchIvrLabel-' + index}
+                id={'switchIvr-' + index}
+                name={'switchIvr-' + index}
+                label='ivrItem'
+                variant="outlined"
+                value={caseItem.ivrFlow || ''}
+                onChange={(e) => handleSelectChange(index, e)}
+              >
+                {/* Add IvrFlow options here */}
+                <MenuItem value="Flow 1">Flow 1</MenuItem>
+                <MenuItem value="Flow 2">Flow 2</MenuItem>
+              </Select>
+            </FormControl>
             <TextField
               placeholder="Textbox"
               value={caseItem.textbox || ''}
@@ -182,7 +346,7 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
           label="Show Info"
         />
       </Box>
-      <Box component="form" noValidate autoComplete="off">
+      <Box component="form" noValidate autoComplete="off" ref={reactFlowWrapper}>
         <TextField
           label="Label"
           name="label"

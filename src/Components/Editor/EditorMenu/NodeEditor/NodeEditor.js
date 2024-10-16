@@ -117,7 +117,7 @@ const NodeEditor = () => {
       case "If":
         return <IfNodeEditor data={data} handleChange={handleChange} addNode={addNode} />;
       case "Switch":
-        return <SwitchNodeEditor data={data} handleChange={handleChange} />;
+        return <SwitchNodeEditor data={data} handleChange={handleChange} addNode={addNode} />;
       case "Dial":
         return <DialNodeEditor data={data} handleChange={handleChange} />;
       case "Set":
@@ -125,7 +125,7 @@ const NodeEditor = () => {
       case "GoTo":
         return <GoToNodeEditor data={data} handleChange={handleChange} addNode={addNode} />;
       case "CallFunction":
-        return <CallFunctionNodeEditor data={data} handleChange={handleChange} />;
+        return <CallFunctionNodeEditor data={data} handleChange={handleChange} addNode={addNode} />;
       case "Rpc":
         return <RpcNodeEditor data={data} handleChange={handleChange} />;
       case "SendFax":

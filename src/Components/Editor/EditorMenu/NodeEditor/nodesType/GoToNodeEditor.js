@@ -10,7 +10,6 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import { AppContext } from "../../../../../Context/AppContext";
-import uniqueId from "../../../../../utils/uniqueId";
 import ReactFlow, { addEdge } from "reactflow";
 
 const GoToNodeEditor = ({ data, handleChange, addNode }) => {

@@ -71,17 +71,26 @@ const CustomNode = ({ id }) => {
   return (
     <>
       <div className="nodeItem">
-        {nodeType !== "start" && nodeType !== "gotoIvr" && !nodeType.includes("ifIvr") && (
+        {nodeType !== "start" && nodeType !== "gotoIvr" && nodeType !== "switchIvr" && !nodeType.includes("ifIvr") && nodeType !== "ivrCallFunction" && (
           <Handle className="edge-handle top" type="source" position="top" />
         )}
 
         {nodeType == "GoTo" && (
           <Handle className="edge-handle left" type="source" position="left" id="goto-source-right" />
         )}
+        {nodeType == "CallFunction" && (
+          <Handle className="edge-handle left" type="source" position="left" id="callFunction-source-right" />
+        )}
         {nodeType == "If" && (
           <>
             <Handle className="edge-handle left" type="source" position="left" id="if-false-source-left" />
             <Handle className="edge-handle right" type="source" position="right" id="if-true-source-right" />
+          </>
+        )}
+        {nodeType == "Switch" && (
+          <>
+            <Handle className="edge-handle left" type="source" position="left" id="switch-source-left" />
+            <Handle className="edge-handle right" type="source" position="right" id="switch-source-right" />
           </>
         )}
         {nodeType !== "start" && nodeType !== "end" && (
@@ -98,7 +107,7 @@ const CustomNode = ({ id }) => {
                   setIsUpdated(true);
                 }}
               />
-              {nodeType !== "gotoIvr" && !nodeType.includes("ifIvr") && (
+              {nodeType !== "gotoIvr" && nodeType !== "switchIvr" && !nodeType.includes("ifIvr") && (
                 <BiPencil
                   onClick={() => {
                     setData((prev) => ({
@@ -123,7 +132,7 @@ const CustomNode = ({ id }) => {
         <div
           onMouseEnter={() => setIsVisible(true)}
           onMouseLeave={() => setIsVisible(false)}
-          className={`custom-node-wrapper ${selected ? "selected" : ""} ${nodeType === "start" ? "startClass" : ""} ${nodeType === "end" ? "endClass" : ""} ${nodeType.includes("ifIvr") ? 'ifIvr' : ""} ${nodeType === "gotoIvr" ? 'gotoIvr' : ""}`}
+          className={`custom-node-wrapper ${selected ? "selected" : ""} ${nodeType === "start" ? "startClass" : ""} ${nodeType === "end" ? "endClass" : ""} ${nodeType.includes("ifIvr") ? 'ifIvr' : ""} ${nodeType === "gotoIvr" ? 'gotoIvr' : ""} ${nodeType === "ivrCallFunction" ? 'ivrCallFunction' : ""} ${nodeType === "switchIvr" ? 'switchIvr' : ""}`}
           onClick={() => centerSelectedNode(id, reactFlowInstance)}
         >
           {nodeType !== "end" && (
@@ -131,7 +140,7 @@ const CustomNode = ({ id }) => {
               className={`${nodeType === "start" ? "startNodeIcon" : ""}`}
               style={{ backgroundColor: nodeType === "start" ? "white" : color }}
             >
-              {nodeType == "gotoIvr" || nodeType.includes("ifIvr") ? (
+              {nodeType == "gotoIvr" || nodeType.includes("ifIvr") || nodeType == "ivrCallFunction" || nodeType == "switchIvr" ? (
                 <a className="nodeLabel" href="#!" target="_blank">
                   {getIcons(Icon)}
                 </a>
@@ -141,7 +150,7 @@ const CustomNode = ({ id }) => {
             </div>
           )}
           <div className="nodInfo">
-            {nodeType == "gotoIvr" || nodeType.includes("ifIvr") ? (
+            {nodeType == "gotoIvr" || nodeType.includes("ifIvr") || nodeType == "ivrCallFunction" || nodeType == "switchIvr" ? (
               <a className="nodeLabel" href="#!" target="_blank">
                 {stringReducer(title, 30)}
               </a>

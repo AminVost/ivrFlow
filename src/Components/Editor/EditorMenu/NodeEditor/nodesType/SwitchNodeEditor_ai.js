@@ -1,43 +1,104 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import './css/SwitchNodeEditor.css';
-import { TextField, Button, Box, FormControl, Select, MenuItem, InputLabel, IconButton, Checkbox, FormControlLabel } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Box,
+  FormControl,
+  Select,
+  MenuItem,
+  InputLabel,
+  IconButton,
+  Checkbox,
+  FormControlLabel
+} from "@mui/material";
 import { Add, Delete } from '@mui/icons-material';
+import { AppContext } from "../../../../../Context/AppContext";
+import { Handle, useReactFlow, addEdge } from "reactflow";
 
-const SwitchNodeEditor = ({ data, handleChange }) => {
+const SwitchNodeEditor = ({ data, handleChange ,addNode }) => {
   const [showDetails, setShowDetails] = useState(false);
+  const [cases, setCases] = useState(data.cases || [{ id: 1, operand: '', value: '', ivrFlow: '' }]);
+  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes } = useContext(AppContext);
+  const reactFlowWrapper = useRef(null);
 
   useEffect(() => {
     data.showInfo = showDetails;
   }, [showDetails, data]);
 
-  const handleCheckboxChange = (event) => {
-    setShowDetails(event.target.checked);
-
-    const modifiedEvent = {
-      ...event,
-      target: {
-        ...event.target,
-        name: event.target.name,
-        value: event.target.checked ? "on" : "off"
-      }
-    };
-
-    handleChange(modifiedEvent);
-  };
-  // Initialize cases from data or create a default case
-  const [cases, setCases] = useState(data.cases || [{ id: 1, operand: '', value: '' }]);
-
   useEffect(() => {
-    // Update the parent component with the new cases array whenever it changes
     handleChange({ target: { name: 'cases', value: cases } });
   }, [cases]);
 
-  const handleAddCase = () => {
-    setCases([...cases, { id: cases.length + 1, operand: '', value: '' }]);
+  const createOrUpdateNode = (nodeId, ivrFlow, position) => {
+    if (!createdNodes[nodeId]) {
+      const newNode = {
+        id: nodeId,
+        type: 'custom',
+        position,
+        data: {
+          title: `IVR ${ivrFlow}`,
+          nodeType: `ivr-${ivrFlow}`,
+          Icon: "RiExternalLinkLine",
+          color: "#ff8333",
+        },
+      };
+
+      setIsUpdated(true);
+      addNode(newNode);
+      setCreatedNodes((prevNodes) => ({
+        ...prevNodes,
+        [nodeId]: newNode,
+      }));
+
+      const newEdge = {
+        id: `edge-${data.currentId}-${newNode.id}`,
+        source: data.currentId,
+        sourceHandle: position.x > 0 ? "right" : "left",
+        target: newNode.id,
+        type: "smoothstep",
+        animated: true,
+        style: { stroke: "#ff8333" },
+        data: { label: ivrFlow },
+      };
+
+      reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
+    } else {
+      reactFlowInstance.setNodes((nds) =>
+        nds.map((node) => {
+          if (node.id === createdNodes[nodeId].id) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                title: `IVR ${ivrFlow}`,
+              },
+            };
+          }
+          return node;
+        })
+      );
+      setCreatedNodes((prevNodes) => ({
+        ...prevNodes,
+        [nodeId]: {
+          ...prevNodes[nodeId],
+          data: {
+            ...prevNodes[nodeId].data,
+            title: `IVR ${ivrFlow}`,
+          },
+        },
+      }));
+    }
   };
 
-  const handleRemoveCase = (index) => {
-    setCases(cases.filter((_, i) => i !== index));
+  const handleRemoveNode = (nodeId) => {
+    reactFlowInstance.setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
+    reactFlowInstance.setEdges((edges) => edges.filter((edge) => !edge.id.includes(nodeId)));
+    setCreatedNodes((prevNodes) => {
+      const updatedNodes = { ...prevNodes };
+      delete updatedNodes[nodeId];
+      return updatedNodes;
+    });
   };
 
   const handleCaseChange = (index, field, value) => {
@@ -45,6 +106,29 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
       i === index ? { ...caseItem, [field]: value } : caseItem
     );
     setCases(updatedCases);
+
+    // Create or update the node when the IvrFlow is selected
+    if (field === 'ivrFlow' && value) {
+      const currentNode = reactFlowInstance.getNode(data.currentId);
+
+      const position = {
+        x: currentNode.position.x + (index % 2 === 0 ? currentNode.width * 1.5 : -currentNode.width * 1.5),
+        y: currentNode.position.y + (index * 100), // adjust vertical position based on index
+      };
+      const nodeId = `${data.currentId}-case-${index}`;
+      createOrUpdateNode(nodeId, value, position);
+    }
+  };
+
+  const handleAddCase = () => {
+    setCases([...cases, { id: cases.length + 1, operand: '', value: '', ivrFlow: '' }]);
+  };
+
+  const handleRemoveCase = (index) => {
+    console.log('handleRemoveCase')
+    const nodeId = `${data.currentId}-case-${index}`;
+    handleRemoveNode(nodeId); // Remove node when a case is deleted
+    setCases(cases.filter((_, i) => i !== index));
   };
 
   const renderCaseElements = (caseItem, index) => {
@@ -175,28 +259,19 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
             <Checkbox
               name="showInfo"
               checked={showDetails}
-              onChange={handleCheckboxChange}
+              onChange={(e) => setShowDetails(e.target.checked)}
               color="primary"
             />
           }
           label="Show Info"
         />
       </Box>
-      <Box component="form" noValidate autoComplete="off">
+      <Box component="form" noValidate autoComplete="off"  ref={reactFlowWrapper}>
         <TextField
           label="Label"
           name="label"
           value={data.label || ''}
           onChange={handleChange}
-          fullWidth
-          sx={{ mb: 1.2 }}
-        />
-
-        <TextField
-          label="Action"
-          name="action"
-          value="switch"
-          InputProps={{ readOnly: true }}
           fullWidth
           sx={{ mb: 1.2 }}
         />
@@ -224,7 +299,7 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
                 </Select>
               </FormControl>
               {renderCaseElements(caseItem, index)}
-              <IconButton onClick={() => handleRemoveCase(index)} sx={removeButtonStyle}>
+              <IconButton onClick={() => handleRemoveCase(index)} sx={{ alignSelf: 'flex-end' }}>
                 <Delete sx={{ color: '#1976d2', fontSize: '1.2rem' }} />
               </IconButton>
             </Box>
@@ -234,36 +309,9 @@ const SwitchNodeEditor = ({ data, handleChange }) => {
         <Button variant="outlined" onClick={handleAddCase} startIcon={<Add sx={{ color: '#1976d2' }} />}>
           Add Case
         </Button>
-
-        <TextField
-          label="Comments"
-          name="comments"
-          multiline
-          rows={3}
-          value={data.comments || ''}
-          onChange={handleChange}
-          fullWidth
-          sx={{ mt: 2 }}
-        />
       </Box>
     </>
   );
 };
 
 export default SwitchNodeEditor;
-
-const removeButtonStyle = {
-  width: '1.5rem',
-  height: '1.5rem',
-  border: '1px solid #1976d2',
-  padding: '1rem',
-  margin: '0 auto',
-  marginTop: '.5rem',
-  '&:hover': {
-    backgroundColor: '#c0392b',
-    border: '1px solid white',
-    '& svg': {
-      color: 'white',
-    },
-  },
-};
