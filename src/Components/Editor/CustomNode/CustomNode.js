@@ -28,7 +28,7 @@ const CustomNode = ({ id }) => {
   useEffect(() => {
     const storedNodes = localStorage.getItem("createdNodes");
     if (storedNodes) {
-      console.log("read localStorage CustomNode", JSON.parse(storedNodes));
+      // console.log("read localStorage CustomNode", JSON.parse(storedNodes));
       setCreatedNodes(JSON.parse(storedNodes));
     }
   }, []);
@@ -50,23 +50,63 @@ const CustomNode = ({ id }) => {
     }
   };
 
+  // const deleteNode = useCallback(() => {
+  //   if (id !== "start" && id !== "end") {
+
+  //     setNodes((nodes) => nodes.filter((node) => node.id !== id));
+  //     setData((prev) => ({ ...prev, status: false }));
+
+  //     const updatedNodes = { ...createdNodes };
+  //     const nodeKey = Object.keys(updatedNodes).find((key) => key.includes(id));
+
+  //     if (nodeKey) {
+  //       delete updatedNodes[nodeKey];
+  //       console.log('Updated Nodes:', updatedNodes);
+  //       localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
+  //       setCreatedNodes(updatedNodes);
+  //     }
+  //   }
+  // }, [id, createdNodes, setNodes, setCreatedNodes, setData]);
+
   const deleteNode = useCallback(() => {
     if (id !== "start" && id !== "end") {
-
-      setNodes((nodes) => nodes.filter((node) => node.id !== id));
+      const edges = reactFlowInstance.getEdges();
+  
+      const connectedEdges = edges.filter(
+        (edge) => edge.source === id
+      );
+  
+      const connectedNodeIds = connectedEdges.map((edge) =>
+        edge.source === id ? edge.target : ''
+      );
+  
+      reactFlowInstance.setNodes((nodes) =>
+        nodes.filter(
+          (node) => node.id !== id && !connectedNodeIds.includes(node.id)
+        )
+      );
+  
+      reactFlowInstance.setEdges((edges) =>
+        edges.filter(
+          (edge) => edge.source !== id && edge.target !== id
+        )
+      );
+  
       setData((prev) => ({ ...prev, status: false }));
-
+  
       const updatedNodes = { ...createdNodes };
       const nodeKey = Object.keys(updatedNodes).find((key) => key.includes(id));
-
+  
       if (nodeKey) {
         delete updatedNodes[nodeKey];
-        console.log('Updated Nodes:', updatedNodes);
+        console.log("Updated Nodes:", updatedNodes);
         localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
         setCreatedNodes(updatedNodes);
       }
+  
+      setIsUpdated(true);
     }
-  }, [id, createdNodes, setNodes, setCreatedNodes, setData]);
+  }, [id, createdNodes, setNodes, setCreatedNodes, setData, reactFlowInstance, setIsUpdated]);
 
   return (
     <>
@@ -93,20 +133,23 @@ const CustomNode = ({ id }) => {
             <Handle className="edge-handle right" type="source" position="right" id="switch-source-right" />
           </>
         )}
-        {nodeType !== "start" && nodeType !== "end" && (
+        {nodeType !== "start" && nodeType !== "end" && nodeType !== "gotoIvr" && nodeType !== "switchIvr" && (
           <div
             className={`toolbar-wrapper ${nodeType === "start" ? "hidden" : ""}`}
             style={{ display: isVisible ? "flex" : "none" }}
             onMouseEnter={() => setIsVisible(true)}
             onMouseLeave={() => setIsVisible(false)}
           >
+
             <div>
-              <AiOutlineDelete
-                onClick={() => {
-                  deleteNode();
-                  setIsUpdated(true);
-                }}
-              />
+              {nodeType !== "gotoIvr" && nodeType !== "switchIvr" && (
+                <AiOutlineDelete
+                  onClick={() => {
+                    deleteNode();
+                    setIsUpdated(true);
+                  }}
+                />
+              )}
               {nodeType !== "gotoIvr" && nodeType !== "switchIvr" && !nodeType.includes("ifIvr") && (
                 <BiPencil
                   onClick={() => {

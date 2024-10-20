@@ -26,6 +26,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
   }, [createdNodes, updateNewNode]);
 
   const handleSelectChange = (index, value) => {
+    // const { value, name } = event.target;
 
     if (!reactFlowInstance || !reactFlowWrapper.current) {
       console.log("Flow instance or wrapper not available.");
@@ -42,6 +43,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
     ) => {
       if (!createdNodes[nodeId]) {
         const position = {
+          // x: currentNode.position.x + currentNode.width * 1.5 ,
           x: currentNode.position.x + (index % 2 === 0
             ? + currentNode.width * 1.5
             : - currentNode.width * 1.5),
@@ -63,9 +65,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
         console.log("Creating new node:", newNode);
 
         setIsUpdated(true);
-        // addNode(newNode);
-        // reactFlowInstance.setNodes((prevNodes) => [...prevNodes, newNode]);
-        reactFlowInstance.setNodes((nds) => nds.concat(newNode));
+        addNode(newNode);
         setCreatedNodes((prevNodes) => ({
           ...prevNodes,
           [nodeId]: newNode,
@@ -143,7 +143,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
       switchNodeId
     );
 
-  };  
+  };
 
   const handleCheckboxChange = (event) => {
     setShowDetails(event.target.checked);
@@ -158,20 +158,22 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
     };
 
     handleChange(modifiedEvent);
-  };  
+  };
 
   useEffect(() => {
     handleChange({ target: { name: 'cases', value: cases } });
+    console.log('cases useEffect');
   }, [cases]);
 
   const handleAddCase = () => {
     setCases([...cases, { id: cases.length + 1, operand: '', value: '' }]);
   };
 
-  const handleRemoveCase = (index , caseItem) => {
-    // setCases(cases.filter((_, i) => i !== index));
-    setCases((cases) => cases.filter((item) => item.id !== caseItem.id));
-
+  const handleRemoveCase = (index) => {
+    // return;
+    setCases(cases.filter((_, i) => i !== index));
+    console.log('casess', cases);
+    console.log('data after remove', data)
     let nodeIdToDelete = data.currentId + '-' + index;
     console.log('Removing node with id:', nodeIdToDelete);
     let nodeToDelete = reactFlowInstance.getNode(nodeIdToDelete);
@@ -179,6 +181,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
     if (nodeToDelete != undefined && nodeToDelete.hasOwnProperty('id')) {
       console.log('Node found for deletion:', nodeToDelete);
       reactFlowInstance.setNodes((nodes) => nodes.filter((node) => node.id !== nodeToDelete.id));
+      console.log('Nodes after deletion:', updatedNodes);
       reactFlowInstance.setEdges((edges) =>
         edges.filter(
           (edge) => edge.id !== `edge-${data.currentId}-${nodeToDelete.id}`
@@ -193,7 +196,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
         localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
         setCreatedNodes(updatedNodes);
       }
-      // setData((prev) => ({ ...prev, status: false }));
+      setData((prev) => ({ ...prev, status: false }));
     }
   };
 
@@ -206,11 +209,10 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
       handleSelectChange(index, value)
     }
     setCases(updatedCases);
-    // handleChange({ target: { name: 'cases', value: cases } });
   };
 
   const renderCaseElements = (caseItem, index) => {
-    // console.log('caseItem', caseItem);
+    console.log('caseItem', caseItem);
     switch (caseItem.operand) {
       case 'Time Frame':
         return (
@@ -410,7 +412,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
                 </Select>
               </FormControl>
               {renderCaseElements(caseItem, index)}
-              <IconButton onClick={() => handleRemoveCase(index , caseItem)} sx={removeButtonStyle}>
+              <IconButton onClick={() => handleRemoveCase(index)} sx={removeButtonStyle}>
                 <Delete sx={{ color: '#1976d2', fontSize: '1.2rem' }} />
               </IconButton>
             </Box>

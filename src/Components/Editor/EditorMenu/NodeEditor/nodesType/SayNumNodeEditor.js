@@ -13,6 +13,7 @@ import InfoTooltipAdornment from "../../../../../utils/InfoTooltipAdornment";
 
 const SayNumNodeEditor = ({ data, handleChange }) => {
   const [showDetails, setShowDetails] = useState(false);
+   console.log('data=>'  ,data)
 
   useEffect(() => {
     data.showInfo = showDetails;

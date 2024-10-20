@@ -41,7 +41,9 @@ const NodeEditor = () => {
     isUpdated,
     setActiveEditor,
   } = useContext(AppContext);
-  const { data } = currentNode;
+  const { id, data } = currentNode;
+  // console.log('currentNode=>', currentNode)
+  // console.log('data===>', data)
   const {
     title,
     nodeType,
@@ -67,10 +69,12 @@ const NodeEditor = () => {
   const handleChange = (e) => {
     const { name: key, value } = e.target;
     console.log('key, value =>', key, value);
-    const { id, data } = currentNode;
+    // const { id, data } = currentNode;
     const updatedData = { ...data, [key]: value };
     setData((prevData) => ({ ...prevData, data: updatedData }));
-    updateEditorNode(key, value, id);
+    setTimeout(() => {
+      updateEditorNode(key, value, id);
+    }, 100);
   };
 
   useEffect(() => {
