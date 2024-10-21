@@ -1,20 +1,41 @@
 import React, { useEffect, useRef, useContext, useState } from "react";
-import { TextField, Box, FormControl, InputLabel, Select, MenuItem,Checkbox, FormControlLabel } from "@mui/material";
+import {
+  TextField,
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Checkbox,
+  FormControlLabel,
+} from "@mui/material";
 import { AppContext } from "../../../../../Context/AppContext";
-import uniqueId from "../../../../../utils/uniqueId";
-import ReactFlow, {
-  addEdge,
-} from "reactflow";
+import ReactFlow, { addEdge } from "reactflow";
 
 const GoToNodeEditor = ({ data, handleChange, addNode }) => {
-  const { reactFlowInstance, setIsUpdated } = useContext(AppContext);
+  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes,changeChildIf } =
+    useContext(AppContext);
   const reactFlowWrapper = useRef(null);
-  const [createdNode, setCreatedNode] = useState(null); 
   const [showDetails, setShowDetails] = useState(false);
+  const [updateNewNode, setUpdateNewNode] = useState(false);
+  console.log("data=>", data);
 
   useEffect(() => {
     data.showInfo = showDetails;
   }, [showDetails, data]);
+
+  useEffect(() => {
+    if (changeChildIf.parentId == data.currentId) {
+      handleChange({ target: { name: 'advanceIvr', value: null } })
+    }
+  }, [changeChildIf]);
+
+  useEffect(() => {
+    if (createdNodes && Object.keys(createdNodes).length !== 0) {
+      localStorage.setItem("createdNodes", JSON.stringify(createdNodes));
+      // console.log("setttt", createdNodes);
+    }
+  }, [createdNodes, updateNewNode]);
 
   const handleCheckboxChange = (event) => {
     setShowDetails(event.target.checked);
@@ -24,90 +45,109 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
       target: {
         ...event.target,
         name: event.target.name,
-        value: event.target.checked ? "on" : "off"
-      }
+        value: event.target.checked ? "on" : "off",
+      },
     };
 
     handleChange(modifiedEvent);
   };
 
   const handleSelectChange = (event) => {
-    const { value } = event.target;
-    handleChange(event); 
+    const { value, name } = event.target;
+    handleChange(event);
 
-    console.log('reactFlowInstance' , reactFlowInstance)
     if (!reactFlowInstance || !reactFlowWrapper.current) {
-      console.log('Flow instance or wrapper not available.');
+      console.log("Flow instance or wrapper not available.");
       return;
     }
 
-    const nodes = reactFlowInstance?.getNodes();
-    const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-    const currentNode = nodes.find((node) => node.id === data.currentId);
+    const currentNode = reactFlowInstance?.getNode(data.currentId);
+    console.log("currentNode", currentNode);
 
-    if (!createdNode) {
-      
-      const position = reactFlowInstance.screenToFlowPosition({
-        x: currentNode.position.x, 
-        y: currentNode.position.y, 
-      });
+    const createOrUpdateNode = (sourceHandle, value, nodeId) => {
+      if (!createdNodes[nodeId]) {
+        const position = {
+          x: currentNode.position.x - currentNode.width * 1.5,
+          y: currentNode.position.y,
+        };
 
-      const newNode = {
-        id: uniqueId(7),
-        type: "custom",
-        position,
-        data: {
-          title: `GoTo ${value} new tab`,
-          nodeType: "gotoIvr",
-          Icon: "RiExternalLinkLine",
-          color: "#33ff83",
-        },
-      };
+        const newNode = {
+          // id: uniqueId(7),
+          id: `${nodeId}`,
+          type: "custom",
+          position,
+          data: {
+            title: `Go To ${value}`,
+            // nodeType: `goTo-${nodeId}`,
+            nodeType: `gotoIvr`,
+            Icon: "RiExternalLinkLine",
+            color: "#33ff83",
+          },
+        };
 
+        setIsUpdated(true);
+        addNode(newNode);
+        setCreatedNodes((prevNodes) => ({
+          ...prevNodes,
+          [nodeId]: newNode,
+        }));
 
-      setIsUpdated(true);
-      addNode(newNode);
-      setCreatedNode(newNode); 
+        const newEdge = {
+          id: `edge-${currentNode.id}-${newNode.id}`,
+          source: currentNode.id,
+          sourceHandle: sourceHandle,
+          target: newNode.id,
+          type: "smoothstep",
+          animated: true,
+          style: { stroke: "#33ff83" },
+        };
 
+        reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
+        console.log(
+          `New node and edge added:`,
+          newNode,
+          newEdge
+        );
+      } else {
+        reactFlowInstance.setNodes((nds) =>
+          nds.map((node) => {
+            if (node.id === createdNodes[nodeId].id) {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  title: `Go To ${value}`,
+                },
+              };
+            }
+            return node;
+          })
+        );
+        setCreatedNodes((prevNodes) => ({
+          ...prevNodes,
+          [nodeId]: {
+            ...prevNodes[nodeId],
+            data: {
+              ...prevNodes[nodeId].data,
+              title: `Go To ${value}`,
+            },
+          },
+        }));
+        setUpdateNewNode(!updateNewNode);
+        setIsUpdated(true);
+      }
+    };
 
-      const newEdge = {
-        id: `edge-${currentNode.id}-${newNode.id}`,
-        source: currentNode.id,
-        sourceHandle: 'source-right',
-        target: newNode.id,
-        type: "smoothstep",
-        animated: true,
-        style: { stroke: "#33ff83" },
-      };
+    const goToNodeId = `${data.currentId}-goTo`;
 
-      reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
-
-      console.log("New node and edge added:", newNode, newEdge);
-    } else {
-      
-      reactFlowInstance.setNodes((nds) =>
-        nds.map((node) => {
-          if (node.id === createdNode.id) {
-        
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                title: `Node for ${value}`,
-              },
-            };
-          }
-          return node;
-        })
-      );
-
-      console.log(`Node updated with new title: Node for ${value}`);
+    if (name === "advanceIvr" && value) {
+      createOrUpdateNode("goto-source-right", value, goToNodeId);
     }
   };
 
   return (
     <>
-       <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+      <Box sx={{ display: "flex", justifyContent: "end" }}>
         <FormControlLabel
           control={
             <Checkbox
@@ -120,11 +160,16 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
           label="Show Info"
         />
       </Box>
-      <Box ref={reactFlowWrapper} component="form" noValidate autoComplete="off">
+      <Box
+        ref={reactFlowWrapper}
+        component="form"
+        noValidate
+        autoComplete="off"
+      >
         <TextField
           label="Label"
           name="label"
-          value={data.label || ''}
+          value={data.label || ""}
           onChange={handleChange}
           fullWidth
           sx={{ mb: 1.2 }}
@@ -137,17 +182,19 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
           fullWidth
           sx={{ mb: 1.2 }}
         />
-        <FormControl sx={{ mb: 1.2, width: '100%' }}>
+        <FormControl sx={{ mb: 1.2, width: "100%" }}>
           <InputLabel id="advanceIvr-label">Advance IVR</InputLabel>
           <Select
             labelId="advanceIvr-label"
             id="advanceIvr-select"
             name="advanceIvr"
-            value={data.advanceIvr || ''}
-            onChange={handleSelectChange} 
+            value={data.advanceIvr || ""}
+            onChange={handleSelectChange}
           >
-            {['iv1', 'iv2', 'iv3', 'iv4'].map((ext) => (
-              <MenuItem key={ext} value={ext}>{ext}</MenuItem>
+            {["iv1", "iv2", "iv3", "iv4"].map((ext) => (
+              <MenuItem key={ext} value={ext}>
+                {ext}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -156,7 +203,7 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
           name="comments"
           multiline
           rows={3}
-          value={data.comments || ''}
+          value={data.comments || ""}
           onChange={handleChange}
           fullWidth
           sx={{ mb: 1.2 }}

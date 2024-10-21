@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { TextField, Box, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel } from "@mui/material";
+import { TextField, Box, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, Radio, RadioGroup } from "@mui/material";
 import { AppContext } from "../../../../../Context/AppContext";
 import ReactFlow, { addEdge } from "reactflow";
 
@@ -9,6 +9,7 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode }) => {
   const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf } =
     useContext(AppContext);
   const reactFlowWrapper = useRef(null);
+  const [selectedOption, setSelectedOption] = useState("IVR");
   console.log("data=>", data);
 
   useEffect(() => {
@@ -69,7 +70,6 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode }) => {
           position,
           data: {
             title: `${value}`,
-            // nodeType: `goTo-${nodeId}`,
             nodeType: `ivrCallFunction`,
             Icon: "RiExternalLinkLine",
             color: "#ff3333",
@@ -136,6 +136,34 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode }) => {
     }
   };
 
+  const handleRadioChange = (event) => {
+    const { value } = event.target;
+    setSelectedOption(value);
+    handleChange(event);
+    if (value == 'IVR') {
+      handleChange({ target: { name: 'labelValue', value: null } })
+    } else if (value == 'labelValue') {
+      handleChange({ target: { name: 'advanceIvr', value: null } });
+      const goToNodeId = `${data.currentId}-callFunction`;
+      // Remove node and edge
+      reactFlowInstance.setNodes((nds) => nds.filter((node) => node.id !== goToNodeId));
+      reactFlowInstance.setEdges((eds) => eds.filter((edge) => !edge.id.includes(goToNodeId)));
+      const updatedNodes = { ...createdNodes };
+      const nodeKey = Object.keys(updatedNodes).find((key) => key.includes(goToNodeId));
+
+      if (nodeKey) {
+        delete updatedNodes[nodeKey];
+        console.log("Updated Nodes:", updatedNodes);
+        localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
+        setCreatedNodes(updatedNodes);
+      }
+
+      console.log('createdNodes', createdNodes);
+
+      setIsUpdated(true);
+    }
+  };
+
   return (
     <>
       <Box sx={{ display: 'flex', justifyContent: 'end' }}>
@@ -168,20 +196,49 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode }) => {
           fullWidth
           sx={{ mb: 1.2 }}
         />
-        <FormControl sx={{ mb: 1.2, width: '100%' }}>
-          <InputLabel id="advanceIvr-label">Advance IVR</InputLabel>
-          <Select
-            labelId="advanceIvr-label"
-            id="advanceIvr-select"
-            name="advanceIvr"
-            value={data.advanceIvr || ''}
-            onChange={handleSelectChange}
-          >
-            {['iv1', 'iv2', 'iv3', 'iv4'].map((ext) => (
-              <MenuItem key={ext} value={ext}>{ext}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <RadioGroup
+          name="ivrOptions"
+          value={selectedOption}
+          onChange={handleRadioChange}
+          row
+        >
+          <FormControlLabel
+            value="IVR"
+            control={<Radio sx={{ color: "blue" }} />}
+            label="IVR"
+          />
+          <FormControlLabel
+            value="labelValue"
+            control={<Radio sx={{ color: "green" }} />}
+            label="Label Value"
+          />
+        </RadioGroup>
+        {selectedOption === "IVR" && (
+          <FormControl sx={{ mb: 1.2, width: '100%' }}>
+            <InputLabel id="advanceIvr-label">Advance IVR</InputLabel>
+            <Select
+              labelId="advanceIvr-label"
+              id="advanceIvr-select"
+              name="advanceIvr"
+              value={data.advanceIvr || ''}
+              onChange={handleSelectChange}
+            >
+              {['iv1', 'iv2', 'iv3', 'iv4'].map((ext) => (
+                <MenuItem key={ext} value={ext}>{ext}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+        {selectedOption === "labelValue" && (
+          <TextField
+            label="Label Value"
+            name="labelValue"
+            value={data.labelValue || ""}
+            onChange={handleChange}
+            fullWidth
+            sx={{ mb: 1.2 }}
+          />
+        )}
         <TextField
           label="Comments"
           name="comments"

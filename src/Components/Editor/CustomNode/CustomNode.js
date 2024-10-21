@@ -465,6 +465,13 @@ const CustomNode = ({ id }) => {
                           )}
                         </div>
                       )
+                    ),
+                    (data?.labelValue && data?.labelValue !== undefined) && (
+                      <div className="nodeBrief">
+                        <p>
+                          Label: <b style={{ color: '#69ffa4', fontWeight: 400 }}> {stringReducer(data?.labelValue, 25)} </b>
+                        </p>
+                      </div>
                     )
                   );
                 case 'CallFunction':
@@ -482,6 +489,13 @@ const CustomNode = ({ id }) => {
                           )}
                         </div>
                       )
+                    ),
+                    (data?.labelValue && data?.labelValue !== undefined) && (
+                      <div className="nodeBrief">
+                        <p>
+                          Label: <b style={{ color: '#ff3333', fontWeight: 400 }}> {stringReducer(data?.labelValue, 25)} </b>
+                        </p>
+                      </div>
                     )
                   );
                 case 'Rpc':
@@ -682,6 +696,23 @@ const CustomNode = ({ id }) => {
 
                     )
                   );
+                case 'If':
+                  return (
+                    ((data?.trueLabelValue || data?.falseLabelValue) !== undefined) && (
+                      <div className="nodeBrief">
+                        {data?.trueLabelValue && (
+                          <p>
+                            When <b style={{ color: '#4CAF50', fontWeight: 400 }}> True </b> Label: <b style={{ color: '#ff8333', fontWeight: 400 }}>{data.trueLabelValue}</b>
+                          </p>
+                        )}
+                        {data?.falseLabelValue && (
+                          <p>
+                            When <b style={{ color: '#F44336', fontWeight: 400 }}> False </b> Label: <b style={{ color: '#ff8333', fontWeight: 400 }}>{data.falseLabelValue}</b>
+                          </p>
+                        )}
+                      </div>
+                    )
+                  )
                 default:
                   return (
                     <>

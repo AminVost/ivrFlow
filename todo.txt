@@ -30,8 +30,10 @@ ok - dar switch , node haye child ruye ham mian va dide nemishavand . bayad be t
 
 ok - mojaza kardane node haye cases switch dar flowchart (bg red)
 
-- agar node child ro az flow chart hazf konim , meghdare un dar form ivrflow node parent ham bayad hazf shavad
+ok - agar node child ro az flow chart hazf konim , meghdare un dar form ivrflow node parent ham bayad hazf shavad
+
+- ya be ivr ya label
+
+- har nodei be node dg vasl bashad va un ro hazf konim , nodei ke behesh vasl hast ham hazf mishavad . nabayad injori bashe . faghat bayad node hai ke typeshun if , callFunction , goTo , switch hast hazf beshe childash
 
 - agar baraye node i child tarif konim vali hazfesh nakonim dg nemishe sakht be dalile localstorage creeateNodes
-
-

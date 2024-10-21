@@ -52,13 +52,13 @@
 
 .toolbar-wrapper {
   position: absolute;
-  top: -2.2rem;
+  top: -2rem;
   padding: 8px 0px;
   width: 210px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-height: 2.2rem;
+  max-height: 2rem;
 }
 
 .toolbar-wrapper>p {

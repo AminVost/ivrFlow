@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import './css/SwitchNodeEditor.css';
-import { TextField, Button, Box, FormControl, Select, MenuItem, InputLabel, IconButton, Checkbox, FormControlLabel } from "@mui/material";
+import { TextField, Button, Box, FormControl, Select, MenuItem, InputLabel, IconButton, Checkbox, FormControlLabel, Radio, RadioGroup } from "@mui/material";
 import { Add, Delete } from '@mui/icons-material';
 import { AppContext } from "../../../../../Context/AppContext";
 import { Handle, useReactFlow, addEdge } from "reactflow";
 
 const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
   console.log("data=>", data);
-  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, setData } =
-    useContext(AppContext);
+  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, setData } = useContext(AppContext);
   const reactFlowWrapper = useRef(null);
   const [showDetails, setShowDetails] = useState(false);
   const [updateNewNode, setUpdateNewNode] = useState(false);
   const [cases, setCases] = useState(data.cases || [{ id: 1, operand: '', timeFrame: '', ivrFlow: '' }]);
+  const [selectedOption, setSelectedOption] = useState([]);
 
   useEffect(() => {
     data.showInfo = showDetails;
@@ -41,7 +41,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
     ) => {
       if (!createdNodes[nodeId]) {
         const index = cases.findIndex(node => node.id === caseId);
-        
+
         const verticalSpacing = currentNode.height + 50;
         const isFirstNodeInSide = index < 2;
 
@@ -127,7 +127,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
         setIsUpdated(true);
       }
     };
-    
+
     const switchNodeId = `${data.currentId}-${caseId}`;
 
     createOrUpdateNode(
@@ -159,9 +159,9 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
 
   const handleAddCase = () => {
     let lastCaseObj = cases[cases.length - 1];
-    console.log('lastCaseIndex',lastCaseObj);
+    console.log('lastCaseIndex', lastCaseObj);
     // return;
-    let lastCaseId =  lastCaseObj.id;
+    let lastCaseId = lastCaseObj.id;
     setCases([...cases, { id: lastCaseId + 1, operand: '', value: '' }]);
   };
 
@@ -226,6 +226,23 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
                 <MenuItem value="Time Frame 2">Time Frame 2</MenuItem>
               </Select>
             </FormControl>
+            <RadioGroup
+              name={`ivrOptions-${caseItem.id}`}
+              value={selectedOption[caseItem.id]}
+              onChange={handleRadioChange}
+              row
+            >
+              <FormControlLabel
+                value="IVR"
+                control={<Radio sx={{ color: "blue" }} />}
+                label="IVR"
+              />
+              <FormControlLabel
+                value="labelValue"
+                control={<Radio sx={{ color: "green" }} />}
+                label="Label Value"
+              />
+            </RadioGroup>
             <FormControl fullWidth sx={{ mr: 1 }}>
               <InputLabel id={'switchIvrLabel-' + index}>IvrFlow</InputLabel>
               <Select
@@ -370,6 +387,33 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
     }
   };
 
+  const handleRadioChange = (event) => {
+    const { value } = event.target;
+    setSelectedOption(value);
+    handleChange(event);
+    if (value == 'IVR') {
+      handleChange({ target: { name: 'labelValue', value: null } })
+    } else if (value == 'labelValue') {
+      handleChange({ target: { name: 'advanceIvr', value: null } });
+      const goToNodeId = `${data.currentId}-goTo`;
+      // Remove node and edge
+      reactFlowInstance.setNodes((nds) => nds.filter((node) => node.id !== goToNodeId));
+      reactFlowInstance.setEdges((eds) => eds.filter((edge) => !edge.id.includes(goToNodeId)));
+      const updatedNodes = { ...createdNodes };
+      const nodeKey = Object.keys(updatedNodes).find((key) => key.includes(goToNodeId));
+
+      if (nodeKey) {
+        delete updatedNodes[nodeKey];
+        console.log("Updated Nodes:", updatedNodes);
+        localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
+        setCreatedNodes(updatedNodes);
+      }
+
+      console.log('createdNodes', createdNodes);
+
+      setIsUpdated(true);
+    }
+  };
   return (
     <>
       <Box sx={{ display: 'flex', justifyContent: 'end' }}>

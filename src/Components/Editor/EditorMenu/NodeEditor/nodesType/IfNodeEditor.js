@@ -8,11 +8,12 @@ import {
   MenuItem,
   FormControlLabel,
   Checkbox,
+  Radio,
+  RadioGroup
 } from "@mui/material";
 import InfoTooltipAdornment from "../../../../../utils/InfoTooltipAdornment";
 import { AppContext } from "../../../../../Context/AppContext";
-import uniqueId from "../../../../../utils/uniqueId";
-import { Handle, useReactFlow, addEdge, Background } from "reactflow";
+import { addEdge } from "reactflow";
 
 const IfNodeEditor = ({ data, handleChange, addNode }) => {
   console.log("data=>", data);
@@ -22,6 +23,10 @@ const IfNodeEditor = ({ data, handleChange, addNode }) => {
   const [operand, setOperand] = useState(data.operand || "timeFrame");
   const [showDetails, setShowDetails] = useState(false);
   const [updateNewNode, setUpdateNewNode] = useState(false);
+
+  const [selectedTrueOption, setSelectedTrueOption] = useState("IVRTrue");
+  const [selectedFalseOption, setSelectedFalseOption] = useState("IVRFalse");
+
 
   useEffect(() => {
     data.showInfo = showDetails;
@@ -211,6 +216,61 @@ const IfNodeEditor = ({ data, handleChange, addNode }) => {
     handleChange({ target: { name: "data", value: cleanedData } });
   };
 
+  const handleRadioChange = (event) => {
+    const { value, name } = event.target;
+    if (name == 'ivrTrueOptions') {
+      setSelectedTrueOption(value);
+      handleChange(event);
+      if (value == 'IVRTrue') {
+        handleChange({ target: { name: 'trueLabelValue', value: null } })
+      } else if (value == 'labelValueTrue') {
+        handleChange({ target: { name: 'trueIf', value: null } });
+        const goToNodeId = `${data.currentId}-trueIf`;
+        // Remove node and edge
+        reactFlowInstance.setNodes((nds) => nds.filter((node) => node.id !== goToNodeId));
+        reactFlowInstance.setEdges((eds) => eds.filter((edge) => !edge.id.includes(goToNodeId)));
+        const updatedNodes = { ...createdNodes };
+        const nodeKey = Object.keys(updatedNodes).find((key) => key.includes(goToNodeId));
+
+        if (nodeKey) {
+          delete updatedNodes[nodeKey];
+          console.log("Updated Nodes:", updatedNodes);
+          localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
+          setCreatedNodes(updatedNodes);
+        }
+
+        console.log('createdNodes', createdNodes);
+
+        setIsUpdated(true);
+      }
+    } else if (name == 'ivrFalseOptions') {
+      setSelectedFalseOption(value);
+      handleChange(event);
+      if (value == 'IVRFalse') {
+        handleChange({ target: { name: 'falseLabelValue', value: null } })
+      } else if (value == 'labelValueFalse') {
+        handleChange({ target: { name: 'falseIf', value: null } });
+        const goToNodeId = `${data.currentId}-falseIf`;
+        // Remove node and edge
+        reactFlowInstance.setNodes((nds) => nds.filter((node) => node.id !== goToNodeId));
+        reactFlowInstance.setEdges((eds) => eds.filter((edge) => !edge.id.includes(goToNodeId)));
+        const updatedNodes = { ...createdNodes };
+        const nodeKey = Object.keys(updatedNodes).find((key) => key.includes(goToNodeId));
+
+        if (nodeKey) {
+          delete updatedNodes[nodeKey];
+          console.log("Updated Nodes:", updatedNodes);
+          localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
+          setCreatedNodes(updatedNodes);
+        }
+
+        console.log('createdNodes', createdNodes);
+
+        setIsUpdated(true);
+      }
+    }
+  };
+
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "end" }}>
@@ -373,47 +433,105 @@ const IfNodeEditor = ({ data, handleChange, addNode }) => {
           />
         )}
 
-        <FormControl fullWidth>
-          <InputLabel id="true-go-to-label">True Go To</InputLabel>
-          <Select
-            labelId="true-go-to-label"
-            id="trueIf"
-            name="trueIf"
-            label="True Go To"
-            variant="outlined"
-            value={data.trueIf || ""}
-            onChange={handleSelectChange}
-            endAdornment={
-              <InfoTooltipAdornment tooltipText="This is the True Go To" />
-            }
-          >
-            <MenuItem value="IVR1">IVR 1</MenuItem>
-            <MenuItem value="IVR2">IVR 2</MenuItem>
-            <MenuItem value="IVR3">IVR 3</MenuItem>
-            <MenuItem value="IVR4">IVR 4</MenuItem>
-          </Select>
-        </FormControl>
+        <RadioGroup
+          name="ivrTrueOptions"
+          value={selectedTrueOption}
+          onChange={handleRadioChange}
+          row
+        >
+          <FormControlLabel
+            value="IVRTrue"
+            control={<Radio sx={{ color: "blue" }} />}
+            label="IVR True"
+          />
+          <FormControlLabel
+            value="labelValueTrue"
+            control={<Radio sx={{ color: "green" }} />}
+            label="Label Value True"
+          />
+        </RadioGroup>
+        {selectedTrueOption === "IVRTrue" && (
+          <FormControl fullWidth>
+            <InputLabel id="true-go-to-label">True Go To</InputLabel>
+            <Select
+              labelId="true-go-to-label"
+              id="trueIf"
+              name="trueIf"
+              label="True Go To"
+              variant="outlined"
+              value={data.trueIf || ""}
+              onChange={handleSelectChange}
+              endAdornment={
+                <InfoTooltipAdornment tooltipText="This is the True Go To" />
+              }
+            >
+              <MenuItem value="IVR1">IVR 1</MenuItem>
+              <MenuItem value="IVR2">IVR 2</MenuItem>
+              <MenuItem value="IVR3">IVR 3</MenuItem>
+              <MenuItem value="IVR4">IVR 4</MenuItem>
+            </Select>
+          </FormControl>
+        )}
+        {selectedTrueOption === "labelValueTrue" && (
+          <TextField
+            label="True Label Value"
+            name="trueLabelValue"
+            value={data.trueLabelValue || ""}
+            onChange={handleChange}
+            fullWidth
+            sx={{ mb: 1.2 }}
+          />
+        )}
 
-        <FormControl fullWidth>
-          <InputLabel id="false-go-to-label">False Go To</InputLabel>
-          <Select
-            labelId="false-go-to-label"
-            id="falseIf"
-            name="falseIf"
-            label="False Go To"
-            variant="outlined"
-            value={data.falseIf || ""}
-            onChange={handleSelectChange}
-            endAdornment={
-              <InfoTooltipAdornment tooltipText="This is the False Go To" />
-            }
-          >
-            <MenuItem value="IVR 5">IVR 5</MenuItem>
-            <MenuItem value="IVR 6">IVR 6</MenuItem>
-            <MenuItem value="IVR 7">IVR 7</MenuItem>
-            <MenuItem value="IVR 8">IVR 8</MenuItem>
-          </Select>
-        </FormControl>
+        <RadioGroup
+          name="ivrFalseOptions"
+          value={selectedFalseOption}
+          onChange={handleRadioChange}
+          row
+        >
+          <FormControlLabel
+            value="IVRFalse"
+            control={<Radio sx={{ color: "blue" }} />}
+            label="IVR False"
+          />
+          <FormControlLabel
+            value="labelValueFalse"
+            control={<Radio sx={{ color: "green" }} />}
+            label="Label Value False"
+          />
+        </RadioGroup>
+        {selectedFalseOption === "IVRFalse" && (
+          <FormControl fullWidth>
+            <InputLabel id="false-go-to-label">False Go To</InputLabel>
+            <Select
+              labelId="false-go-to-label"
+              id="falseIf"
+              name="falseIf"
+              label="False Go To"
+              variant="outlined"
+              value={data.falseIf || ""}
+              onChange={handleSelectChange}
+              endAdornment={
+                <InfoTooltipAdornment tooltipText="This is the False Go To" />
+              }
+            >
+              <MenuItem value="IVR 5">IVR 5</MenuItem>
+              <MenuItem value="IVR 6">IVR 6</MenuItem>
+              <MenuItem value="IVR 7">IVR 7</MenuItem>
+              <MenuItem value="IVR 8">IVR 8</MenuItem>
+            </Select>
+          </FormControl>
+        )}
+        {selectedFalseOption === "labelValueFalse" && (
+          <TextField
+            label="False Label Value"
+            name="falseLabelValue"
+            value={data.falseLabelValue || ""}
+            onChange={handleChange}
+            fullWidth
+            sx={{ mb: 1.2 }}
+          />
+        )}
       </Box>
     </>
   );
