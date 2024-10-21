@@ -16,19 +16,21 @@ const CustomNode = ({ id }) => {
     setIsUpdated,
     setActiveEditor,
     createdNodes,
-    setCreatedNodes
+    setCreatedNodes,
+    changeChildIf,
+    setChangeChildIf
   } = useContext(AppContext);
   const [isVisible, setIsVisible] = useState(false);
   const { setNodes, getNodes } = useReactFlow();
 
   const currentNode = getNodes()?.filter((node) => node.id === id);
   const { type, data, selected } = currentNode[0];
-  const { title, nodeType, Icon, color, ref, label } = data;
+  const { title, nodeType, Icon, color, label } = data;
 
   useEffect(() => {
     const storedNodes = localStorage.getItem("createdNodes");
     if (storedNodes) {
-      // console.log("read localStorage CustomNode", JSON.parse(storedNodes));
+      console.log("read localStorage CustomNode", JSON.parse(storedNodes));
       setCreatedNodes(JSON.parse(storedNodes));
     }
   }, []);
@@ -50,67 +52,180 @@ const CustomNode = ({ id }) => {
     }
   };
 
-  // const deleteNode = useCallback(() => {
-  //   if (id !== "start" && id !== "end") {
-
-  //     setNodes((nodes) => nodes.filter((node) => node.id !== id));
-  //     setData((prev) => ({ ...prev, status: false }));
-
-  //     const updatedNodes = { ...createdNodes };
-  //     const nodeKey = Object.keys(updatedNodes).find((key) => key.includes(id));
-
-  //     if (nodeKey) {
-  //       delete updatedNodes[nodeKey];
-  //       console.log('Updated Nodes:', updatedNodes);
-  //       localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
-  //       setCreatedNodes(updatedNodes);
-  //     }
-  //   }
-  // }, [id, createdNodes, setNodes, setCreatedNodes, setData]);
-
   const deleteNode = useCallback(() => {
     if (id !== "start" && id !== "end") {
       const edges = reactFlowInstance.getEdges();
-  
+
       const connectedEdges = edges.filter(
         (edge) => edge.source === id
       );
-  
+
       const connectedNodeIds = connectedEdges.map((edge) =>
         edge.source === id ? edge.target : ''
       );
-  
+
       reactFlowInstance.setNodes((nodes) =>
         nodes.filter(
           (node) => node.id !== id && !connectedNodeIds.includes(node.id)
         )
       );
-  
+
       reactFlowInstance.setEdges((edges) =>
         edges.filter(
           (edge) => edge.source !== id && edge.target !== id
         )
       );
-  
-      setData((prev) => ({ ...prev, status: false }));
-  
+
       const updatedNodes = { ...createdNodes };
       const nodeKey = Object.keys(updatedNodes).find((key) => key.includes(id));
-  
+
       if (nodeKey) {
         delete updatedNodes[nodeKey];
         console.log("Updated Nodes:", updatedNodes);
         localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
         setCreatedNodes(updatedNodes);
       }
-  
       setIsUpdated(true);
+
+      const currentNode = reactFlowInstance.getNode(id);
+      if (currentNode?.data?.nodeType?.includes("ifIvr")) {
+        const regex = /^(.*?)-(trueIf|falseIf)$/;
+        const match = id.match(regex);
+
+        if (match) {
+          const parentId = match[1]; // ID parent
+          const conditionType = match[2]; // trueIf or falseIf
+          const parentNode = reactFlowInstance.getNode(parentId);
+          // setData({
+          //   parentId,
+          //   selected: true,
+          //   type: parentNode.type,
+          //   data: parentNode.data,
+          //   status: true,
+          // });
+          setData((prevData) => ({
+            ...prevData, // Copy the previous state
+            parentId, // Update parentId
+            selected: true, // Update selected
+            type: parentNode?.type || prevData?.type, // Update type if parentNode exists, otherwise keep previous
+            data: parentNode?.data || prevData?.data, // Update data if parentNode exists, otherwise keep previous
+            status: true, // Update status
+          }));
+
+          // setData((prevData) => ({ ...prevData, data: parentNode.data }));
+
+          setActiveEditor(true);
+          setShowSidebar(true);
+          setShowDrawer(true);
+          setTimeout(() => {
+            setChangeChildIf({
+              id: currentNode.id,
+              parentId: parentId,
+              conditionType: conditionType
+            })
+          }, 100);
+        }
+      } else if (currentNode?.data?.nodeType == 'gotoIvr') {
+        const regex = /^([a-zA-Z0-9]+)-([a-zA-Z]+)$/;
+        const match = id.match(regex);
+        if (match) {
+          const parentId = match[1]; // ID parent
+          const parentNode = reactFlowInstance.getNode(parentId);
+          setData({
+            parentId,
+            selected: true,
+            type: parentNode.type,
+            data: parentNode.data,
+            status: true,
+          });
+          // setData((prevData) => ({ ...prevData, data: parentNode.data }));
+
+          setActiveEditor(true);
+          setShowSidebar(true);
+          setShowDrawer(true);
+          setTimeout(() => {
+            setChangeChildIf({
+              parentId: parentId,
+            })
+          }, 100);
+        }
+
+      } else if (currentNode?.data?.nodeType == 'ivrCallFunction') {
+        const regex = /^([a-zA-Z0-9]+)-([a-zA-Z]+)$/;
+        const match = id.match(regex);
+        if (match) {
+          const parentId = match[1]; // ID parent
+          const parentNode = reactFlowInstance.getNode(parentId);
+          setData({
+            parentId,
+            selected: true,
+            type: parentNode.type,
+            data: parentNode.data,
+            status: true,
+          });
+          // setData((prevData) => ({ ...prevData, data: parentNode.data }));
+
+          setActiveEditor(true);
+          setShowSidebar(true);
+          setShowDrawer(true);
+          setTimeout(() => {
+            setChangeChildIf({
+              parentId: parentId,
+            })
+          }, 100);
+        }
+
+      }
+
     }
   }, [id, createdNodes, setNodes, setCreatedNodes, setData, reactFlowInstance, setIsUpdated]);
 
+
+  const updateParent = (id) => {
+    const currentNode = reactFlowInstance.getNode(id);
+    if (currentNode?.data?.nodeType?.includes("ifIvr")) {
+      const regex = /^(.*?)-(trueIf|falseIf)$/;
+      const match = id.match(regex);
+
+      if (match) {
+        const parentId = match[1];
+        const conditionType = match[2];
+
+        const parentNode = reactFlowInstance.getNode(parentId);
+
+        if (parentNode) {
+          reactFlowInstance.setNodes((nodes) =>
+            nodes.map((node) => {
+              if (node.id === parentNode.id) {
+                const updatedData = { ...node.data };
+                if (conditionType === "trueIf") {
+                  delete updatedData.trueIf;
+                } else if (conditionType === "falseIf") {
+                  delete updatedData.falseIf;
+                }
+
+                return { ...node, data: updatedData };
+              }
+              return node;
+            })
+          );
+        }
+      }
+    }
+  };
+
+
+
+  const isValidSingleConnection = (connection) => {
+    const targetNodeEdges = reactFlowInstance.getEdges().filter(
+      (edge) => edge.target === connection.target
+    );
+    return targetNodeEdges.length === 0;
+  };
+
   return (
     <>
-      <div className="nodeItem">
+      <div className={`nodeItem  ${nodeType}`} data-nodeId={`${id}`}>
         {nodeType !== "start" && nodeType !== "gotoIvr" && nodeType !== "switchIvr" && !nodeType.includes("ifIvr") && nodeType !== "ivrCallFunction" && (
           <Handle className="edge-handle top" type="source" position="top" />
         )}
@@ -118,22 +233,26 @@ const CustomNode = ({ id }) => {
         {nodeType == "GoTo" && (
           <Handle className="edge-handle left" type="source" position="left" id="goto-source-right" />
         )}
+
         {nodeType == "CallFunction" && (
           <Handle className="edge-handle left" type="source" position="left" id="callFunction-source-right" />
         )}
+
         {nodeType == "If" && (
           <>
             <Handle className="edge-handle left" type="source" position="left" id="if-false-source-left" />
             <Handle className="edge-handle right" type="source" position="right" id="if-true-source-right" />
           </>
         )}
+
         {nodeType == "Switch" && (
           <>
             <Handle className="edge-handle left" type="source" position="left" id="switch-source-left" />
             <Handle className="edge-handle right" type="source" position="right" id="switch-source-right" />
           </>
         )}
-        {nodeType !== "start" && nodeType !== "end" && nodeType !== "gotoIvr" && nodeType !== "switchIvr" && (
+
+        {nodeType !== "start" && nodeType !== "end" && nodeType !== "switchIvr" && (
           <div
             className={`toolbar-wrapper ${nodeType === "start" ? "hidden" : ""}`}
             style={{ display: isVisible ? "flex" : "none" }}
@@ -142,7 +261,7 @@ const CustomNode = ({ id }) => {
           >
 
             <div>
-              {nodeType !== "gotoIvr" && nodeType !== "switchIvr" && (
+              {nodeType !== "switchIvr" && (
                 <AiOutlineDelete
                   onClick={() => {
                     deleteNode();
@@ -572,9 +691,54 @@ const CustomNode = ({ id }) => {
             })()}
           </div>
         </div>
-        {nodeType != "end" && (
-          <Handle className="edge-handle" type="target" position="bottom" />
+        {nodeType != "end" && nodeType !== "gotoIvr" && nodeType !== "switchIvr" && !nodeType.includes("ifIvr") && nodeType !== "ivrCallFunction" && (
+          <Handle className="edge-handle bottom" type="target" position="bottom" />
         )}
+
+        {/* {(nodeType === "gotoIvr" ||
+          nodeType === "switchIvr" ||
+          nodeType.includes("ifIvr") ||
+          nodeType === "ivrCallFunction") && (
+            <Handle className="edge-handle" type="target" position="bottom" />
+          )} */}
+
+        {nodeType === "gotoIvr" && (
+          <Handle
+            className="edge-handle"
+            type="target"
+            position="bottom"
+            isValidConnection={isValidSingleConnection}
+          />
+        )}
+
+        {nodeType === "switchIvr" && (
+          <Handle
+            className="edge-handle"
+            type="target"
+            position="bottom"
+            isValidConnection={isValidSingleConnection}
+          />
+        )}
+
+        {nodeType.includes("ifIvr") && (
+          <Handle
+            className="edge-handle"
+            type="target"
+            position="bottom"
+            isValidConnection={isValidSingleConnection}
+          />
+        )}
+
+        {nodeType === "ivrCallFunction" && (
+          <Handle
+            className="edge-handle"
+            type="target"
+            position="bottom"
+            isValidConnection={isValidSingleConnection}
+          />
+        )}
+
+
       </div>
     </>
   );

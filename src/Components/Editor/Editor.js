@@ -92,6 +92,21 @@ function Editor() {
     [setEdges, setIsUpdated]
   );
 
+  // const onConnect = useCallback(
+  //   (params) => {
+  //     console.log('paramsss', params);
+  //     const newEdge = {
+  //       ...params,
+  //       type: 'custom-edge', // Specify the custom edge type here
+  //       // label: 'Custom Edge Label', // Add a custom label (optional)
+  //       style: { stroke: '#ff8333', strokeWidth: 2 }, // Custom styling
+  //     };
+  //     setEdges((eds) => addEdge(newEdge, eds));
+  //     setIsUpdated(true);
+  //   },
+  //   [setEdges, setIsUpdated]
+  // );
+
   const onDragOver = useCallback((event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
@@ -191,15 +206,20 @@ function Editor() {
         type: edge.type,
         animated: edge.animated ?? false,
         style: edge.style ?? {},
+        label: edge.label ?? null,
+        labelStyle: edge.labelStyle ?? {},
+        labelBgStyle: edge.labelBgStyle ?? {},
+        labelBgPadding: edge.labelBgPadding ?? [],
+        labelBgBorderRadius: edge.labelBgBorderRadius ?? null,
         // Add other necessary properties here
       })),
     };
     console.log("workflowData", workflowData);
     localStorage.setItem("workflowData", stringify(workflowData));
   });
-  
 
-  useEffect(() => {    
+
+  useEffect(() => {
     if (reactFlowInstance && !initialized) {
       const { width, height } =
         reactFlowWrapper.current.getBoundingClientRect();
@@ -244,7 +264,7 @@ function Editor() {
         ref={ref}
         nodes={nodes}
         nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
+        // edgeTypes={edgeTypes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}

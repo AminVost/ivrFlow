@@ -12,12 +12,12 @@ import {
 import InfoTooltipAdornment from "../../../../../utils/InfoTooltipAdornment";
 import { AppContext } from "../../../../../Context/AppContext";
 import uniqueId from "../../../../../utils/uniqueId";
-import { Handle, useReactFlow, addEdge } from "reactflow";
+import { Handle, useReactFlow, addEdge, Background } from "reactflow";
 
 const IfNodeEditor = ({ data, handleChange, addNode }) => {
   console.log("data=>", data);
-  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes } =
-    useContext(AppContext);
+  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf,
+    setChangeChildIf } = useContext(AppContext);
   const reactFlowWrapper = useRef(null);
   const [operand, setOperand] = useState(data.operand || "timeFrame");
   const [showDetails, setShowDetails] = useState(false);
@@ -27,13 +27,11 @@ const IfNodeEditor = ({ data, handleChange, addNode }) => {
     data.showInfo = showDetails;
   }, [showDetails, data]);
 
-  // useEffect(() => {
-  //   const storedNodes = localStorage.getItem("createdNodes");
-  //   if (storedNodes) {
-  //     // console.log("readdddd", JSON.parse(storedNodes));
-  //     setCreatedNodes(JSON.parse(storedNodes));
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (changeChildIf.parentId == data.currentId) {
+      handleChange({ target: { name: changeChildIf.conditionType, value: null } })
+    }
+  }, [changeChildIf]);
 
   useEffect(() => {
     if (createdNodes && Object.keys(createdNodes).length !== 0) {
@@ -115,7 +113,11 @@ const IfNodeEditor = ({ data, handleChange, addNode }) => {
           type: "smoothstep",
           animated: true,
           style: { stroke: "#ff8333" },
-          data: { label: nodeType },
+          label: nodeType,
+          labelStyle: { fill: 'black', fontWeight: 600, fontSize: 13 },
+          labelBgStyle: { fill: 'white' },
+          labelBgPadding: [8, 4],
+          labelBgBorderRadius: 4,
         };
 
         reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));

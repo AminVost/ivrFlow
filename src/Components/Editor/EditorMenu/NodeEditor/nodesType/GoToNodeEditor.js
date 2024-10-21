@@ -13,15 +13,22 @@ import { AppContext } from "../../../../../Context/AppContext";
 import ReactFlow, { addEdge } from "reactflow";
 
 const GoToNodeEditor = ({ data, handleChange, addNode }) => {
-  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes } =
+  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes,changeChildIf } =
     useContext(AppContext);
   const reactFlowWrapper = useRef(null);
   const [showDetails, setShowDetails] = useState(false);
   const [updateNewNode, setUpdateNewNode] = useState(false);
+  console.log("data=>", data);
 
   useEffect(() => {
     data.showInfo = showDetails;
   }, [showDetails, data]);
+
+  useEffect(() => {
+    if (changeChildIf.parentId == data.currentId) {
+      handleChange({ target: { name: 'advanceIvr', value: null } })
+    }
+  }, [changeChildIf]);
 
   useEffect(() => {
     if (createdNodes && Object.keys(createdNodes).length !== 0) {

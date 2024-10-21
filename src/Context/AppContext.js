@@ -13,6 +13,7 @@ export const AppContextProvider = ({ children }) => {
   const [activeEditor, setActiveEditor] = useState(false);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
   const [createdNodes, setCreatedNodes] = useState({});
+  const [changeChildIf, setChangeChildIf] = useState({});
 
 
   return (
@@ -36,6 +37,8 @@ export const AppContextProvider = ({ children }) => {
         activeEditor,
         createdNodes,
         setCreatedNodes,
+        changeChildIf,
+        setChangeChildIf
       }}
     >
       {children}

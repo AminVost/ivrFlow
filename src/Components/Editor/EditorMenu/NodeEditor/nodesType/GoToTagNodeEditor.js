@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Box, FormControl, InputLabel, Select, MenuItem, FormControlLabel } from "@mui/material";
+import { TextField, Box, FormControl, InputLabel, Select, MenuItem, FormControlLabel , Checkbox } from "@mui/material";
 
 const GoToTagNodeEditor = ({ data, handleChange }) => {
   const [showDetails, setShowDetails] = useState(false);

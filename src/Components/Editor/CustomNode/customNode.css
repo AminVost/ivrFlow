@@ -163,3 +163,12 @@
   border-color: #3383ff;
   border-width: thin;
 }
+.nodeItem {
+  border: 2px solid transparent;
+}
+.nodeItem.highlighted-node {
+  border-radius: 10px;
+  border: 2px solid rgb(255, 9, 9);
+  /* box-shadow: 0px 0px 10px rgba(255, 0, 0, 0.775); */
+  /* box-shadow:0px 0px 12px 7px rgb(37 37 37); */
+}

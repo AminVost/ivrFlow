@@ -1,15 +1,37 @@
+ok - priority az hame form edit ha hazf shaved.
 
+ok - eslaahe dorost gharar nagereftane node dar jaye mouse bad az ezafe kardane node dar chart
 
--label bayad bere dakhele parantez kenare type - Done
+ok - eslaahe mogheiate node if o else dar smate chap o rast, node IF 
 
--jaye felie label bayad brief info mokhtase har action 
- (kholase amaliate un action)
+ok - bad az ijade node jaded . hata bad az unmount shodan ham dg nemisaze 
 
--eslaahe node if . ezafe kardane eage true false dar samte chapo rast box
+ok - lable go to tarif shod betone arrow ro khodesh be sorate automatic bekeshe / ya belax agar keshid khodesh por kone (goto , if, switch , function) (open in new tab be on ivr e external)
 
--node start & End faghat bayad yek eadge va yek path
+ok - connector e bala paeen baraye priority bashe va chapo rast baraye if o else va switch estefade beshe 
 
--eslahe object node switch
+ok - matne if va else roye khat biad 
 
--delete all node button
+ok - agar be ivr e dige bironi raft ye icon va name e ivr miad.
+
+ok - icon e cheshm roye har eleman e form dar edit biad va betone control kone ke namayesh bede infosho ro dar har item ya kheir
+
+ok - bad az sakhte node jadid , agar un ro hazf konim hamchenan dar context maa vujud dare va nemisaze
+
+ok - agar new node dashte bashim az source yek node , age node source ra delete kardim , node haye vabastasham hazf beshavand
+
+ok - child haye node ha be jaye dg vasl nashavad
+
+ok - bad az save va refreash kardane safhe label namayesh ade nemishavad
+
+ok - eslaahe handel GOTO 
+
+ok - dar switch , node haye child ruye ham mian va dide nemishavand . bayad be tartib az bala ta pain gharar begirand
+
+ok - mojaza kardane node haye cases switch dar flowchart (bg red)
+
+- agar node child ro az flow chart hazf konim , meghdare un dar form ivrflow node parent ham bayad hazf shavad
+
+- agar baraye node i child tarif konim vali hazfesh nakonim dg nemishe sakht be dalile localstorage creeateNodes
+
 
