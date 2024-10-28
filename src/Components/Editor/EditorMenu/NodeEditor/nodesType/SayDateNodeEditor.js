@@ -81,6 +81,7 @@ const SayDateNodeEditor = ({ data, handleChange }) => {
           <Select
             name="dateType"
             value={data.dateType || ''}
+            label="Date Type"
             onChange={handleChange}
           >
             <MenuItem value="shamsi">shamsi</MenuItem>

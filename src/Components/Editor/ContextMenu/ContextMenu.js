@@ -6,7 +6,12 @@ import findEdgeById from "../../../utils/findEdgeById";
 import { AppContext } from "../../../Context/AppContext";
 
 function ContextMenu({ id, top, left, right, bottom, ...props }) {
-  if (id !== "start") {
+  // const target = event.target;
+  // const isNode = target?.closest(".react-flow__node") ? true : false;
+  // console.log('isNode' , isNode)
+  // console.log('event.target :>> ', event.target);
+
+  if (id !== "start" && findEdgeById(id)) {
     const { getNode, setNodes, addNodes, setEdges, getNodes } = useReactFlow();
     const { setIsUpdated } = useContext(AppContext);
 
@@ -60,14 +65,14 @@ export default ContextMenu;
 const NodesMenu = memo(({ id, duplicateNode, deleteNode, setIsUpdated }) => {
   return (
     <>
-      <button
+      {/* <button
         onClick={() => {
           duplicateNode();
           setIsUpdated(true);
         }}
       >
         duplicate
-      </button>
+      </button> */}
       <button
         onClick={() => {
           deleteNode();

@@ -94,6 +94,7 @@ const PlayErrorNodeEditor = ({ data, handleChange }) => {
             id="error-group-select"
             name="errorGroup"
             value={data.errorGroup || ''}
+            label="Error Group"
             onChange={handleChange}
             endAdornment={<InfoTooltipAdornment tooltipText="This is the error group" />}
           >

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Box, Select, MenuItem, FormControl, InputLabel, heckbox, FormControlLabel } from "@mui/material";
+import { TextField, Box, Select, MenuItem, FormControl, InputLabel, heckbox, FormControlLabel, Checkbox } from "@mui/material";
 
 const SendFaxNodeEditor = ({ data, handleChange }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -95,6 +95,7 @@ const SendFaxNodeEditor = ({ data, handleChange }) => {
           <Select
             name="fileType"
             value={fileType}
+            label="File Type"
             onChange={handleFileChange}
           >
             {fileOptions.map((option) => (
@@ -110,6 +111,7 @@ const SendFaxNodeEditor = ({ data, handleChange }) => {
             name="fileItem"
             value={fileItem}
             onChange={handleFileGroupChange}
+            label="File Item"
             disabled={!selectedFile}
           >
             {selectedFile?.groups.map((group, index) => (

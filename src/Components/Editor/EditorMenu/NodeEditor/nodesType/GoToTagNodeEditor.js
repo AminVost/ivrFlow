@@ -68,6 +68,7 @@ const GoToTagNodeEditor = ({ data, handleChange }) => {
             labelId="ivrTagGroup-label"
             id="ivrTagGroup-select"
             name="ivrTagGroup"
+            label="Ivr Tag Group"
             value={data.ivrTagGroup || ''}
             onChange={handleChange}
           >

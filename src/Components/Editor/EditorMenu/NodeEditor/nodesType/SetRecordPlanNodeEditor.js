@@ -61,6 +61,7 @@ const SetRecordPlanNodeEditor = ({ data, handleChange }) => {
             id="setRecordPlan-select"
             name="setRecordPlan"
             value={data.setRecordPlan || ''}
+            label="set_record_plan"
             onChange={handleChange}
           >
             {['Record Plan 1', 'Record Plan 2'].map((ext) => (

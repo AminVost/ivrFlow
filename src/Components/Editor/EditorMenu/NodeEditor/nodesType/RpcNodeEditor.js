@@ -61,6 +61,7 @@ const RpcNodeEditor = ({ data, handleChange }) => {
             id="routine-select"
             name="routine"
             value={data.routine || ''}
+            label="Routine"
             onChange={handleChange}
           >
             {['CRM', 'IV@-33', 'Save Voice Log', 'Soap header test'].map((ext) => (
@@ -75,6 +76,7 @@ const RpcNodeEditor = ({ data, handleChange }) => {
             id="whenRoutineRun-select"
             name="whenRoutineRun"
             value={data.whenRoutineRun || ''}
+            label="When Routine Run"
             onChange={handleChange}
           >
             {['NOW', 'ANSWER', 'HANGUP'].map((ext) => (

@@ -51,6 +51,7 @@ const PlayErrorNodeEditor = ({ data = {}, handleChange }) => {
             labelId="error-group-label"
             id="error-group-select"
             value={data.errorGroup || ''}
+            label="Error Group"
             onChange={(e) => handleChange(e.target.value, 'errorGroup')}
           >
             <MenuItem value="group1">Group 1</MenuItem>

@@ -134,6 +134,7 @@ const InputNodeEditor = ({ data, handleChange }) => {
             id="fileType-select"
             name="fileType"
             value={fileType}
+            label=">File Type"
             onChange={handleFileChange}
             endAdornment={<InfoTooltipAdornment tooltipText="This is the fileType" />}
             sx={{
@@ -157,6 +158,7 @@ const InputNodeEditor = ({ data, handleChange }) => {
             id="file-group-select"
             name="fileItem"
             value={fileItem}
+            label="File Item"
             onChange={handleFileGroupChange}
             endAdornment={<InfoTooltipAdornment tooltipText="This is the file group" />}
             sx={{

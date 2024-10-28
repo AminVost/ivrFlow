@@ -1,7 +1,7 @@
 import React from "react";
 import { RxLightningBolt } from "react-icons/rx";
-import { RiWindow2Line,RiArrowDownFill, RiCursorLine, RiParagraph,RiPlayCircleLine,RiCalendarEventFill,RiTimerLine,RiPriceTag3Line,RiPentagonLine,RiMicOffLine,RiMicLine,RiChatVoiceLine,RiStarLine,RiErrorWarningLine,RiMicFill,RiQuestionLine,RiPhoneLine,RiChatNewLine,RiFilePaper2Line,RiFunctionAddLine,RiExternalLinkLine  } from "react-icons/ri";
-import { TbPhoto,TbNumber123,TbSpeakerphone,TbArrowBigDownLine,TbArrowGuide,TbFunction,TbPhoneOff,TbArrowCapsule  } from "react-icons/tb";
+import { RiWindow2Line,RiArrowDownFill, RiCursorLine, RiParagraph,RiPlayCircleLine,RiCalendarEventFill,RiTimerLine,RiPriceTag3Line,RiPentagonLine,RiMicOffLine,RiMicLine,RiChatVoiceLine,RiStarLine,RiErrorWarningLine,RiMicFill,RiQuestionLine,RiPhoneLine,RiChatNewLine,RiFilePaper2Line,RiFunctionAddLine,RiExternalLinkLine,RiSunFill   } from "react-icons/ri";
+import { TbPhoto,TbNumber123,TbSpeakerphone,TbArrowBigDownLine,TbArrowGuide,TbFunction,TbPhoneOff,TbArrowCapsule,TbMoonFilled   } from "react-icons/tb";
 
 function getIcons(requestIcon) {
   const icons = {
@@ -35,6 +35,8 @@ function getIcons(requestIcon) {
     RiPriceTag3Line : <RiPriceTag3Line />,
     RiArrowDownFill : <RiArrowDownFill  />,
     RiExternalLinkLine : <RiExternalLinkLine  />,
+    RiSunFill : <RiSunFill />,
+    TbMoonFilled  : <TbMoonFilled   />,
   };
 
   return icons[requestIcon];

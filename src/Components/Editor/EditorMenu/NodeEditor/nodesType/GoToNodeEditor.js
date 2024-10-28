@@ -237,6 +237,7 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
               labelId="advanceIvr-label"
               id="advanceIvr-select"
               name="advanceIvr"
+              label="Advance IVR"
               value={data.advanceIvr || ""}
               onChange={handleSelectChange}
             >

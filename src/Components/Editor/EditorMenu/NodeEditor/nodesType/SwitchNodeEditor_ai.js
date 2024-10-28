@@ -140,6 +140,7 @@ const SwitchNodeEditor = ({ data, handleChange ,addNode }) => {
               <InputLabel>Time Frame</InputLabel>
               <Select
                 value={caseItem.value}
+                label="Time Frame"
                 onChange={(e) => handleCaseChange(index, 'value', e.target.value)}
               >
                 <MenuItem value="Time Frame 1">Time Frame 1</MenuItem>
@@ -150,6 +151,7 @@ const SwitchNodeEditor = ({ data, handleChange ,addNode }) => {
               <InputLabel>IvrFlow</InputLabel>
               <Select
                 value={caseItem.ivrFlow || ''}
+                label="IvrFlow"
                 onChange={(e) => handleCaseChange(index, 'ivrFlow', e.target.value)}
               >
                 {/* Add IvrFlow options here */}
@@ -179,6 +181,7 @@ const SwitchNodeEditor = ({ data, handleChange ,addNode }) => {
               <InputLabel>List</InputLabel>
               <Select
                 value={caseItem.list || ''}
+                label="List"
                 onChange={(e) => handleCaseChange(index, 'list', e.target.value)}
               >
                 {/* Add List options here */}
@@ -190,6 +193,7 @@ const SwitchNodeEditor = ({ data, handleChange ,addNode }) => {
               <InputLabel>IvrFlow</InputLabel>
               <Select
                 value={caseItem.ivrFlow || ''}
+                label="IvrFlow"
                 onChange={(e) => handleCaseChange(index, 'ivrFlow', e.target.value)}
               >
                 {/* Add IvrFlow options here */}
@@ -224,6 +228,7 @@ const SwitchNodeEditor = ({ data, handleChange ,addNode }) => {
               <InputLabel>Operand 2</InputLabel>
               <Select
                 value={caseItem.operand2 || ''}
+                label="Operand 2"
                 onChange={(e) => handleCaseChange(index, 'operand2', e.target.value)}
               >
                 {/* Add Operand 2 options here */}
@@ -286,6 +291,7 @@ const SwitchNodeEditor = ({ data, handleChange ,addNode }) => {
                 <InputLabel>Operand</InputLabel>
                 <Select
                   value={caseItem.operand}
+                  label="Operand"
                   onChange={(e) => handleCaseChange(index, 'operand', e.target.value)}
                 >
                   <MenuItem value="Time Frame">Time Frame</MenuItem>

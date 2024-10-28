@@ -69,6 +69,7 @@ const RecordNodeEditor = ({ data, handleChange }) => {
           <Select
             name="recordReason"
             value={data.recordReason || ''}
+            label="Record Reason"
             onChange={handleChange}
           >
             <MenuItem value="reason1">Reason 1</MenuItem>
@@ -99,6 +100,7 @@ const RecordNodeEditor = ({ data, handleChange }) => {
           <Select
             name="recordOption"
             value={data.recordOption || ''}
+            label="Record Option"
             onChange={handleChange}
           >
             {recordOptions.map((option) => (

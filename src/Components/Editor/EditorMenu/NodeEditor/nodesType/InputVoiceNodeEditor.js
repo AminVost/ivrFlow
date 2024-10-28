@@ -84,6 +84,7 @@ const InputVoiceNodeEditor = ({ data, handleChange }) => {
           <Select
             name="speechServer"
             value={data.speechServer || ''}
+            label="Speech Server"
             onChange={handleChange}
           >
             <MenuItem value="server1">Server 1</MenuItem>
@@ -137,6 +138,7 @@ const InputVoiceNodeEditor = ({ data, handleChange }) => {
             labelId="voiceLog-label"
             id="voiceLog-select"
             name="voiceLog"
+            label="Voice Log"
             value={data.voiceLog || ''}
             onChange={handleChange}
           >
@@ -167,6 +169,7 @@ const InputVoiceNodeEditor = ({ data, handleChange }) => {
           <Select
             name="file"
             value={file || ''}
+            label="File"
             onChange={handleFileChange}
           >
             {fileOptions.map((option) => (
@@ -181,6 +184,7 @@ const InputVoiceNodeEditor = ({ data, handleChange }) => {
           <Select
             name="fileGroup"
             value={fileGroup || ''}
+            label="File Grou"
             onChange={handleFileGroupChange}
           >
             {fileOptions.find((option) => option.value === file)?.groups.map((group) => (

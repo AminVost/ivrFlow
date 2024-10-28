@@ -14,6 +14,10 @@ export const AppContextProvider = ({ children }) => {
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
   const [createdNodes, setCreatedNodes] = useState({});
   const [changeChildIf, setChangeChildIf] = useState({});
+  const [theme, setTheme] = useState(() => {
+    // Check local storage for theme value
+    return localStorage.getItem("ivrTheme") || "dark"; // Default to light if no value found
+  });
 
 
   return (
@@ -38,7 +42,9 @@ export const AppContextProvider = ({ children }) => {
         createdNodes,
         setCreatedNodes,
         changeChildIf,
-        setChangeChildIf
+        setChangeChildIf,
+        theme,
+        setTheme
       }}
     >
       {children}

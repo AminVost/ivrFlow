@@ -354,7 +354,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
 
   const handleHoverNode = (caseId) => {
     const nodeId = `${data.currentId}-${caseId}`;
-    const element = document.querySelector(`[data-nodeId='${nodeId}']`);
+    const element = document.querySelector(`[data-nodeid='${nodeId}']`);
     if (element) {
       console.log('findddd');
       element.classList.add('highlighted-node');
@@ -363,7 +363,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
 
   const handleRemoveHoverNode = (caseId) => {
     const nodeId = `${data.currentId}-${caseId}`;
-    const element = document.querySelector(`[data-nodeId='${nodeId}']`);
+    const element = document.querySelector(`[data-nodeid='${nodeId}']`);
 
     if (element) {
       element.classList.remove('highlighted-node');
