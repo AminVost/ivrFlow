@@ -69,13 +69,50 @@ const NodeEditor = () => {
   const handleChange = (e) => {
     const { name: key, value } = e.target;
     console.log('key, value =>', key, value);
-    // const { id, data } = currentNode;
     const updatedData = { ...data, [key]: value };
     setData((prevData) => ({ ...prevData, data: updatedData }));
     setTimeout(() => {
       updateEditorNode(key, value, id);
     }, 100);
   };
+
+  const handleChangeAwait = async (updates) => {
+    return new Promise((resolve) => {
+      const updatedData = { ...data, ...updates };
+  
+      setData((prevData) => ({ ...prevData, data: updatedData }));
+      setNodes((nodes) =>
+        nodes.map((node) => {
+          if (node.id === id) {
+            return { ...node, data: updatedData };
+          }
+          return node;
+        })
+      );
+      setTimeout(() => {
+        resolve();
+      }, 200);
+    });
+  };
+
+  // const handleChange = (e) => {
+  //   const { name: key, value } = e.target;
+  //   const updatedData = key === "multipleValues" 
+  //     ? { ...data, ...value } 
+  //     : { ...data, [key]: value };
+  
+  //   setData((prevData) => ({ ...prevData, data: updatedData }));
+  
+  //   setTimeout(() => {
+  //     if (key === "multipleValues") {
+  //       Object.entries(value).forEach(([subKey, subValue]) =>
+  //         updateEditorNode(subKey, subValue, id)
+  //       );
+  //     } else {
+  //       updateEditorNode(key, value, id);
+  //     }
+  //   }, 100);
+  // };
 
   useEffect(() => {
     try {
@@ -127,7 +164,7 @@ const NodeEditor = () => {
       case "Set":
         return <SetNodeEditor data={data} handleChange={handleChange} />;
       case "GoTo":
-        return <GoToNodeEditor data={data} handleChange={handleChange} addNode={addNode} />;
+        return <GoToNodeEditor data={data} handleChange={handleChange} addNode={addNode} handleChangeAwait={handleChangeAwait} />;
       case "CallFunction":
         return <CallFunctionNodeEditor data={data} handleChange={handleChange} addNode={addNode} />;
       case "Rpc":

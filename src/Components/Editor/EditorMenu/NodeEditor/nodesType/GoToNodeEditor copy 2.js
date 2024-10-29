@@ -13,15 +13,13 @@ import {
 import { AppContext } from "../../../../../Context/AppContext";
 import ReactFlow, { addEdge } from "reactflow";
 
-const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
+const GoToNodeEditor = ({ data, handleChange, addNode }) => {
   const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf, setChangeChildIf } =
     useContext(AppContext);
   const reactFlowWrapper = useRef(null);
   const [showDetails, setShowDetails] = useState(false);
   const [updateNewNode, setUpdateNewNode] = useState(false);
-  const [labelType, setLabelType] = useState(data?.advanceIvr ? 'ivrLabel' : "justLabel");
-  const [inputValue, setInputValue] = useState("");
-  const [options, setOptions] = useState([]);
+  const [labelType, setLabelType] = useState("justLabel");
 
   console.log("data=>", data);
 
@@ -30,30 +28,19 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
   }, [showDetails, data]);
 
   useEffect(() => {
-    if (reactFlowInstance) {
-      const allNodes = reactFlowInstance.getNodes();
-      setOptions(allNodes.map((node) => ({ id: node.id, title: node.data.title })));
-    }
-  }, [reactFlowInstance]);
-
-  useEffect(() => {
-    if (labelType == 'ivrLabel') {
-      deleteLabelValue();
-    }
-  }, [labelType]);
-
-  useEffect(() => {
     if (changeChildIf.parentId == data.currentId) {
-      // console.log('changeChildIffffff')
+      console.log('changeChildIffffff')
       handleChange({ target: { name: 'advanceIvr', value: null } })
       setChangeChildIf({});
       setLabelType('justLabel');
+
     }
   }, [changeChildIf]);
 
   useEffect(() => {
     if (createdNodes && Object.keys(createdNodes).length !== 0) {
       localStorage.setItem("createdNodes", JSON.stringify(createdNodes));
+      // console.log("setttt", createdNodes);
     }
   }, [createdNodes, updateNewNode]);
 
@@ -76,7 +63,7 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
     const { value, name } = event.target;
     handleChange(event);
     if (name == 'advanceIvr' && !value) {
-      // console.log('nullll :>> ');
+      console.log('nullll :>> ');
       setLabelType('justLabel');
       const goToNodeId = `${data.currentId}-goTo`;
       // Remove node and edge
@@ -190,86 +177,6 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
     }
   };
 
-  const deleteLabelValue = async () => {
-    const currentNodeId = data.currentId;
-    const previousNodeId = data?.labelValueId;
-    if (previousNodeId) {
-      await reactFlowInstance.setEdges((edges) =>
-        edges.filter((edge) => edge.id !== `edge-${currentNodeId}-${previousNodeId}`)
-      );
-      await handleChangeAwait({
-        labelValue: null,
-        labelValueId: null,
-      });
-    }
-  }
-
-
-  const handleAutocompleteChange = async (event, selectedNode) => {
-    const currentNodeId = data.currentId;
-    const previousNodeId = data?.labelValueId;
-    const newSelectedNodeId = selectedNode?.id;
-
-    if (selectedNode) {
-      if (previousNodeId) {
-        console.log('previousNodeId', previousNodeId)
-        await reactFlowInstance.setEdges((edges) =>
-          edges.filter((edge) => edge.id !== `edge-${currentNodeId}-${previousNodeId}`)
-        );
-      }
-      await handleChangeAwait({
-        labelValue: selectedNode.title,
-        labelValueId: newSelectedNodeId,
-      });
-
-      const newEdge = {
-        id: `edge-${currentNodeId}-${newSelectedNodeId}`,
-        source: currentNodeId,
-        target: newSelectedNodeId,
-        type: "smoothstep",
-        animated: true,
-        style: { stroke: "#33ff83" },
-      };
-
-      reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
-    } else {
-
-      // handleChange({ target: { name: "labelValue", value: null } });
-      // handleChange({ target: { name: "labelValueId", value: null } });
-      await handleChangeAwait({
-        labelValue: null,
-        labelValueId: null,
-        advanceIvrLabel: null
-      });
-
-      reactFlowInstance.setEdges((edges) =>
-        edges.filter((edge) => edge.id !== `edge-${currentNodeId}-${previousNodeId}`)
-      );
-    }
-  };
-
-  useEffect(() => {
-    if (data?.advanceIvrLabel) {
-      const goToNodeId = `${data.currentId}-goTo`;
-      reactFlowInstance.setNodes((nds) =>
-        nds.map((node) => {
-          if (node.id === goToNodeId) {
-            console.log('newNode', node)
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                label: data.advanceIvrLabel,
-              },
-            };
-          }
-          return node;
-        })
-      );
-      setIsUpdated(true);
-    }
-  }, [data?.advanceIvrLabel, reactFlowInstance]);
-
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "end" }}>
@@ -326,12 +233,12 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
             ))}
           </Select>
         </FormControl>
-
+        
         {labelType == 'ivrLabel' && (
           <TextField
             label="IVR Label"
-            name="advanceIvrLabel"
-            value={data.advanceIvrLabel || ""}
+            name="ivrLabelValue"
+            value={data.ivrLabelValue || ""}
             onChange={handleChange}
             fullWidth
             sx={{ mb: 1.2 }}
@@ -339,25 +246,16 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
         )}
 
         {labelType == 'justLabel' && (
-          <Autocomplete
-            options={options}
-            getOptionLabel={(option) => option.title || ""}
-            inputValue={inputValue}
-            value={
-              options.find((option) => option.title === data.labelValue) || null
-            }
-            onInputChange={(event, value) => setInputValue(value)}
-            onChange={handleAutocompleteChange}
-            renderInput={(params) => (
-              <TextField {...params} label="Select Node by Label" variant="outlined" fullWidth sx={{ mb: 1.2 }} />
-            )}
-            filterOptions={(options, { inputValue }) =>
-              options.filter((option) =>
-                option.title.toLowerCase().includes(inputValue.toLowerCase())
-              )
-            }
+          <TextField
+            label="Label"
+            name="labelValue"
+            value={data.labelValue || ""}
+            onChange={handleChange}
+            fullWidth
+            sx={{ mb: 1.2 }}
           />
         )}
+
 
         <TextField
           label="Comments"

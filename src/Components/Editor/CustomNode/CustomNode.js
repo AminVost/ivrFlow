@@ -136,13 +136,14 @@ const CustomNode = ({ id }) => {
         if (match) {
           const parentId = match[1]; // ID parent
           const parentNode = reactFlowInstance.getNode(parentId);
-          setData({
+          setData((prevData) => ({
+            ...prevData,
             parentId,
             selected: true,
             type: parentNode.type,
             data: parentNode.data,
             status: true,
-          });
+          }));
           // setData((prevData) => ({ ...prevData, data: parentNode.data }));
 
           setActiveEditor(true);
@@ -303,9 +304,8 @@ const CustomNode = ({ id }) => {
           nodeType !== "end" &&
           nodeType !== "switchIvr" && (
             <div
-              className={`toolbar-wrapper ${
-                nodeType === "start" ? "hidden" : ""
-              }`}
+              className={`toolbar-wrapper ${nodeType === "start" ? "hidden" : ""
+                }`}
               style={{ display: isVisible ? "flex" : "none" }}
               onMouseEnter={() => setIsVisible(true)}
               onMouseLeave={() => setIsVisible(false)}
@@ -325,10 +325,10 @@ const CustomNode = ({ id }) => {
                     <BiPencil
                       onClick={() => {
                         setData((prev) => ({
-                          ...prev,                          
+                          ...prev,
                           status: false,
                         }));
-                        setTimeout(() => {                         
+                        setTimeout(() => {
                           setData((prev) => ({
                             ...prev,
                             id,
@@ -352,13 +352,10 @@ const CustomNode = ({ id }) => {
         <div
           onMouseEnter={() => setIsVisible(true)}
           onMouseLeave={() => setIsVisible(false)}
-          className={`custom-node-wrapper ${selected ? "selected" : ""} ${
-            nodeType === "start" ? "startClass" : ""
-          } ${nodeType === "end" ? "endClass" : ""} ${
-            nodeType.includes("ifIvr") ? "ifIvr" : ""
-          } ${nodeType === "gotoIvr" ? "gotoIvr" : ""} ${
-            nodeType === "ivrCallFunction" ? "ivrCallFunction" : ""
-          } ${nodeType === "switchIvr" ? "switchIvr" : ""}`}
+          className={`custom-node-wrapper ${selected ? "selected" : ""} ${nodeType === "start" ? "startClass" : ""
+            } ${nodeType === "end" ? "endClass" : ""} ${nodeType.includes("ifIvr") ? "ifIvr" : ""
+            } ${nodeType === "gotoIvr" ? "gotoIvr" : ""} ${nodeType === "ivrCallFunction" ? "ivrCallFunction" : ""
+            } ${nodeType === "switchIvr" ? "switchIvr" : ""}`}
           onClick={() => centerSelectedNode(id, reactFlowInstance)}
         >
           {nodeType !== "end" && (
@@ -369,9 +366,9 @@ const CustomNode = ({ id }) => {
               }}
             >
               {nodeType == "gotoIvr" ||
-              nodeType.includes("ifIvr") ||
-              nodeType == "ivrCallFunction" ||
-              nodeType == "switchIvr" ? (
+                nodeType.includes("ifIvr") ||
+                nodeType == "ivrCallFunction" ||
+                nodeType == "switchIvr" ? (
                 <a className="nodeLabel" href="#!" target="_blank">
                   {getIcons(Icon)}
                 </a>
@@ -382,11 +379,12 @@ const CustomNode = ({ id }) => {
           )}
           <div className="nodInfo">
             {nodeType == "gotoIvr" ||
-            nodeType.includes("ifIvr") ||
-            nodeType == "ivrCallFunction" ||
-            nodeType == "switchIvr" ? (
+              nodeType.includes("ifIvr") ||
+              nodeType == "ivrCallFunction" ||
+              nodeType == "switchIvr" ? (
               <a className="nodeLabel" href="#!" target="_blank">
                 {stringReducer(title, 30)}
+                {label ? "(" + stringReducer(label, 16) + ")" : ""}
               </a>
             ) : (
               <p className="nodeLabel">
@@ -586,47 +584,47 @@ const CustomNode = ({ id }) => {
                 case "GoTo":
                   return (
                     data?.showInfo &&
-                      data.showInfo == "on" &&
-                      (data?.advanceIvr || data?.comments) && (
-                        <div className="nodeBrief">
-                          {data?.advanceIvr && (
-                            <p>
-                              <b> {data?.advanceIvr || "unknown"} </b>
-                            </p>
-                          )}
-                          {data?.comments && (
-                            <p>Comment: {stringReducer(data.comments, 35)}</p>
-                          )}
-                        </div>
-                      ),
-                    data?.labelValue && data?.labelValue !== undefined && (
+                    data.showInfo == "on" &&
+                    (data?.advanceIvr || data?.comments) && (
                       <div className="nodeBrief">
-                        <p>
-                          Label:{" "}
-                          <b style={{ color: "#69ffa4", fontWeight: 400 }}>
-                            {" "}
-                            {stringReducer(data?.labelValue, 25)}{" "}
-                          </b>
-                        </p>
+                        {data?.advanceIvr && (
+                          <p>
+                            <b> {data?.advanceIvr || "unknown"} </b>
+                          </p>
+                        )}
+                        {data?.comments && (
+                          <p>Comment: {stringReducer(data.comments, 35)}</p>
+                        )}
                       </div>
                     )
+                    // data?.labelValue && data?.labelValue !== undefined && (
+                    //   <div className="nodeBrief">
+                    //     <p>
+                    //       Label:{" "}
+                    //       <b style={{ color: "#69ffa4", fontWeight: 400 }}>
+                    //         {" "}
+                    //         {stringReducer(data?.labelValue, 25)}{" "}
+                    //       </b>
+                    //     </p>
+                    //   </div>
+                    // )
                   );
                 case "CallFunction":
                   return (
                     data?.showInfo &&
-                      data.showInfo == "on" &&
-                      (data?.advanceIvr || data?.comments) && (
-                        <div className="nodeBrief">
-                          {data?.advanceIvr && (
-                            <p>
-                              <b> {data?.advanceIvr || "unknown"} </b>
-                            </p>
-                          )}
-                          {data?.comments && (
-                            <p>Comment: {stringReducer(data.comments, 35)}</p>
-                          )}
-                        </div>
-                      ),
+                    data.showInfo == "on" &&
+                    (data?.advanceIvr || data?.comments) && (
+                      <div className="nodeBrief">
+                        {data?.advanceIvr && (
+                          <p>
+                            <b> {data?.advanceIvr || "unknown"} </b>
+                          </p>
+                        )}
+                        {data?.comments && (
+                          <p>Comment: {stringReducer(data.comments, 35)}</p>
+                        )}
+                      </div>
+                    ),
                     data?.labelValue && data?.labelValue !== undefined && (
                       <div className="nodeBrief">
                         <p>
@@ -854,7 +852,7 @@ const CustomNode = ({ id }) => {
                 case "If":
                   return (
                     (data?.trueLabelValue || data?.falseLabelValue) !==
-                      undefined && (
+                    undefined && (
                       <div className="nodeBrief">
                         {data?.trueLabelValue && (
                           <p>
@@ -946,7 +944,7 @@ const CustomNode = ({ id }) => {
           nodeType !== "switchIvr" &&
           !nodeType.includes("ifIvr") &&
           nodeType !== "ivrCallFunction" &&
-          nodeType !== "goTo" && (
+          nodeType !== "GoTo" && (
             <Handle
               className="edge-handle bottom"
               type="source"

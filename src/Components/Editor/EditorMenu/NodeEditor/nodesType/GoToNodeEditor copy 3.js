@@ -13,13 +13,13 @@ import {
 import { AppContext } from "../../../../../Context/AppContext";
 import ReactFlow, { addEdge } from "reactflow";
 
-const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
+const GoToNodeEditor = ({ data, handleChange, addNode }) => {
   const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf, setChangeChildIf } =
     useContext(AppContext);
   const reactFlowWrapper = useRef(null);
   const [showDetails, setShowDetails] = useState(false);
   const [updateNewNode, setUpdateNewNode] = useState(false);
-  const [labelType, setLabelType] = useState(data?.advanceIvr ? 'ivrLabel' : "justLabel");
+  const [labelType, setLabelType] = useState("justLabel");
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState([]);
 
@@ -37,17 +37,12 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
   }, [reactFlowInstance]);
 
   useEffect(() => {
-    if (labelType == 'ivrLabel') {
-      deleteLabelValue();
-    }
-  }, [labelType]);
-
-  useEffect(() => {
     if (changeChildIf.parentId == data.currentId) {
       // console.log('changeChildIffffff')
       handleChange({ target: { name: 'advanceIvr', value: null } })
       setChangeChildIf({});
       setLabelType('justLabel');
+
     }
   }, [changeChildIf]);
 
@@ -190,37 +185,30 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
     }
   };
 
-  const deleteLabelValue = async () => {
-    const currentNodeId = data.currentId;
-    const previousNodeId = data?.labelValueId;
-    if (previousNodeId) {
-      await reactFlowInstance.setEdges((edges) =>
-        edges.filter((edge) => edge.id !== `edge-${currentNodeId}-${previousNodeId}`)
-      );
-      await handleChangeAwait({
-        labelValue: null,
-        labelValueId: null,
-      });
-    }
-  }
 
+  // const handleAutocompleteChange = (event, selectedNode) => {
+  //   if (selectedNode) {
+  //     handleChange({ target: { name: "labelValue", value: selectedNode.title } });
 
-  const handleAutocompleteChange = async (event, selectedNode) => {
+  //   } else {
+  //     handleChange({ target: { name: "labelValue", value: null } });
+  //   }
+  // };
+
+  const handleAutocompleteChange = (event, selectedNode) => {
     const currentNodeId = data.currentId;
     const previousNodeId = data?.labelValueId;
     const newSelectedNodeId = selectedNode?.id;
 
     if (selectedNode) {
+      handleChange({ target: { name: "labelValue", value: selectedNode.title } });
+      handleChange({ target: { name: "labelValueId", value: newSelectedNodeId } });
+      
       if (previousNodeId) {
-        console.log('previousNodeId', previousNodeId)
-        await reactFlowInstance.setEdges((edges) =>
+        reactFlowInstance.setEdges((edges) =>
           edges.filter((edge) => edge.id !== `edge-${currentNodeId}-${previousNodeId}`)
         );
       }
-      await handleChangeAwait({
-        labelValue: selectedNode.title,
-        labelValueId: newSelectedNodeId,
-      });
 
       const newEdge = {
         id: `edge-${currentNodeId}-${newSelectedNodeId}`,
@@ -234,13 +222,8 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
       reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
     } else {
 
-      // handleChange({ target: { name: "labelValue", value: null } });
-      // handleChange({ target: { name: "labelValueId", value: null } });
-      await handleChangeAwait({
-        labelValue: null,
-        labelValueId: null,
-        advanceIvrLabel: null
-      });
+      handleChange({ target: { name: "labelValue", value: null } });
+      handleChange({ target: { name: "labelValueId", value: null } });
 
       reactFlowInstance.setEdges((edges) =>
         edges.filter((edge) => edge.id !== `edge-${currentNodeId}-${previousNodeId}`)
@@ -248,27 +231,6 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
     }
   };
 
-  useEffect(() => {
-    if (data?.advanceIvrLabel) {
-      const goToNodeId = `${data.currentId}-goTo`;
-      reactFlowInstance.setNodes((nds) =>
-        nds.map((node) => {
-          if (node.id === goToNodeId) {
-            console.log('newNode', node)
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                label: data.advanceIvrLabel,
-              },
-            };
-          }
-          return node;
-        })
-      );
-      setIsUpdated(true);
-    }
-  }, [data?.advanceIvrLabel, reactFlowInstance]);
 
   return (
     <>
@@ -330,8 +292,8 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
         {labelType == 'ivrLabel' && (
           <TextField
             label="IVR Label"
-            name="advanceIvrLabel"
-            value={data.advanceIvrLabel || ""}
+            name="ivrLabelValue"
+            value={data.ivrLabelValue || ""}
             onChange={handleChange}
             fullWidth
             sx={{ mb: 1.2 }}
