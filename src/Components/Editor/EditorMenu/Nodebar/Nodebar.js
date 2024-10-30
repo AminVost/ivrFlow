@@ -153,6 +153,12 @@ const nodes = [
     icon: "RiPriceTag3Line",
     color: "#b90f13",
   },
+  {
+    title: "End",
+    type: "end",
+    icon: "RiArrowUpFill",
+    color: "#fff",
+  },
 ];
 
 function Nodebar() {

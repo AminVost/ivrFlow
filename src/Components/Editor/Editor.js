@@ -91,23 +91,11 @@ function Editor() {
     document.body.className = theme;
   }, [theme]);
 
-  // const toggleTheme = () => {
-  //   setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
-  //   document.body.className = theme; // Apply theme to body
-  //   setTimeout(() => {
-  //     localStorage.setItem("ivrTheme", theme);
-
-  //   }, 100);
-  //   console.log("theme:", theme);
-  // };
-
   const toggleTheme = () => {
     setTheme((prevTheme) => {
-      // console.log('prevTheme :>> ', prevTheme);
       const newTheme = prevTheme === "dark" ? "light" : "dark";
       document.body.className = newTheme;
       localStorage.setItem("ivrTheme", newTheme);
-      // console.log("theme:", newTheme);
       return newTheme;
     });
   };
@@ -119,9 +107,6 @@ function Editor() {
       params.type = "smoothstep";
       const existingEdges = getEdges();
       console.log("existingEdges :>> ", existingEdges);
-      // const sourceEdges = existingEdges.filter(
-      //   (edge) => edge.source === params.source
-      // );
 
       const hasSourceHandleConnection = existingEdges.some(
         (edge) =>
@@ -143,16 +128,6 @@ function Editor() {
     },
     [setEdges, setIsUpdated]
   );
-  // const onConnect = useCallback(
-  //   (params) => {
-  //     console.log('paramsss', params);
-  //     params.type = "smoothstep";
-  //     // params.label ='label';
-  //     setEdges((eds) => addEdge(params, eds));
-  //     setIsUpdated(true);
-  //   },
-  //   [setEdges, setIsUpdated]
-  // );
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -162,24 +137,33 @@ function Editor() {
   const onDrop = useCallback(
     (event) => {
       event.preventDefault();
-      let uniqId = uniqueId(7);
-      // const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
       const data = event.dataTransfer.getData("application/reactflow");
       const { type, title, Icon, color } = JSON.parse(data);
-
-      // check if the dropped element is valid
+      console.log('type :>> ', type);
+      let uniqId = type == 'end' ? 'end' : uniqueId(7);
       if (typeof type === "undefined" || !type) {
         return;
       }
-      // console.log('event', event)
+      if (type === 'end' && reactFlowInstance.getNodes().some(node => node.id === 'end')) {
+        Swal.fire({
+          position: "center",
+          icon: "error",
+          title: "You cannot have more than one END node in the flowchart.",
+          showConfirmButton: false,
+          timer: 3000,
+          customClass: {
+            popup: "swal-popup",
+            title: "swal-error-title",
+            icon: "swal-icon",
+          },
+          background: "#27272a",
+        });
+        return;
+      }
       const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX - 105,
         y: event.clientY,
       });
-      // const position = reactFlowInstance.screenToFlowPosition({
-      //   x: event.clientX - reactFlowBounds.left,
-      //   y: event.clientY - reactFlowBounds.top,
-      // });
 
       const newNode = {
         id: uniqId,
@@ -294,13 +278,16 @@ function Editor() {
         setNodes(nodes);
         setEdges(edges);
         setInitialized(true);
-      } else {
+      } 
+      else {
         // Add default start node if no nodes are loaded from localStorage
-        setNodes([defaultStartNode, defaultEndNode]);
+        setNodes([defaultStartNode]);
+        // setNodes([defaultStartNode, defaultEndNode]);
       }
     } catch (error) {
       // Add default start node if an error occurs during loading from localStorage
-      setNodes([defaultStartNode, defaultEndNode]);
+      setNodes([defaultStartNode]);
+      // setNodes([defaultStartNode, defaultEndNode]);
     }
   }, [setNodes, setEdges]);
 

@@ -184,6 +184,11 @@ body.dark .editor-bg {
   font-size: 18px;
   font-weight: 400;
 }
+.swal-error-title {
+  color: #f27474;
+  font-size: 18px;
+  font-weight: 400;
+}
 
 .swal-icon {
   font-size: 24px;

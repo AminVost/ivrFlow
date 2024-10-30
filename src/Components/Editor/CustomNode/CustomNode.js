@@ -59,7 +59,8 @@ const CustomNode = ({ id }) => {
   };
 
   const deleteNode = useCallback(() => {
-    if (id !== "start" && id !== "end") {
+    if (id !== "start") {
+    // if (id !== "start" && id !== "end") {
       if (
         nodeType == "If" ||
         nodeType == "Switch" ||
@@ -268,7 +269,7 @@ const CustomNode = ({ id }) => {
         )}
 
         {nodeType !== "start" &&
-          nodeType !== "end" &&
+          // nodeType !== "end" &&
           nodeType !== "switchIvr" && (
             <div
               className={`toolbar-wrapper ${nodeType === "start" ? "hidden" : ""
@@ -288,6 +289,7 @@ const CustomNode = ({ id }) => {
                 )}
                 {nodeType !== "gotoIvr" &&
                   nodeType !== "switchIvr" &&
+                  nodeType !== "end" &&
                   !nodeType.includes("ifIvr") && (
                     <BiPencil
                       onClick={() => {
