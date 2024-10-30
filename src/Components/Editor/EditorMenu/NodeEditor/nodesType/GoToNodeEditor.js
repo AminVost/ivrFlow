@@ -76,10 +76,8 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
     const { value, name } = event.target;
     handleChange(event);
     if (name == 'advanceIvr' && !value) {
-      // console.log('nullll :>> ');
       setLabelType('justLabel');
       const goToNodeId = `${data.currentId}-goTo`;
-      // Remove node and edge
       const nodeExists = reactFlowInstance.getNodes().some((node) => node.id === goToNodeId);
 
       if (nodeExists) {
@@ -90,11 +88,11 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
 
         if (nodeKey) {
           delete updatedNodes[nodeKey];
-          console.log("Updated Nodes:", updatedNodes);
+          // console.log("Updated Nodes:", updatedNodes);
           localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
           setCreatedNodes(updatedNodes);
         }
-        console.log('createdNodes', createdNodes);
+        // console.log('createdNodes', createdNodes);
         setIsUpdated(true);
       }
     } else {
@@ -106,7 +104,7 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
       }
 
       const currentNode = reactFlowInstance?.getNode(data.currentId);
-      console.log("currentNode", currentNode);
+      // console.log("currentNode", currentNode);
 
       const createOrUpdateNode = (sourceHandle, value, nodeId) => {
         if (!createdNodes[nodeId]) {
@@ -147,11 +145,11 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
           };
 
           reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
-          console.log(
-            `New node and edge added:`,
-            newNode,
-            newEdge
-          );
+          // console.log(
+          //   `New node and edge added:`,
+          //   newNode,
+          //   newEdge
+          // );
         } else {
           reactFlowInstance.setNodes((nds) =>
             nds.map((node) => {
@@ -233,9 +231,6 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
 
       reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
     } else {
-
-      // handleChange({ target: { name: "labelValue", value: null } });
-      // handleChange({ target: { name: "labelValueId", value: null } });
       await handleChangeAwait({
         labelValue: null,
         labelValueId: null,
@@ -254,7 +249,7 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
       reactFlowInstance.setNodes((nds) =>
         nds.map((node) => {
           if (node.id === goToNodeId) {
-            console.log('newNode', node)
+            // console.log('newNode', node)
             return {
               ...node,
               data: {

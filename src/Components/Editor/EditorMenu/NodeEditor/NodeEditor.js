@@ -156,7 +156,7 @@ const NodeEditor = () => {
       case "Input":
         return <InputNodeEditor data={data} handleChange={handleChange} />;
       case "If":
-        return <IfNodeEditor data={data} handleChange={handleChange} addNode={addNode} />;
+        return <IfNodeEditor data={data} handleChange={handleChange} addNode={addNode} handleChangeAwait={handleChangeAwait} />;
       case "Switch":
         return <SwitchNodeEditor data={data} handleChange={handleChange} addNode={addNode} />;
       case "Dial":
@@ -166,7 +166,7 @@ const NodeEditor = () => {
       case "GoTo":
         return <GoToNodeEditor data={data} handleChange={handleChange} addNode={addNode} handleChangeAwait={handleChangeAwait} />;
       case "CallFunction":
-        return <CallFunctionNodeEditor data={data} handleChange={handleChange} addNode={addNode} />;
+        return <CallFunctionNodeEditor data={data} handleChange={handleChange} addNode={addNode} handleChangeAwait={handleChangeAwait} />;
       case "Rpc":
         return <RpcNodeEditor data={data} handleChange={handleChange} />;
       case "SendFax":

@@ -2,6 +2,7 @@
     /* width: 210px; */
     min-width: 210px;
     width: auto;
+    max-width: 210px;
     background-color: #27272a;
     padding: 13px;
     border-radius: 10px;

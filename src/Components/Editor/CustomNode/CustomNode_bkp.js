@@ -101,7 +101,7 @@ const CustomNode = ({ id }) => {
 
       const currentNode = reactFlowInstance.getNode(id);
       if (currentNode?.data?.nodeType?.includes("ifIvr")) {
-        const regex = /^(.*?)-(advanceIvrTrueIf|advanceIvrFalseIf)$/;
+        const regex = /^(.*?)-(trueIf|falseIf)$/;
         const match = id.match(regex);
 
         if (match) {

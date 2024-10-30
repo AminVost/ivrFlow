@@ -8,37 +8,47 @@ import {
   MenuItem,
   FormControlLabel,
   Checkbox,
+  Radio,
+  RadioGroup,
 } from "@mui/material";
 import InfoTooltipAdornment from "../../../../../utils/InfoTooltipAdornment";
 import { AppContext } from "../../../../../Context/AppContext";
-import uniqueId from "../../../../../utils/uniqueId";
-import { Handle, useReactFlow, addEdge } from "reactflow";
+import { addEdge } from "reactflow";
 
 const IfNodeEditor = ({ data, handleChange, addNode }) => {
   console.log("data=>", data);
-  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes } =
-    useContext(AppContext);
+  const {
+    reactFlowInstance,
+    setIsUpdated,
+    createdNodes,
+    setCreatedNodes,
+    changeChildIf,
+    setChangeChildIf,
+  } = useContext(AppContext);
   const reactFlowWrapper = useRef(null);
   const [operand, setOperand] = useState(data.operand || "timeFrame");
   const [showDetails, setShowDetails] = useState(false);
   const [updateNewNode, setUpdateNewNode] = useState(false);
+
+  const [selectedTrueOption, setSelectedTrueOption] = useState("IVRTrue");
+  const [selectedFalseOption, setSelectedFalseOption] = useState("IVRFalse");
 
   useEffect(() => {
     data.showInfo = showDetails;
   }, [showDetails, data]);
 
   useEffect(() => {
-    const storedNodes = localStorage.getItem("createdNodes");
-    if (storedNodes) {
-      // console.log("readdddd", JSON.parse(storedNodes));
-      setCreatedNodes(JSON.parse(storedNodes));
+    if (changeChildIf.parentId == data.currentId) {
+      handleChange({
+        target: { name: changeChildIf.conditionType, value: null },
+      });
     }
-  }, []);
+  }, [changeChildIf]);
 
   useEffect(() => {
-    if (createdNodes && Object.keys(createdNodes).length != 0) {
+    if (createdNodes && Object.keys(createdNodes).length !== 0) {
       localStorage.setItem("createdNodes", JSON.stringify(createdNodes));
-      // console.log("setttt", createdNodes);                  
+      // console.log("setttt", createdNodes);
     }
   }, [createdNodes, updateNewNode]);
 
@@ -114,7 +124,11 @@ const IfNodeEditor = ({ data, handleChange, addNode }) => {
           type: "smoothstep",
           animated: true,
           style: { stroke: "#ff8333" },
-          data: { label: nodeType },
+          label: nodeType,
+          labelStyle: { fill: "black", fontWeight: 600, fontSize: 13 },
+          labelBgStyle: { fill: "white" },
+          labelBgPadding: [8, 4],
+          labelBgBorderRadius: 4,
         };
 
         reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
@@ -149,9 +163,9 @@ const IfNodeEditor = ({ data, handleChange, addNode }) => {
           },
         }));
         setUpdateNewNode(!updateNewNode);
+        setIsUpdated(true);
       }
     };
-
     const trueNodeId = `${data.currentId}-trueIf`;
     const falseNodeId = `${data.currentId}-falseIf`;
 
@@ -206,6 +220,70 @@ const IfNodeEditor = ({ data, handleChange, addNode }) => {
     }
 
     handleChange({ target: { name: "data", value: cleanedData } });
+  };
+
+  const handleRadioChange = (event) => {
+    const { value, name } = event.target;
+    if (name == "ivrTrueOptions") {
+      setSelectedTrueOption(value);
+      handleChange(event);
+      if (value == "IVRTrue") {
+        handleChange({ target: { name: "trueLabelValue", value: null } });
+      } else if (value == "labelValueTrue") {
+        handleChange({ target: { name: "trueIf", value: null } });
+        const goToNodeId = `${data.currentId}-trueIf`;
+        // Remove node and edge
+        reactFlowInstance.setNodes((nds) =>
+          nds.filter((node) => node.id !== goToNodeId)
+        );
+        reactFlowInstance.setEdges((eds) =>
+          eds.filter((edge) => !edge.id.includes(goToNodeId))
+        );
+        const updatedNodes = { ...createdNodes };
+        const nodeKey = Object.keys(updatedNodes).find((key) =>
+          key.includes(goToNodeId)
+        );
+        if (nodeKey) {
+          delete updatedNodes[nodeKey];
+          console.log("Updated Nodes:", updatedNodes);
+          localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
+          setCreatedNodes(updatedNodes);
+        }
+        console.log("createdNodes", createdNodes);
+        setIsUpdated(true);
+      }
+    } else if (name == "ivrFalseOptions") {
+      setSelectedFalseOption(value);
+      handleChange(event);
+      if (value == "IVRFalse") {
+        handleChange({ target: { name: "falseLabelValue", value: null } });
+      } else if (value == "labelValueFalse") {
+        handleChange({ target: { name: "falseIf", value: null } });
+        const goToNodeId = `${data.currentId}-falseIf`;
+        // Remove node and edge
+        reactFlowInstance.setNodes((nds) =>
+          nds.filter((node) => node.id !== goToNodeId)
+        );
+        reactFlowInstance.setEdges((eds) =>
+          eds.filter((edge) => !edge.id.includes(goToNodeId))
+        );
+        const updatedNodes = { ...createdNodes };
+        const nodeKey = Object.keys(updatedNodes).find((key) =>
+          key.includes(goToNodeId)
+        );
+
+        if (nodeKey) {
+          delete updatedNodes[nodeKey];
+          console.log("Updated Nodes:", updatedNodes);
+          localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
+          setCreatedNodes(updatedNodes);
+        }
+
+        console.log("createdNodes", createdNodes);
+
+        setIsUpdated(true);
+      }
+    }
   };
 
   return (
@@ -266,14 +344,14 @@ const IfNodeEditor = ({ data, handleChange, addNode }) => {
           <TextField
             className="inputText"
             id="firstValueIf"
-            name="firstValue"
-            label="Value"
+            name="varName"
+            label="VarName"
             variant="outlined"
             onChange={handleChange}
-            value={data.firstValue || ""}
+            value={data.varName || ""}
             InputProps={{
               endAdornment: (
-                <InfoTooltipAdornment tooltipText="This is the firstValue Component" />
+                <InfoTooltipAdornment tooltipText="This is the varName Component" />
               ),
               sx: { paddingRight: 0 },
             }}
@@ -352,15 +430,16 @@ const IfNodeEditor = ({ data, handleChange, addNode }) => {
           </FormControl>
         )}
 
-        {operand === "pattern" && (
+        {/* {operand === "pattern" && ( */}
+        {operand !== "list" && operand !== "timeFrame" && (
           <TextField
             className="inputText"
             id="secondValueIf"
-            name="secoundValue"
-            label="Second Value"
+            name="value"
+            label="Value"
             variant="outlined"
             onChange={handleChange}
-            value={data.secoundValue || ""}
+            value={data.value || ""}
             InputProps={{
               endAdornment: (
                 <InfoTooltipAdornment tooltipText="This is the secondValue Component" />
@@ -369,6 +448,8 @@ const IfNodeEditor = ({ data, handleChange, addNode }) => {
             }}
           />
         )}
+
+        <InputLabel sx={{ mb: 1.2 }}>When True</InputLabel>
 
         <FormControl fullWidth>
           <InputLabel id="true-go-to-label">True Go To</InputLabel>
@@ -391,6 +472,17 @@ const IfNodeEditor = ({ data, handleChange, addNode }) => {
           </Select>
         </FormControl>
 
+        <TextField
+          label="True Label Value"
+          name="trueLabelValue"
+          value={data.trueLabelValue || ""}
+          onChange={handleChange}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
+
+        <InputLabel sx={{ mb: 1.2 }}>When False</InputLabel>
+
         <FormControl fullWidth>
           <InputLabel id="false-go-to-label">False Go To</InputLabel>
           <Select
@@ -411,7 +503,26 @@ const IfNodeEditor = ({ data, handleChange, addNode }) => {
             <MenuItem value="IVR 8">IVR 8</MenuItem>
           </Select>
         </FormControl>
+
+        <TextField
+          label="False Label Value"
+          name="falseLabelValue"
+          value={data.falseLabelValue || ""}
+          onChange={handleChange}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
       </Box>
+      <TextField
+          label="Comments"
+          name="comments"
+          multiline
+          rows={3}
+          value={data.comments || ''}
+          onChange={handleChange}
+          fullWidth
+          sx={{ mb: 1.2 }}
+        />
     </>
   );
 };
