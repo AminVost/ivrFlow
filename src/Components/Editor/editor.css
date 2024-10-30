@@ -120,6 +120,11 @@ body.dark .editor-bg {
   font-size: 25px;
   color: white;
 }
+.leftPanelContainer {
+  display: flex;
+  align-items: center;
+  column-gap: 7px;
+}
 .right-panel-button.toggleTheme {
   padding: 7px;
   height: fit-content;

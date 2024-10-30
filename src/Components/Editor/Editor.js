@@ -84,7 +84,7 @@ function Editor() {
     theme,
     setTheme,
   } = useContext(AppContext);
-  
+
   useEffect(() => {
     console.log("theme:", theme);
 
@@ -96,7 +96,7 @@ function Editor() {
   //   document.body.className = theme; // Apply theme to body
   //   setTimeout(() => {
   //     localStorage.setItem("ivrTheme", theme);
-      
+
   //   }, 100);
   //   console.log("theme:", theme);
   // };
@@ -163,7 +163,7 @@ function Editor() {
     (event) => {
       event.preventDefault();
       let uniqId = uniqueId(7);
-      const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+      // const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
       const data = event.dataTransfer.getData("application/reactflow");
       const { type, title, Icon, color } = JSON.parse(data);
 
@@ -277,8 +277,8 @@ function Editor() {
           node.id === "start"
             ? { ...node, position: { x: startX, y: startY - 100 } } // Adjust start node position
             : node.id === "end"
-            ? { ...node, position: { x: startX, y: startY + 100 } } // Adjust end node position
-            : node
+              ? { ...node, position: { x: startX, y: startY + 100 } } // Adjust end node position
+              : node
         )
       );
 
@@ -328,7 +328,7 @@ function Editor() {
         <Background
           variant="dots"
           className="editor-bg"
-          size={theme == "dark" ? 1 : 2}
+          size={theme == "dark" ? 1 : 3}
           color={theme == "dark" ? "#8f8f98" : "#27272a69"}
         />
         {/* <Background variant="dots" className="editor-bg" gap={20} size={2} /> */}
@@ -338,6 +338,8 @@ function Editor() {
           showDrawer={showDrawer}
           setShowDrawer={setShowDrawer}
           width={width}
+          toggleTheme={toggleTheme}
+          theme={theme}
         />
         <RightPanel
           handleWorkflowData={handleWorkflowData}
@@ -366,29 +368,38 @@ function Editor() {
 export default memo(Editor);
 
 const LeftPanel = memo(
-  ({ showSidebar, setShowSidebar, showDrawer, setShowDrawer, width }) => {
+  ({ showSidebar, setShowSidebar, showDrawer, setShowDrawer, width, toggleTheme, theme }) => {
     return (
       <Panel position="top-left">
-        <div className="left-panel-button">
-          <IconButton
-            disableTouchRipple
-            onClick={() => {
-              setShowSidebar(!showSidebar);
-              setShowDrawer(!showDrawer);
-            }}
-          >
-            {width > 815 ? (
-              !showSidebar ? (
+        <div className="leftPanelContainer">
+          <div className="left-panel-button">
+            <IconButton
+              disableTouchRipple
+              onClick={() => {
+                setShowSidebar(!showSidebar);
+                setShowDrawer(!showDrawer);
+              }}
+            >
+              {width > 815 ? (
+                !showSidebar ? (
+                  <PiSidebarSimpleFill />
+                ) : (
+                  <BiFullscreen />
+                )
+              ) : showSidebar ? (
                 <PiSidebarSimpleFill />
               ) : (
                 <BiFullscreen />
-              )
-            ) : showSidebar ? (
-              <PiSidebarSimpleFill />
-            ) : (
-              <BiFullscreen />
-            )}
-          </IconButton>
+              )}
+            </IconButton>
+          </div>
+          <div className="left-panel-button toggleTheme">
+            <IconButton
+              onClick={toggleTheme}
+            >
+            {theme === "dark" ? getIcons("RiSunFill") : getIcons("TbMoonFilled")}
+            </IconButton>
+          </div>
         </div>
       </Panel>
     );
@@ -451,9 +462,9 @@ const RightPanel = memo(
           <p>Save</p>
         </div>
 
-        <div className="right-panel-button toggleTheme" onClick={toggleTheme}>
+        {/* <div className="right-panel-button toggleTheme" onClick={toggleTheme}>
           {theme === "dark" ? getIcons("RiSunFill") : getIcons("TbMoonFilled")}
-        </div>
+        </div> */}
       </Panel>
     );
   }

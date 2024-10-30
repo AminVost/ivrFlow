@@ -30,6 +30,7 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
   const [updateNewNode, setUpdateNewNode] = useState(false);
   const [trueLabelType, setTrueLabelType] = useState(data?.advanceIvrTrueIf ? 'ivrLabel' : "justLabel");
   const [falseLabelType, setFalseLabelType] = useState(data?.advanceIvrFalseIf ? 'ivrLabel' : "justLabel");
+
   const [inputValueTrue, setInputValueTrue] = useState("");
   const [inputValueFalse, setInputValueFalse] = useState("");
   const [optionsTrue, setOptionsTrue] = useState([]);
@@ -104,134 +105,10 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
     handleChange(modifiedEvent);
   };
 
-  // const handleSelectChange = (event) => {
-  //   const { value, name } = event.target;
-  //   handleChange(event);
-
-  //   if (!reactFlowInstance || !reactFlowWrapper.current) {
-  //     console.log("Flow instance or wrapper not available.");
-  //     return;
-  //   }
-
-  //   const currentNode = reactFlowInstance?.getNode(data.currentId);
-  //   console.log("currentNode", currentNode);
-
-  //   const createOrUpdateNode = (
-  //     nodeType,
-  //     direction,
-  //     sourceHandle,
-  //     value,
-  //     nodeId
-  //   ) => {
-  //     if (!createdNodes[nodeId]) {
-  //       const position = {
-  //         x:
-  //           currentNode.position.x +
-  //           (direction === "right"
-  //             ? currentNode.width * 1.5
-  //             : -currentNode.width * 1.5),
-  //         y: currentNode.position.y,
-  //       };
-
-  //       const newNode = {
-  //         // id: uniqueId(7),
-  //         id: `${nodeId}`,
-  //         type: "custom",
-  //         position,
-  //         data: {
-  //           title: `${nodeType} Go To ${value}`,
-  //           nodeType: `ifIvr-${nodeType}`,
-  //           Icon: "RiExternalLinkLine",
-  //           color: "#ff8333",
-  //         },
-  //       };
-
-  //       setIsUpdated(true);
-  //       addNode(newNode);
-  //       setCreatedNodes((prevNodes) => ({
-  //         ...prevNodes,
-  //         [nodeId]: newNode,
-  //       }));
-
-  //       const newEdge = {
-  //         id: `edge-${currentNode.id}-${newNode.id}`,
-  //         source: currentNode.id,
-  //         sourceHandle: sourceHandle,
-  //         target: newNode.id,
-  //         type: "smoothstep",
-  //         animated: true,
-  //         style: { stroke: "#ff8333" },
-  //         label: nodeType,
-  //         labelStyle: { fill: "black", fontWeight: 600, fontSize: 13 },
-  //         labelBgStyle: { fill: "white" },
-  //         labelBgPadding: [8, 4],
-  //         labelBgBorderRadius: 4,
-  //       };
-
-  //       reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
-  //       console.log(
-  //         `New ${nodeType.toLowerCase()} node and edge added:`,
-  //         newNode,
-  //         newEdge
-  //       );
-  //     } else {
-  //       reactFlowInstance.setNodes((nds) =>
-  //         nds.map((node) => {
-  //           if (node.id === createdNodes[nodeId].id) {
-  //             return {
-  //               ...node,
-  //               data: {
-  //                 ...node.data,
-  //                 title: `${nodeType} Go To ${value}`,
-  //               },
-  //             };
-  //           }
-  //           return node;
-  //         })
-  //       );
-  //       setCreatedNodes((prevNodes) => ({
-  //         ...prevNodes,
-  //         [nodeId]: {
-  //           ...prevNodes[nodeId],
-  //           data: {
-  //             ...prevNodes[nodeId].data,
-  //             title: `${nodeType} Go To ${value}`,
-  //           },
-  //         },
-  //       }));
-  //       setUpdateNewNode(!updateNewNode);
-  //       setIsUpdated(true);
-  //     }
-  //   };
-  //   const trueNodeId = `${data.currentId}-advanceIvrTrueIf`;
-  //   const falseNodeId = `${data.currentId}-advanceIvrFalseIf`;
-
-  //   if (name === "trueIf" && value) {
-  //     createOrUpdateNode(
-  //       "True",
-  //       "right",
-  //       "if-true-source-right",
-  //       value,
-  //       trueNodeId
-  //     );
-  //   }
-
-  //   if (name === "falseIf" && value) {
-  //     createOrUpdateNode(
-  //       "False",
-  //       "left",
-  //       "if-false-source-left",
-  //       value,
-  //       falseNodeId
-  //     );
-  //   }
-  // };
-
   const handleSelectChange = (event) => {
     const { value, name } = event.target;
     handleChange(event);
     if (name == 'advanceIvrTrueIf') {
-
       if (!value) {
         setTrueLabelType('justLabel');
         const goToNodeId = `${data.currentId}-advanceIvrTrueIf`;
@@ -300,27 +177,29 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
               [nodeId]: newNode,
             }));
 
-            const newEdge = {
-              id: `edge-${currentNode.id}-${newNode.id}`,
-              source: currentNode.id,
-              sourceHandle: sourceHandle,
-              target: newNode.id,
-              type: "smoothstep",
-              animated: true,
-              style: { stroke: "#ff8333" },
-              label: nodeType,
-              labelStyle: { fill: "black", fontWeight: 600, fontSize: 13 },
-              labelBgStyle: { fill: "white" },
-              labelBgPadding: [8, 4],
-              labelBgBorderRadius: 4,
-            };
+            setTimeout(() => {
+              const newEdge = {
+                id: `edge-${currentNode.id}-${newNode.id}`,
+                source: currentNode.id,
+                sourceHandle: sourceHandle,
+                target: newNode.id,
+                type: "smoothstep",
+                animated: true,
+                style: { stroke: "#ff8333" },
+                label: nodeType,
+                labelStyle: { fill: "black", fontWeight: 600, fontSize: 13 },
+                labelBgStyle: { fill: "white" },
+                labelBgPadding: [8, 4],
+                labelBgBorderRadius: 4,
+              };
 
-            reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
-            console.log(
-              `New ${nodeType.toLowerCase()} node and edge added:`,
-              newNode,
-              newEdge
-            );
+              reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
+              console.log(
+                `New ${nodeType.toLowerCase()} node and edge added:`,
+                newNode,
+                newEdge
+              );
+            }, 10);
           } else {
             reactFlowInstance.setNodes((nds) =>
               nds.map((node) => {
@@ -361,7 +240,6 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
           trueNodeId
         );
       }
-
     } else if (name == 'advanceIvrFalseIf') {
 
       if (!value) {
@@ -432,27 +310,29 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
               [nodeId]: newNode,
             }));
 
-            const newEdge = {
-              id: `edge-${currentNode.id}-${newNode.id}`,
-              source: currentNode.id,
-              sourceHandle: sourceHandle,
-              target: newNode.id,
-              type: "smoothstep",
-              animated: true,
-              style: { stroke: "#ff8333" },
-              label: nodeType,
-              labelStyle: { fill: "black", fontWeight: 600, fontSize: 13 },
-              labelBgStyle: { fill: "white" },
-              labelBgPadding: [8, 4],
-              labelBgBorderRadius: 4,
-            };
+            setTimeout(() => {
+              const newEdge = {
+                id: `edge-${currentNode.id}-${newNode.id}`,
+                source: currentNode.id,
+                sourceHandle: sourceHandle,
+                target: newNode.id,
+                type: "smoothstep",
+                animated: true,
+                style: { stroke: "#ff8333" },
+                label: nodeType,
+                labelStyle: { fill: "black", fontWeight: 600, fontSize: 13 },
+                labelBgStyle: { fill: "white" },
+                labelBgPadding: [8, 4],
+                labelBgBorderRadius: 4,
+              };
 
-            reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
-            console.log(
-              `New ${nodeType.toLowerCase()} node and edge added:`,
-              newNode,
-              newEdge
-            );
+              reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
+              console.log(
+                `New ${nodeType.toLowerCase()} node and edge added:`,
+                newNode,
+                newEdge
+              );
+            }, 10);
           } else {
             reactFlowInstance.setNodes((nds) =>
               nds.map((node) => {
@@ -556,9 +436,9 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
     }
   };
 
-  const handleAutocompleteChange = async (event, selectedNode) => {
-    const { name } = event.target;
-    if (name == 'trueAutoComplete') {
+  const handleAutocompleteChange = async (event, selectedNode, autoCompleteType) => {
+    // console.log('selectedNode' , selectedNode , autoCompleteType);return;
+    if (autoCompleteType == 'True') {
       const currentNodeId = data.currentId;
       const truePreviousNodeId = data?.trueLabelValueId;
       const newSelectedNodeId = selectedNode?.id;
@@ -578,10 +458,16 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
         const newEdge = {
           id: `edge-${currentNodeId}-${newSelectedNodeId}`,
           source: currentNodeId,
+          sourceHandle: "if-true-source-right",
           target: newSelectedNodeId,
           type: "smoothstep",
           animated: true,
-          style: { stroke: "#33ff83" },
+          style: { stroke: "#ff8333" },
+          label: autoCompleteType,
+          labelStyle: { fill: "black", fontWeight: 600, fontSize: 13 },
+          labelBgStyle: { fill: "white" },
+          labelBgPadding: [8, 4],
+          labelBgBorderRadius: 4,
         };
 
         reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
@@ -596,7 +482,7 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
           edges.filter((edge) => edge.id !== `edge-${currentNodeId}-${truePreviousNodeId}`)
         );
       }
-    } else {
+    } else if (autoCompleteType == 'False') {
 
       const currentNodeId = data.currentId;
       const falsePreviousNodeId = data?.falseLabelValueId;
@@ -617,10 +503,16 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
         const newEdge = {
           id: `edge-${currentNodeId}-${newSelectedNodeId}`,
           source: currentNodeId,
+          sourceHandle: "if-false-source-left",
           target: newSelectedNodeId,
           type: "smoothstep",
           animated: true,
-          style: { stroke: "#33ff83" },
+          style: { stroke: "#ff8333" },
+          label: autoCompleteType,
+          labelStyle: { fill: "black", fontWeight: 600, fontSize: 13 },
+          labelBgStyle: { fill: "white" },
+          labelBgPadding: [8, 4],
+          labelBgBorderRadius: 4,
         };
 
         reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
@@ -659,6 +551,9 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
       );
       setIsUpdated(true);
     }
+  }, [data?.trueAdvanceIvrLabel, reactFlowInstance]);
+
+  useEffect(() => {
     if (data?.falseAdvanceIvrLabel) {
       const goToNodeId = `${data.currentId}-advanceIvrFalseIf`;
       reactFlowInstance.setNodes((nds) =>
@@ -678,7 +573,7 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
       );
       setIsUpdated(true);
     }
-  }, [data?.falseAdvanceIvrLabel, data?.trueAdvanceIvrLabel, reactFlowInstance]);
+  }, [data?.falseAdvanceIvrLabel, reactFlowInstance]);
 
   return (
     <>
@@ -889,15 +784,15 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
             }
             name='trueAutoComplete'
             onInputChange={(event, value) => setInputValueTrue(value)}
-            onChange={handleAutocompleteChange}
+            onChange={(event, value) => handleAutocompleteChange(event, value, 'True')}
             renderInput={(params) => (
               <TextField {...params} label="Select Node by Label" variant="outlined" fullWidth sx={{ mb: 1.2 }} />
             )}
-            // filterOptions={(options, { inputValue }) =>
-            //   options.filter((option) =>
-            //     option.title.toLowerCase().includes(inputValue.toLowerCase())
-            //   )
-            // }
+            filterOptions={(options, { inputValue }) =>
+              options.filter((option) =>
+                option.title.toLowerCase().includes(inputValue.toLowerCase())
+              )
+            }
           />
         )}
 
@@ -947,15 +842,15 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
             }
             name='falseAutoComplete'
             onInputChange={(event, value) => setInputValueFalse(value)}
-            onChange={handleAutocompleteChange}
+            onChange={(event, value) => handleAutocompleteChange(event, value, 'False')}
             renderInput={(params) => (
               <TextField {...params} label="Select Node by Label" variant="outlined" fullWidth sx={{ mb: 1.2 }} />
             )}
-            // filterOptions={(options, { inputValue }) =>
-            //   options.filter((option) =>
-            //     option.title.toLowerCase().includes(inputValue.toLowerCase())
-            //   )
-            // }
+            filterOptions={(options, { inputValue }) =>
+              options.filter((option) =>
+                option.title.toLowerCase().includes(inputValue.toLowerCase())
+              )
+            }
           />
         )}
       </Box>
