@@ -11,6 +11,10 @@
   cursor: pointer;
 }
 
+body.light .node-navigate svg {
+  fill: black;
+}
+
 .node-navigate>div {
   display: flex;
   align-items: center;
@@ -19,6 +23,10 @@
 
 .node-navigate>div>p {
   font-weight: 500;
+}
+
+body.light .node-navigate>div>p {
+  color: black;
 }
 
 /* .node-editor {

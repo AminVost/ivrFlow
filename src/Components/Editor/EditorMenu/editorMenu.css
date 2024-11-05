@@ -5,6 +5,10 @@
   color: white;
 }
 
+body.light .editor-menu {
+  background: white;
+}
+
 .nodes-header {
   display: flex;
   flex-direction: column;
@@ -23,6 +27,9 @@
   width: 28px;
   height: 28px;
 }
+body.light .nodes-header > div > svg {
+  fill: black;
+}
 
 .nodes-header > div:first-child > p {
   font-size: 20px;
@@ -36,6 +43,10 @@
   background-color: #313134;
 }
 
+body.light .nodes-header > div:last-child {
+  background-color: #d6d6d6;
+}
+
 .nodes-header > div:last-child > input {
   width: 100%;
   padding: 5px;
@@ -44,6 +55,9 @@
   background-color: #313134;
   font-size: 16px;
   color: white;
+}
+body.light .nodes-header > div:last-child > input {
+  background-color: #d6d6d6;
 }
 
 .nodes-header > div:last-child > input::placeholder {
@@ -135,6 +149,10 @@
   cursor: grab;
   gap: 8px;
 }
+body.light .node {
+  background-color: #d6d6d6;
+  color: black;
+}
 
 .node > p {
   width: 100%;
@@ -164,6 +182,9 @@
   margin: auto;
   width: 18px;
   height: 18px;
+}
+body.light .node > div > button > svg {
+fill: black;
 }
 
 .screen-toggle-button {

@@ -36,8 +36,15 @@ body.dark .editor-bg {
   padding: 10px;
 }
 
+body.light .controls>button {
+background-color: white;
+}
+
 .controls>button>svg {
   fill: white;
+}
+body.light .controls>button>svg {
+  fill: black;
 }
 
 .controls>button:hover {
@@ -110,6 +117,9 @@ body.dark .editor-bg {
   border-radius: 8px;
   padding: 10.5px;
 }
+body.light .left-panel-button>button {
+background-color: white;
+}
 
 .left-panel-button>button:hover {
   background-color: #313134;
@@ -119,6 +129,9 @@ body.dark .editor-bg {
 .left-panel-button svg {
   font-size: 25px;
   color: white;
+}
+body.light .left-panel-button svg {
+  color: black;
 }
 .leftPanelContainer {
   display: flex;

@@ -158,7 +158,7 @@ const NodeEditor = () => {
       case "If":
         return <IfNodeEditor data={data} handleChange={handleChange} addNode={addNode} handleChangeAwait={handleChangeAwait} />;
       case "Switch":
-        return <SwitchNodeEditor data={data} handleChange={handleChange} addNode={addNode} />;
+        return <SwitchNodeEditor data={data} handleChange={handleChange} addNode={addNode} handleChangeAwait={handleChangeAwait} />;
       case "Dial":
         return <DialNodeEditor data={data} handleChange={handleChange} />;
       case "Set":
