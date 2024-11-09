@@ -34,6 +34,11 @@ const AsteriskCmdNodeEditor = ({ data, handleChange }) => {
             />
           }
           label="Show Info"
+          sx={{
+            '& .MuiFormControlLabel-label': {
+              color: 'red', // رنگ دلخواه
+            },
+          }}
         />
       </Box>
       <Box component="form" noValidate autoComplete="off">

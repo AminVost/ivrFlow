@@ -4,7 +4,7 @@ import { AppContext } from "../../../../../Context/AppContext";
 import ReactFlow, { addEdge } from "reactflow";
 
 const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
-  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf } =
+  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf , setChangeChildIf } =
     useContext(AppContext);
   const [showDetails, setShowDetails] = useState(false);
   const [updateNewNode, setUpdateNewNode] = useState(false);
@@ -12,7 +12,28 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState([]);
   const reactFlowWrapper = useRef(null);
+  const ivrLabels = ["Label 1", "Label 2", "Label 3", "Label 4", "Label 5", "Label 6"];
+
   console.log("data=>", data);
+
+  useEffect(() => {
+    window.addEventListener('error', e => {
+        if (e.message === 'ResizeObserver loop limit exceeded') {
+            const resizeObserverErrDiv = document.getElementById(
+                'webpack-dev-server-client-overlay-div'
+            );
+            const resizeObserverErr = document.getElementById(
+                'webpack-dev-server-client-overlay'
+            );
+            if (resizeObserverErr) {
+                resizeObserverErr.setAttribute('style', 'display: none');
+            }
+            if (resizeObserverErrDiv) {
+                resizeObserverErrDiv.setAttribute('style', 'display: none');
+            }
+        }
+    });
+}, []);
 
   useEffect(() => {
     data.showInfo = showDetails;
@@ -46,6 +67,15 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
     }
   }, [createdNodes, updateNewNode]);
 
+  const doesNodeExist = (nodeId) => {
+    if (!reactFlowInstance) {
+      console.warn("React Flow instance is not available.");
+      return false;
+    }
+    const allNodes = reactFlowInstance.getNodes();
+    return allNodes.some((node) => node.id === nodeId);
+  };
+
   const handleCheckboxChange = (event) => {
     setShowDetails(event.target.checked);
 
@@ -60,98 +90,6 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
 
     handleChange(modifiedEvent);
   };
-
-  // const handleSelectChange = (event) => {
-  //   const { value, name } = event.target;
-  //   handleChange(event);
-
-  //   if (!reactFlowInstance || !reactFlowWrapper.current) {
-  //     console.log("Flow instance or wrapper not available.");
-  //     return;
-  //   }
-
-  //   const currentNode = reactFlowInstance?.getNode(data.currentId);
-  //   console.log("currentNode", currentNode);
-
-  //   const createOrUpdateNode = (sourceHandle, value, nodeId) => {
-  //     if (!createdNodes[nodeId]) {
-  //       const position = {
-  //         x: currentNode.position.x - currentNode.width * 1.5,
-  //         y: currentNode.position.y,
-  //       };
-
-  //       const newNode = {
-  //         // id: uniqueId(7),
-  //         id: `${nodeId}`,
-  //         type: "custom",
-  //         position,
-  //         data: {
-  //           title: `${value}`,
-  //           nodeType: `ivrCallFunction`,
-  //           Icon: "RiExternalLinkLine",
-  //           color: "#ff3333",
-  //         },
-  //       };
-
-  //       setIsUpdated(true);
-  //       addNode(newNode);
-  //       setCreatedNodes((prevNodes) => ({
-  //         ...prevNodes,
-  //         [nodeId]: newNode,
-  //       }));
-
-  //       const newEdge = {
-  //         id: `edge-${currentNode.id}-${newNode.id}`,
-  //         source: currentNode.id,
-  //         sourceHandle: sourceHandle,
-  //         target: newNode.id,
-  //         type: "smoothstep",
-  //         animated: true,
-  //         style: { stroke: "#ff3333" },
-  //       };
-
-  //       reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
-  //       console.log(
-  //         `New node and edge added:`,
-  //         newNode,
-  //         newEdge
-  //       );
-  //     } else {
-  //       reactFlowInstance.setNodes((nds) =>
-  //         nds.map((node) => {
-  //           if (node.id === createdNodes[nodeId].id) {
-  //             return {
-  //               ...node,
-  //               data: {
-  //                 ...node.data,
-  //                 title: `${value}`,
-  //               },
-  //             };
-  //           }
-  //           return node;
-  //         })
-  //       );
-  //       setCreatedNodes((prevNodes) => ({
-  //         ...prevNodes,
-  //         [nodeId]: {
-  //           ...prevNodes[nodeId],
-  //           data: {
-  //             ...prevNodes[nodeId].data,
-  //             title: `${value}`,
-  //           },
-  //         },
-  //       }));
-  //       setUpdateNewNode(!updateNewNode);
-  //       setIsUpdated(true);
-  //     }
-  //   };
-
-  //   const goToNodeId = `${data.currentId}-callFunction`;
-
-  //   if (name === "advanceIvr" && value) {
-  //     createOrUpdateNode("callFunction-source-right", value, goToNodeId);
-  //   }
-  // };
 
   const handleSelectChange = (event) => {
     const { value, name } = event.target;
@@ -188,7 +126,8 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
       // console.log("currentNode", currentNode);
 
       const createOrUpdateNode = (sourceHandle, value, nodeId) => {
-        if (!createdNodes[nodeId]) {
+        // if (!createdNodes[nodeId]) {
+        if (!doesNodeExist(nodeId)) {
           const position = {
             x: currentNode.position.x - currentNode.width * 1.5,
             y: currentNode.position.y,
@@ -320,7 +259,7 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
   };
 
   useEffect(() => {
-    if (data?.advanceIvrLabel) {
+    if (data?.advanceIvrLabel || data?.advanceIvrLabel == null) {
       const goToNodeId = `${data.currentId}-callFunction`;
       reactFlowInstance.setNodes((nds) =>
         nds.map((node) => {
@@ -391,13 +330,21 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
         </FormControl>
 
         {labelType == 'ivrLabel' && (
-          <TextField
-            label="IVR Label"
-            name="advanceIvrLabel"
-            value={data.advanceIvrLabel || ""}
-            onChange={handleChange}
-            fullWidth
-            sx={{ mb: 1.2 }}
+          // <TextField
+          //   label="IVR Label"
+          //   name="advanceIvrLabel"
+          //   value={data.advanceIvrLabel || ""}
+          //   onChange={handleChange}
+          //   fullWidth
+          //   sx={{ mb: 1.2 }}
+          // />
+          <Autocomplete
+            options={ivrLabels}
+            value={data?.advanceIvrLabel || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: 'advanceIvrLabel', value: newValue } })}
+            renderInput={(params) => (
+              <TextField {...params} label="Select IVR Label" fullWidth />
+            )}
           />
         )}
 

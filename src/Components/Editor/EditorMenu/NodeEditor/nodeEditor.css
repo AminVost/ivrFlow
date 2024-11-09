@@ -13,8 +13,35 @@
 
 body.light .node-navigate svg {
   fill: black;
+  stroke: black;
 }
-
+/* body.light .css-j204z7-MuiFormControlLabel-root .MuiFormControlLabel-label {
+  color: black;
+}
+body.light .css-12ougtl-MuiSvgIcon-root {
+  color: #313134;
+}
+body.light .css-5a0o8h-MuiFormControl-root-MuiTextField-root .MuiInputLabel-root {
+  color: black;
+}
+body.light .css-5a0o8h-MuiFormControl-root-MuiTextField-root .MuiOutlinedInput-root {
+  background: #31313438;
+}
+body.light .css-1a3dpm0-MuiSvgIcon-root {
+  fill: #313134;
+}
+body.light .css-drxt0s-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root {
+  background: #d2d2d2;
+}
+body.light .css-5a0o8h-MuiFormControl-root-MuiTextField-root .MuiOutlinedInput-root input {
+  color: black;
+}
+body.light .css-drxt0s-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root {
+  color: black;
+}
+body.light .css-1f4qdit-MuiFormLabel-root-MuiInputLabel-root {
+  color: black;
+} */
 .node-navigate>div {
   display: flex;
   align-items: center;
@@ -122,6 +149,6 @@ body.light .node-navigate>div>p {
   border-radius: 0px;
 }
 
-.css-6hp17o-MuiList-root-MuiMenu-list li:hover {
-  background-color: #1976d2;
-}
+/* .MuiAutocomplete-listbox {
+  overflow: hidden !important;
+} */

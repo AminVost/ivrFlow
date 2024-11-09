@@ -4,8 +4,8 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { AppContextProvider } from "./Context/AppContext";
-import { ThemeProvider } from '@mui/material/styles';
-import formTheme from './utils/formTheme'; // Import the custom theme
+import { ThemeProvider } from "@mui/material/styles";
+import formTheme from "./utils/formTheme"; // Import the custom theme
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -17,6 +17,18 @@ root.render(
     </ThemeProvider>
   </React.StrictMode>
 );
+
+const suppressResizeObserverError = () => {
+  const originalConsoleError = console.error;
+  console.error = (...args) => {
+    if (args[0]?.includes('ResizeObserver loop completed')) {
+      return;
+    }
+    originalConsoleError.apply(console, args);
+  };
+};
+
+suppressResizeObserverError();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

@@ -34,9 +34,28 @@ const CustomNode = ({ id }) => {
   const { title, nodeType, Icon, color, label } = data;
 
   useEffect(() => {
+    window.addEventListener('error', e => {
+        if (e.message === 'ResizeObserver loop limit exceeded') {
+            const resizeObserverErrDiv = document.getElementById(
+                'webpack-dev-server-client-overlay-div'
+            );
+            const resizeObserverErr = document.getElementById(
+                'webpack-dev-server-client-overlay'
+            );
+            if (resizeObserverErr) {
+                resizeObserverErr.setAttribute('style', 'display: none');
+            }
+            if (resizeObserverErrDiv) {
+                resizeObserverErrDiv.setAttribute('style', 'display: none');
+            }
+        }
+    });
+}, []);
+
+  useEffect(() => {
     const storedNodes = localStorage.getItem("createdNodes");
     if (storedNodes) {
-      console.log("read localStorage CustomNode", JSON.parse(storedNodes));
+      // console.log("read localStorage CustomNode", JSON.parse(storedNodes));
       setCreatedNodes(JSON.parse(storedNodes));
     }
   }, []);
@@ -129,7 +148,7 @@ const CustomNode = ({ id }) => {
               parentId: parentId,
               conditionType: conditionType,
             });
-          }, 100);
+          }, 200);
         }
       } else if (currentNode?.data?.nodeType == "gotoIvr") {
         const regex = /^([a-zA-Z0-9]+)-([a-zA-Z]+)$/;

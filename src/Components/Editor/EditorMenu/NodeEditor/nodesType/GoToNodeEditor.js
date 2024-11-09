@@ -22,6 +22,7 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
   const [labelType, setLabelType] = useState(data?.advanceIvr ? 'ivrLabel' : "justLabel");
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState([]);
+  const ivrLabels = ["Label 1", "Label 2", "Label 3", "Label 4", "Label 5", "Label 6"];
 
   console.log("data=>", data);
 
@@ -56,6 +57,15 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
       localStorage.setItem("createdNodes", JSON.stringify(createdNodes));
     }
   }, [createdNodes, updateNewNode]);
+
+  const doesNodeExist = (nodeId) => {
+    if (!reactFlowInstance) {
+      console.warn("React Flow instance is not available.");
+      return false;
+    }
+    const allNodes = reactFlowInstance.getNodes();
+    return allNodes.some((node) => node.id === nodeId);
+  };
 
   const handleCheckboxChange = (event) => {
     setShowDetails(event.target.checked);
@@ -104,10 +114,13 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
       }
 
       const currentNode = reactFlowInstance?.getNode(data.currentId);
+    
       // console.log("currentNode", currentNode);
 
       const createOrUpdateNode = (sourceHandle, value, nodeId) => {
-        if (!createdNodes[nodeId]) {
+        // if (!createdNodes[nodeId] && !doesNodeExist(nodeId)) {
+        if (!doesNodeExist(nodeId)) {
+          console.log('iff');
           const position = {
             x: currentNode.position.x - currentNode.width * 1.5,
             y: currentNode.position.y,
@@ -151,6 +164,7 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
           //   newEdge
           // );
         } else {
+          console.log('else');
           reactFlowInstance.setNodes((nds) =>
             nds.map((node) => {
               if (node.id === createdNodes[nodeId].id) {
@@ -244,7 +258,7 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
   };
 
   useEffect(() => {
-    if (data?.advanceIvrLabel) {
+    if (data?.advanceIvrLabel || data?.advanceIvrLabel == null) {
       const goToNodeId = `${data.currentId}-goTo`;
       reactFlowInstance.setNodes((nds) =>
         nds.map((node) => {
@@ -323,13 +337,21 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
         </FormControl>
 
         {labelType == 'ivrLabel' && (
-          <TextField
-            label="IVR Label"
-            name="advanceIvrLabel"
-            value={data.advanceIvrLabel || ""}
-            onChange={handleChange}
-            fullWidth
-            sx={{ mb: 1.2 }}
+          // <TextField
+          //   label="IVR Label"
+          //   name="advanceIvrLabel"
+          //   value={data.advanceIvrLabel || ""}
+          //   onChange={handleChange}
+          //   fullWidth
+          //   sx={{ mb: 1.2 }}
+          // />
+          <Autocomplete
+            options={ivrLabels}
+            value={data?.advanceIvrLabel || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: 'advanceIvrLabel', value: newValue } })}
+            renderInput={(params) => (
+              <TextField {...params} label="Select IVR Label" fullWidth />
+            )}
           />
         )}
 

@@ -185,7 +185,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
     setCases((cases) => cases.filter((item) => item.id !== caseItem.id));
 
     let nodeIdToDelete = data.currentId + "-" + caseId;
-    console.log("Removing node with id:", nodeIdToDelete);
+    console.log("handleRemoveCase | Removing node with id:", nodeIdToDelete);
     let nodeToDelete = reactFlowInstance.getNode(nodeIdToDelete);
 
     if (nodeToDelete != undefined && nodeToDelete.hasOwnProperty("id")) {
@@ -218,18 +218,36 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
     console.log(
       `Changing case at index ${index}, field ${field}, to value: ${value}`
     );
-    console.log(caseElm);
-    const updatedCases = cases.map((caseItem, i) =>
-      caseItem.id === caseElm.id ? { ...caseItem, [field]: value } : caseItem
-    );
+    console.log('caseElm', caseElm);
+    setTimeout(() => {
+      const updatedCases = cases.map((caseItem, i) =>
+        caseItem.id === caseElm.id ? { ...caseItem, [field]: value } : caseItem
+      );
+      setCases(updatedCases);
+      console.log('casessss', cases);
+    }, 100);
     if (field == "ivrFlow") {
       handleSelectChange(caseElm.id, value);
     }
-    setCases(updatedCases);
+    if (field == "ivrLabel") {
+      const ivrNodeId = `${data.currentId}-${caseElm.id}`;
+      reactFlowInstance.setNodes((nds) =>
+        nds.map((node) => {
+          if (node.id === ivrNodeId) {
+            console.log('find Nodeee', node)
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                label: value,
+              },
+            };
+          }
+          return node;
+        })
+      );
+    }
   };
-
-
-
 
 
   const renderCaseElements = (caseItem, index) => {
@@ -243,13 +261,25 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
       handleCaseChange(index, "ivrFlow", value, caseItem);
 
       if (value && value !== null) {
+
         const currentNode = reactFlowInstance.getNode(data.currentId);
+        // Remove edge LABEL
+        
+
         if (currentNode) {
           const newNodeId = `${data.currentId}-${caseItem.id}`;
           if (!createdNodes[newNodeId]) {
+            const verticalSpacing = currentNode.height + 50;
+            const isFirstNodeInSide = index < 2;
             const position = {
-              x: currentNode.position.x + (index % 2 === 0 ? 200 : -200),
-              y: currentNode.position.y + Math.floor(index / 2) * 100,
+              x:
+                currentNode.position.x +
+                (index % 2 === 0
+                  ? +currentNode.width * 1.5
+                  : -currentNode.width * 1.5),
+              y: isFirstNodeInSide
+                ? currentNode.position.y
+                : currentNode.position.y + Math.floor(index / 2) * verticalSpacing,
             };
             const newNode = {
               id: newNodeId,
@@ -258,6 +288,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
               data: {
                 title: `IVR: ${value}`,
                 nodeType: "switchIvr",
+                Icon: "RiExternalLinkLine",
                 color: "#3383ff",
               },
             };
@@ -301,7 +332,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
         const nodeIdToRemove = `${data.currentId}-${caseItem.id}`;
         const nodeToRemove = reactFlowInstance.getNode(nodeIdToRemove);
         if (nodeToRemove) {
-          console.log("Removing node with id:", nodeIdToRemove);
+          console.log("handleSelectIvrFlowChange | Removing node with id:", nodeIdToRemove);
           reactFlowInstance.setNodes((nodes) => nodes.filter((node) => node.id !== nodeIdToRemove));
           reactFlowInstance.setEdges((edges) => edges.filter((edge) => edge.target !== nodeIdToRemove));
           const updatedNodes = { ...createdNodes };
@@ -345,7 +376,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
               }
 
             });
-          }, 100);
+          }, 50);
 
           // Create a new edge to the newly selected node
           const newEdgeId = `edge-${currentNode.id}-${targetNode.id}`;
@@ -361,6 +392,11 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
 
           console.log("Creating new edge to selected node:", newEdge);
           reactFlowInstance.setEdges((eds) => addEdge(newEdge, eds));
+          // setTimeout(() => {
+            
+          //   let allEdges = reactFlowInstance.getEdges();
+          //   console.log('allEdges' , allEdges)
+          // }, 50);
         }
       } else if (value === "" || !value) {
         // Remove edge if the selection is cleared
@@ -414,12 +450,15 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
               <Autocomplete
                 options={ivrLabels}
                 value={caseItem?.ivrLabel || ""}
-                onChange={(event, newValue) =>
+                // onChange={(event, newValue) =>
+                //   handleCaseChange(index, "ivrLabel", newValue, caseItem)
+                // }
+                onChange={(e, newValue) =>
                   handleCaseChange(index, "ivrLabel", newValue, caseItem)
                 }
                 renderInput={(params) => (
                   <TextField {...params} label="Select IVR Label" fullWidth />
-                )}                
+                )}
               />
             ) : (
               <Autocomplete
@@ -484,7 +523,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
               <Autocomplete
                 options={ivrLabels}
                 value={caseItem?.ivrLabel || ""}
-                onChange={(event, newValue) =>
+                onChange={(e, newValue) =>
                   handleCaseChange(index, "ivrLabel", newValue, caseItem)
                 }
                 renderInput={(params) => (
@@ -554,7 +593,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
               <Autocomplete
                 options={ivrLabels}
                 value={caseItem?.ivrLabel || ""}
-                onChange={(event, newValue) =>
+                onChange={(e, newValue) =>
                   handleCaseChange(index, "ivrLabel", newValue, caseItem)
                 }
                 renderInput={(params) => (
@@ -579,13 +618,6 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
         return null;
     }
   };
-
-
-
-
-
-
-
 
   const handleHoverNode = (caseId) => {
     const nodeId = `${data.currentId}-${caseId}`;
