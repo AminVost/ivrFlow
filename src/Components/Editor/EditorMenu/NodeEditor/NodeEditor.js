@@ -40,6 +40,7 @@ const NodeEditor = () => {
     setIsUpdated,
     isUpdated,
     setActiveEditor,
+    reactFlowInstance
   } = useContext(AppContext);
   const { id, data } = currentNode;
   // console.log('currentNode=>', currentNode)
@@ -76,12 +77,12 @@ const NodeEditor = () => {
     }, 100);
   };
 
-  const handleChangeAwait = async (updates) => {
-    return new Promise((resolve) => {
-      const updatedData = { ...data, ...updates };
-  
-      setData((prevData) => ({ ...prevData, data: updatedData }));
-      setNodes((nodes) =>
+  const handleChangeAwait = (updates) => {
+    const updatedData = { ...data, ...updates };
+    setData((prevData) => ({ ...prevData, data: updatedData }));
+    setTimeout(() => {
+      
+      reactFlowInstance.setNodes((nodes) =>
         nodes.map((node) => {
           if (node.id === id) {
             return { ...node, data: updatedData };
@@ -89,20 +90,36 @@ const NodeEditor = () => {
           return node;
         })
       );
-      setTimeout(() => {
-        resolve();
-      }, 200);
-    });
+    }, 200);
   };
+  // const handleChangeAwait = async (updates) => {
+  //   return new Promise((resolve) => {
+  //     const updatedData = { ...data, ...updates };
+  
+  //     setData((prevData) => ({ ...prevData, data: updatedData }));
+  //     reactFlowInstance.setNodes((nodes) =>
+  //       nodes.map((node) => {
+  //         if (node.id === id) {
+  //           return { ...node, data: updatedData };
+  //         }
+  //         return node;
+  //       })
+  //     );
+  //     // resolve();
+  //     setTimeout(() => {
+  //       resolve();
+  //     }, 100);
+  //   });
+  // };
 
   // const handleChange = (e) => {
   //   const { name: key, value } = e.target;
   //   const updatedData = key === "multipleValues" 
   //     ? { ...data, ...value } 
   //     : { ...data, [key]: value };
-  
+
   //   setData((prevData) => ({ ...prevData, data: updatedData }));
-  
+
   //   setTimeout(() => {
   //     if (key === "multipleValues") {
   //       Object.entries(value).forEach(([subKey, subValue]) =>

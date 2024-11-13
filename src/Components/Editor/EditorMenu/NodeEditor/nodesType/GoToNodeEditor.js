@@ -14,7 +14,7 @@ import { AppContext } from "../../../../../Context/AppContext";
 import ReactFlow, { addEdge } from "reactflow";
 
 const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
-  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf, setChangeChildIf } =
+  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf, setChangeChildIf,setData } =
     useContext(AppContext);
   const reactFlowWrapper = useRef(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -45,12 +45,32 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
 
   useEffect(() => {
     if (changeChildIf.parentId == data.currentId) {
-      // console.log('changeChildIffffff')
-      handleChange({ target: { name: 'advanceIvr', value: null } })
+      handleChange2({ target: { name: 'advanceIvr', value: null } });
+      setTimeout(() => {
+        reactFlowInstance.setNodes((nodes) => nodes.filter((node) => node.id !== changeChildIf.id));
+      }, 50);
       setChangeChildIf({});
       setLabelType('justLabel');
     }
   }, [changeChildIf]);
+
+
+  const handleChange2 = (e) => {
+    const { name: key, value } = e.target;
+    const updatedData = { ...data, [key]: value };
+    setData((prevData) => ({ ...prevData, data: updatedData }));
+    setTimeout(() => {
+      reactFlowInstance.setNodes((nodes) =>
+        nodes.map((node) => {
+          if (node.id === data.currentId) {
+            const updatedData = { ...node.data, [key]: value };
+            return { ...node, data: updatedData };
+          }
+          return node;
+        })
+      );
+    }, 50);
+  };
 
   useEffect(() => {
     if (createdNodes && Object.keys(createdNodes).length !== 0) {
@@ -114,7 +134,7 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
       }
 
       const currentNode = reactFlowInstance?.getNode(data.currentId);
-    
+
       // console.log("currentNode", currentNode);
 
       const createOrUpdateNode = (sourceHandle, value, nodeId) => {
@@ -154,7 +174,8 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
             target: newNode.id,
             type: "smoothstep",
             animated: true,
-            style: { stroke: "#33ff83" },
+            style: { stroke: "#33ff83",
+              strokeWidth: 2 },
           };
 
           reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
@@ -240,7 +261,8 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
         target: newSelectedNodeId,
         type: "smoothstep",
         animated: true,
-        style: { stroke: "#33ff83" },
+        style: { stroke: "#33ff83",
+          strokeWidth: 2 },
       };
 
       reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
@@ -250,6 +272,7 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
         labelValueId: null,
         advanceIvrLabel: null
       });
+      console.log('hereeeeee')
 
       reactFlowInstance.setEdges((edges) =>
         edges.filter((edge) => edge.id !== `edge-${currentNodeId}-${previousNodeId}`)

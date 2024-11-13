@@ -1,6 +1,7 @@
 body {
   transition: background-color 0.5s ease, color 0.5s ease;
 }
+
 .editor-wrapper {
   width: 100%;
   height: 100%;
@@ -11,10 +12,12 @@ body {
   background-color: #18181b;
   /* background-color: #ffffff; */
 }
+
 body.light .editor-bg {
   transition: background-color 0.5s ease, color 0.5s ease;
-  background: #dbdbdb;
+  background: #ffffff;
 }
+
 body.dark .editor-bg {
   transition: background-color 0.5s ease, color 0.5s ease;
   background: #18181b;
@@ -31,21 +34,22 @@ body.dark .editor-bg {
 }
 
 .controls>button {
-  background-color: #3a3a3d6f;
+  background-color: #27272a;
   border-bottom: none;
   padding: 10px;
 }
 
-body.light .controls>button {
+/* body.light .controls>button {
 background-color: white;
-}
+} */
 
 .controls>button>svg {
   fill: white;
 }
-body.light .controls>button>svg {
+
+/* body.light .controls>button>svg {
   fill: black;
-}
+} */
 
 .controls>button:hover {
   background-color: #3a3a3d6f;
@@ -117,9 +121,10 @@ body.light .controls>button>svg {
   border-radius: 8px;
   padding: 10.5px;
 }
-body.light .left-panel-button>button {
+
+/* body.light .left-panel-button>button {
 background-color: white;
-}
+} */
 
 .left-panel-button>button:hover {
   background-color: #313134;
@@ -130,22 +135,26 @@ background-color: white;
   font-size: 25px;
   color: white;
 }
-body.light .left-panel-button svg {
+
+/* body.light .left-panel-button svg {
   color: black;
-}
+} */
 .leftPanelContainer {
   display: flex;
   align-items: center;
   column-gap: 7px;
 }
+
 .right-panel-button.toggleTheme {
   padding: 7px;
   height: fit-content;
 }
+
 .right-panel-button.toggleTheme>svg {
   width: 18px;
   height: 18px;
 }
+
 .right-panel-button {
   background-color: white;
   padding: 10px;
@@ -158,6 +167,13 @@ body.light .left-panel-button svg {
   color: black;
   transition: 0.2s;
   cursor: pointer;
+}
+body.light .react-flow__edge-textbg {
+  fill: #c3c3c3 !important;
+}
+body.light .right-panel-button {
+  background-color: #27272a;
+  color: white;
 }
 
 .right-panel-button:hover {
@@ -197,6 +213,7 @@ body.light .left-panel-button svg {
   font-size: 18px;
   font-weight: 400;
 }
+
 .swal-error-title {
   color: #f27474;
   font-size: 18px;

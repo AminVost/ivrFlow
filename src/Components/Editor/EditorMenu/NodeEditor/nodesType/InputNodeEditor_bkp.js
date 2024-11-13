@@ -1,32 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Box, FormControl, InputLabel, Select, MenuItem, Checkbox, Button, FormControlLabel, IconButton, List, ListItem, ListItemText } from "@mui/material";
+import { TextField, Box, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel } from "@mui/material";
 import InfoTooltipAdornment from '../../../../../utils/InfoTooltipAdornment';
-import "./css/InputNodeEditor.css";
-import getIcons from "../../../../../utils/getIcons";
-
 
 const InputNodeEditor = ({ data, handleChange }) => {
-  console.log('data :>> ', data);
   const [showDetails, setShowDetails] = useState(false);
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState("");
-  const [newNumber, setNewNumber] = useState("");
-  const [editingIndex, setEditingIndex] = useState(null);
 
   useEffect(() => {
     data.showInfo = showDetails;
   }, [showDetails, data]);
-
-  useEffect(() => {
-    if (data.comments) {
-      // Parse existing comments in data.comments and populate the comments list
-      const existingComments = data.comments.split("\n").map((item) => {
-        const [number, ...textParts] = item.split("-");
-        return { number: number.trim(), text: textParts.join("-").trim() };
-      });
-      setComments(existingComments);
-    }
-  }, [data.comments]);
 
   const handleCheckboxChange = (event) => {
     setShowDetails(event.target.checked);
@@ -68,53 +49,6 @@ const InputNodeEditor = ({ data, handleChange }) => {
   };
 
   const currentFileGroups = fileOptions.find((option) => option.value === fileType)?.groups || [];
-
-  const updateCommentsInData = (updatedComments) => {
-    const formattedComments = updatedComments
-      .map((item) => `${item.number}-${item.text}`)
-      .join("\n");
-    data.comments = formattedComments;
-    handleChange({ target: { name: "comments", value: formattedComments } });
-  };
-
-  const handleAddOrUpdateComment = () => {
-    if (newComment.trim() === "" || newNumber.trim() === "") return; // Skip if inputs are empty
-
-    let updatedComments;
-    if (editingIndex !== null) {
-      // Update the existing comment
-      updatedComments = comments.map((comment, index) =>
-        index === editingIndex ? { number: newNumber.trim(), text: newComment.trim() } : comment
-      );
-      setEditingIndex(null); // Exit editing mode
-    } else {
-      // Add a new comment
-      updatedComments = [...comments, { number: newNumber.trim(), text: newComment.trim() }];
-    }
-
-    setComments(updatedComments);
-    setNewComment(""); // Reset input
-    setNewNumber(""); // Reset number
-    updateCommentsInData(updatedComments);
-  };
-
-  const handleEditComment = (index) => {
-    setEditingIndex(index);
-    setNewNumber(comments[index].number);
-    setNewComment(comments[index].text);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingIndex(null); // Exit editing mode
-    setNewComment(""); // Reset input
-    setNewNumber(""); // Reset number
-  };
-
-  const handleRemoveComment = (indexToRemove) => {
-    const updatedComments = comments.filter((_, index) => index !== indexToRemove);
-    setComments(updatedComments);
-    updateCommentsInData(updatedComments);
-  };
 
   return (
     <>
@@ -286,92 +220,21 @@ const InputNodeEditor = ({ data, handleChange }) => {
           }}
         />
 
-        <Box>
-          {/* <InputLabel sx={{ mb: 1.2 , color:"white" }}>Comments</InputLabel> */}
-          <h6 className="commentsTitle">Comments</h6>
-          <List>
-            {comments.map((comment, index) => (
-              <ListItem
-                className="custom-list-item-comments"
-                key={index}
-                secondaryAction={
-                  <Box sx={{
-                    display: 'flex',
-                    gap: '.5rem'              
-                  }}>
-                    <IconButton
-                      edge="end"
-                      aria-label="edit"
-                      onClick={() => handleEditComment(index)}
-                      disabled={editingIndex !== null && editingIndex !== index} // Disable edit for other items during edit
-                    >
-                      {getIcons('RiEdit2Line', {
-                        style: { color: editingIndex !== null && editingIndex !== index ? "gray" : "white", fontSize: "22px" },
-                        className: "icon-style-edit"
-                      })}
-                    </IconButton>
-                    <IconButton
-                      edge="end"
-                      aria-label="delete"
-                      onClick={() => handleRemoveComment(index)}
-                      disabled={editingIndex !== null} // Disable delete during edit
-                    >
-                      {getIcons('RiDeleteBin6Line', { style: { color: editingIndex !== null && editingIndex !== index ? "gray" : "white", fontSize: "22px" },
-                        className: "icon-style-delete" })}
-                    </IconButton>
-                  </Box>
-                }
-              >
-                <ListItemText primary={`${comment.number} - ${comment.text}`} />
-              </ListItem>
-            ))}
-          </List>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <TextField
-                id="new-number-input"
-                label="Number"
-                variant="outlined"
-                size="small"
-                type="number"
-                value={newNumber}
-                onChange={(e) => setNewNumber(e.target.value)}
-                sx={{ flex: "1 1 50px" }}
-              />
-              <TextField
-                id="new-comment-input"
-                label="Comment"
-                variant="outlined"
-                size="small"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                sx={{ flex: "2 1 200px" }}
-              />
-            </Box>
-
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <Button
-                variant="outlined"
-                startIcon={editingIndex !== null ? getIcons("RiEdit2Line") : getIcons("RiAddBoxLine")}
-                onClick={handleAddOrUpdateComment}
-                sx={{ flex: "0 0 auto" }}
-              >
-                {editingIndex !== null ? "Update" : "Add"}
-              </Button>
-              {editingIndex !== null && (
-                <Button
-                  variant="outlined"
-                  startIcon={getIcons("RiCloseFill")}
-                  onClick={handleCancelEdit}
-                  sx={{ flex: "0 0 auto" }}
-                >
-                  Cancel
-                </Button>
-              )}
-            </Box>
-          </Box>
-
-        </Box>
+        <TextField
+          className="inputText"
+          id="commentsInput"
+          multiline
+          rows={3}
+          name="comments"
+          label="comments"
+          variant="outlined"
+          onChange={handleChange}
+          value={data.comments || ''}
+          InputProps={{
+            endAdornment: <InfoTooltipAdornment tooltipText="These are the comments" />,
+            sx: { paddingRight: 0 }
+          }}
+        />
 
       </Box>
     </>

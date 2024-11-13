@@ -11,10 +11,10 @@
   cursor: pointer;
 }
 
-body.light .node-navigate svg {
+/* body.light .node-navigate svg {
   fill: black;
   stroke: black;
-}
+} */
 /* body.light .css-j204z7-MuiFormControlLabel-root .MuiFormControlLabel-label {
   color: black;
 }
@@ -52,9 +52,9 @@ body.light .css-1f4qdit-MuiFormLabel-root-MuiInputLabel-root {
   font-weight: 500;
 }
 
-body.light .node-navigate>div>p {
+/* body.light .node-navigate>div>p {
   color: black;
-}
+} */
 
 /* .node-editor {
   display: flex;

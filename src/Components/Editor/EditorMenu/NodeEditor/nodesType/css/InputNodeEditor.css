@@ -1,0 +1,19 @@
+.commentsTitle {
+    width: 100%;
+    font-weight: 400;
+    font-size: 1rem;
+    padding-top: .6rem;
+    padding-bottom: .6rem;
+    border-bottom: 1px solid #ffffff21;
+}
+
+.custom-list-item-comments {
+    padding-left: 1px !important;
+}
+
+.icon-style-edit:hover {
+    color: #1976d2 !important;
+}
+.icon-style-delete:hover {
+    color: #c0392b !important;
+}

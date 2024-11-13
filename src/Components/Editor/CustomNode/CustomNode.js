@@ -35,22 +35,22 @@ const CustomNode = ({ id }) => {
 
   useEffect(() => {
     window.addEventListener('error', e => {
-        if (e.message === 'ResizeObserver loop limit exceeded') {
-            const resizeObserverErrDiv = document.getElementById(
-                'webpack-dev-server-client-overlay-div'
-            );
-            const resizeObserverErr = document.getElementById(
-                'webpack-dev-server-client-overlay'
-            );
-            if (resizeObserverErr) {
-                resizeObserverErr.setAttribute('style', 'display: none');
-            }
-            if (resizeObserverErrDiv) {
-                resizeObserverErrDiv.setAttribute('style', 'display: none');
-            }
+      if (e.message === 'ResizeObserver loop limit exceeded') {
+        const resizeObserverErrDiv = document.getElementById(
+          'webpack-dev-server-client-overlay-div'
+        );
+        const resizeObserverErr = document.getElementById(
+          'webpack-dev-server-client-overlay'
+        );
+        if (resizeObserverErr) {
+          resizeObserverErr.setAttribute('style', 'display: none');
         }
+        if (resizeObserverErrDiv) {
+          resizeObserverErrDiv.setAttribute('style', 'display: none');
+        }
+      }
     });
-}, []);
+  }, []);
 
   useEffect(() => {
     const storedNodes = localStorage.getItem("createdNodes");
@@ -79,7 +79,7 @@ const CustomNode = ({ id }) => {
 
   const deleteNode = useCallback(() => {
     if (id !== "start") {
-    // if (id !== "start" && id !== "end") {
+      // if (id !== "start" && id !== "end") {
       if (
         nodeType == "If" ||
         nodeType == "Switch" ||
@@ -88,56 +88,69 @@ const CustomNode = ({ id }) => {
       ) {
         const edges = reactFlowInstance.getEdges();
 
-        const connectedEdges = edges.filter((edge) => edge.source === id);
+        const deletionCriteria = {
+          If: (node) => node.data.nodeType?.includes("ifIvr-"),
+          Switch: (node) => node.data.nodeType === "switchIvr",
+          GoTo: (node) => node.data.nodeType === "gotoIvr",
+          CallFunction: (node) => node.data.nodeType === "ivrCallFunction",
+        };
 
-        const connectedNodeIds = connectedEdges.map((edge) =>
-          edge.source === id ? edge.target : ""
-        );
+        const connectedEdges = edges.filter((edge) => edge.source === id);
+        const connectedNodeIds = connectedEdges.map((edge) => edge.target);
 
         reactFlowInstance.setNodes((nodes) =>
           nodes.filter(
-            (node) => node.id !== id && !connectedNodeIds.includes(node.id)
+            (node) =>
+              node.id !== id &&
+              !(
+                connectedNodeIds.includes(node.id) &&
+                deletionCriteria[nodeType](node)
+              )
           )
         );
 
         reactFlowInstance.setEdges((edges) =>
+          edges.filter(
+            (edge) =>
+              edge.source !== id &&
+              edge.target !== id &&
+              !connectedNodeIds.includes(edge.target)
+          )
+        );
+
+        setData((prev) => ({ ...prev, status: false }));
+        setActiveEditor(false);
+      } else {
+        // setNodes((nodes) => nodes.filter((node) => node.id !== id));
+        // setData((prev) => ({ ...prev, status: false }));
+        setNodes((nodes) => nodes.filter((node) => node.id !== id));
+
+        reactFlowInstance.setEdges((edges) =>
           edges.filter((edge) => edge.source !== id && edge.target !== id)
         );
-      } else {
-        setNodes((nodes) => nodes.filter((node) => node.id !== id));
+      
         setData((prev) => ({ ...prev, status: false }));
-      }
-
-      const updatedNodes = { ...createdNodes };
-      const nodeKey = Object.keys(updatedNodes).find((key) => key.includes(id));
-
-      if (nodeKey) {
-        delete updatedNodes[nodeKey];
-        console.log("Updated Nodes:", updatedNodes);
-        localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
-        setCreatedNodes(updatedNodes);
-      }
-      setIsUpdated(true);
+      }      
 
       const currentNode = reactFlowInstance.getNode(id);
       if (currentNode?.data?.nodeType?.includes("ifIvr")) {
+        console.log('hereeeee')
         const regex = /^(.*?)-(advanceIvrTrueIf|advanceIvrFalseIf)$/;
         const match = id.match(regex);
 
         if (match) {
-          const parentId = match[1]; // ID parent
-          const conditionType = match[2]; // trueIf or falseIf
+          const parentId = match[1];
+          const conditionType = match[2];
           const parentNode = reactFlowInstance.getNode(parentId);
-          setData((prevData) => ({
-            ...prevData, // Copy the previous state
-            parentId, // Update parentId
-            selected: true, // Update selected
-            type: parentNode?.type || prevData?.type, // Update type if parentNode exists, otherwise keep previous
-            data: parentNode?.data || prevData?.data, // Update data if parentNode exists, otherwise keep previous
-            status: true, // Update status
-          }));
 
-          // setData((prevData) => ({ ...prevData, data: parentNode.data }));
+          setData((prevData) => ({
+            ...prevData,
+            parentId,
+            selected: true,
+            type: parentNode?.type || prevData?.type,
+            data: parentNode?.data || prevData?.data,
+            status: true,
+          }));
 
           setActiveEditor(true);
           setShowSidebar(true);
@@ -171,9 +184,10 @@ const CustomNode = ({ id }) => {
           setShowDrawer(true);
           setTimeout(() => {
             setChangeChildIf({
+              id: currentNode.id,
               parentId: parentId,
             });
-          }, 100);
+          }, 200);
         }
       } else if (currentNode?.data?.nodeType == "ivrCallFunction") {
         const regex = /^([a-zA-Z0-9]+)-([a-zA-Z]+)$/;
@@ -195,11 +209,22 @@ const CustomNode = ({ id }) => {
           setShowDrawer(true);
           setTimeout(() => {
             setChangeChildIf({
+              id: currentNode.id,
               parentId: parentId,
             });
-          }, 100);
+          }, 200);
         }
       }
+
+      const updatedNodes = { ...createdNodes };
+      const nodeKey = Object.keys(updatedNodes).find((key) => key.includes(id));
+      if (nodeKey) {
+        delete updatedNodes[nodeKey];
+        console.log("Updated Nodes:", updatedNodes);
+        localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
+        setCreatedNodes(updatedNodes);
+      }
+      setIsUpdated(true);
     }
   }, [
     id,
@@ -210,12 +235,6 @@ const CustomNode = ({ id }) => {
     reactFlowInstance,
     setIsUpdated,
   ]);
-  // const deleteNode = useCallback(() => {
-  //   if (id !== "start" && id !== "end") {
-  //     setNodes((nodes) => nodes.filter((node) => node.id !== id));
-  //     setData((prev) => ({ ...prev, status: false }));
-  //   }
-  // }, []);
 
   const isValidSingleConnection = (connection) => {
     const targetNodeEdges = reactFlowInstance
@@ -837,40 +856,40 @@ const CustomNode = ({ id }) => {
                       </div>
                     )
                   );
-                case "If":
-                  return (
-                    (data?.trueLabelValue || data?.falseLabelValue) !==
-                    undefined && (
-                      <div className="nodeBrief">
-                        {data?.trueLabelValue && (
-                          <p>
-                            When{" "}
-                            <b style={{ color: "#4CAF50", fontWeight: 400 }}>
-                              {" "}
-                              True{" "}
-                            </b>{" "}
-                            Label:{" "}
-                            <b style={{ color: "#ff8333", fontWeight: 400 }}>
-                              {data.trueLabelValue}
-                            </b>
-                          </p>
-                        )}
-                        {data?.falseLabelValue && (
-                          <p>
-                            When{" "}
-                            <b style={{ color: "#F44336", fontWeight: 400 }}>
-                              {" "}
-                              False{" "}
-                            </b>{" "}
-                            Label:{" "}
-                            <b style={{ color: "#ff8333", fontWeight: 400 }}>
-                              {data.falseLabelValue}
-                            </b>
-                          </p>
-                        )}
-                      </div>
-                    )
-                  );
+                // case "If":
+                //   return (
+                //     (data?.trueLabelValue || data?.falseLabelValue) !==
+                //     undefined && (
+                //       <div className="nodeBrief">
+                //         {data?.trueLabelValue && (
+                //           <p>
+                //             When{" "}
+                //             <b style={{ color: "#4CAF50", fontWeight: 400 }}>
+                //               {" "}
+                //               True{" "}
+                //             </b>{" "}
+                //             Label:{" "}
+                //             <b style={{ color: "#ff8333", fontWeight: 400 }}>
+                //               {data.trueLabelValue}
+                //             </b>
+                //           </p>
+                //         )}
+                //         {data?.falseLabelValue && (
+                //           <p>
+                //             When{" "}
+                //             <b style={{ color: "#F44336", fontWeight: 400 }}>
+                //               {" "}
+                //               False{" "}
+                //             </b>{" "}
+                //             Label:{" "}
+                //             <b style={{ color: "#ff8333", fontWeight: 400 }}>
+                //               {data.falseLabelValue}
+                //             </b>
+                //           </p>
+                //         )}
+                //       </div>
+                //     )
+                //   );
                 case "Dial":
                   return (
                     data?.showInfo && (
@@ -931,7 +950,7 @@ const CustomNode = ({ id }) => {
           nodeType !== "gotoIvr" &&
           nodeType !== "switchIvr" &&
           !nodeType.includes("ifIvr") &&
-          nodeType !== "CallFunction" &&
+          nodeType !== "HangUp" &&
           nodeType !== "ivrCallFunction" &&
           nodeType !== "GoTo" && (
             <Handle

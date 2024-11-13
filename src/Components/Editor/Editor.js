@@ -22,7 +22,7 @@ import CustomNode from "./CustomNode/CustomNode";
 import CustomEdge from "./CustomEdge/CustomEdge";
 import uniqueId from "../../utils/uniqueId";
 import ContextMenu from "./ContextMenu/ContextMenu";
-import { RiSaveLine } from "react-icons/ri";
+import { RiSaveLine, RiErrorWarningLine, RiExchange2Line } from "react-icons/ri";
 import getIcons from "../../utils/getIcons";
 import { TbSend } from "react-icons/tb";
 import { parse, stringify, toJSON, fromJSON } from "flatted";
@@ -33,6 +33,8 @@ import { AppContext } from "../../Context/AppContext";
 import MenuDrawer from "../Sidebar/MenuDrawer/MenuDrawer";
 import { BsFillCircleFill } from "react-icons/bs";
 import Swal from "sweetalert2";
+import ReactDOMServer from "react-dom/server";
+
 
 // Define the default start node
 const defaultStartNode = {
@@ -58,6 +60,15 @@ const defaultEndNode = {
     Icon: "RiArrowUpFill", // Example icon, use any appropriate icon
   },
 };
+
+const IconAlert = () => (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <RiExchange2Line style={{ fontSize: "100px", color: "#f27474" }} />
+    <p style={{ marginTop: "20px", fontSize: "18px", color: "#f27474" }}>
+      This node already has a connection from its source.
+    </p>
+  </div>
+);
 
 function Editor() {
   const reactFlowWrapper = useRef(null);
@@ -99,14 +110,42 @@ function Editor() {
       return newTheme;
     });
   };
-
+  const getNodeById = (id) => {
+    return nodes.find((node) => node.id === id); // Assuming nodes is your state
+  };
 
   const onConnect = useCallback(
     (params) => {
-      console.log("paramsss", params);
+      // console.log("paramsss", params);
       params.type = "smoothstep";
       const existingEdges = getEdges();
-      console.log("existingEdges :>> ", existingEdges);
+      // console.log("existingEdges :>> ", existingEdges);
+
+      // // Retrieve the source and target nodes
+      // console.log('params.source :>> ', params.source);
+      // console.log('params.target :>> ', params.target);
+      // const sourceNode = reactFlowInstance?.getNode(params.source); // Assume getNodeById is a helper function to find a node by its ID
+      // // const targetNode = getNodeById(params.target);
+      // console.log('sourceNode :>> ', sourceNode);
+      
+      // // Check if either the source or target node type is 'If'
+      // if (sourceNode?.type === "If" || targetNode?.type === "If") {
+      //   Swal.fire({
+      //     position: "center",
+      //     html: ReactDOMServer.renderToString(<IconAlert />),
+      //     title: "Connections to or from 'If' nodes are not allowed.",
+      //     showConfirmButton: false,
+      //     timer: 3000,
+      //     customClass: {
+      //       popup: "swal-popup",
+      //       title: "swal-error-title",
+      //       icon: "swal-icon",
+      //     },
+      //     background: "#27272a",
+      //   });
+      //   return; // Exit early if the connection involves an 'If' node
+      // }
+
 
       const hasSourceHandleConnection = existingEdges.some(
         (edge) =>
@@ -124,6 +163,19 @@ function Editor() {
         setIsUpdated(true);
       } else {
         console.log("This node already has a connection from its source.");
+        Swal.fire({
+          position: "center",
+          html: ReactDOMServer.renderToString(<IconAlert />),
+          // title: "This node already has a connection from its source.",
+          showConfirmButton: false,
+          timer: 3000,
+          customClass: {
+            popup: "swal-popup",
+            title: "swal-error-title",
+            icon: "swal-icon",
+          },
+          background: "#27272a",
+        });
       }
     },
     [setEdges, setIsUpdated]
@@ -231,6 +283,7 @@ function Editor() {
       edges: edges.map((edge) => ({
         id: edge.id,
         source: edge.source,
+        data: edge.data ?? null,
         sourceHandle: edge.sourceHandle ?? null,
         target: edge.target,
         targetHandle: edge.targetHandle ?? null,
@@ -278,7 +331,7 @@ function Editor() {
         setNodes(nodes);
         setEdges(edges);
         setInitialized(true);
-      } 
+      }
       else {
         // Add default start node if no nodes are loaded from localStorage
         setNodes([defaultStartNode]);
@@ -315,7 +368,7 @@ function Editor() {
         <Background
           variant="dots"
           className="editor-bg"
-          size={theme == "dark" ? 1 : 3}
+          size={theme == "dark" ? 1 : 2}
           color={theme == "dark" ? "#8f8f98" : "#27272a69"}
         />
         {/* <Background variant="dots" className="editor-bg" gap={20} size={2} /> */}
@@ -384,7 +437,7 @@ const LeftPanel = memo(
             <IconButton
               onClick={toggleTheme}
             >
-            {theme === "dark" ? getIcons("RiSunFill") : getIcons("TbMoonFilled")}
+              {theme === "dark" ? getIcons("RiSunFill") : getIcons("TbMoonFilled")}
             </IconButton>
           </div>
         </div>

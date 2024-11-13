@@ -5,9 +5,9 @@
   color: white;
 }
 
-body.light .editor-menu {
+/* body.light .editor-menu {
   background: white;
-}
+} */
 
 .nodes-header {
   display: flex;
@@ -27,9 +27,9 @@ body.light .editor-menu {
   width: 28px;
   height: 28px;
 }
-body.light .nodes-header > div > svg {
+/* body.light .nodes-header > div > svg {
   fill: black;
-}
+} */
 
 .nodes-header > div:first-child > p {
   font-size: 20px;
@@ -43,9 +43,9 @@ body.light .nodes-header > div > svg {
   background-color: #313134;
 }
 
-body.light .nodes-header > div:last-child {
+/* body.light .nodes-header > div:last-child {
   background-color: #d6d6d6;
-}
+} */
 
 .nodes-header > div:last-child > input {
   width: 100%;
@@ -56,9 +56,9 @@ body.light .nodes-header > div:last-child {
   font-size: 16px;
   color: white;
 }
-body.light .nodes-header > div:last-child > input {
+/* body.light .nodes-header > div:last-child > input {
   background-color: #d6d6d6;
-}
+} */
 
 .nodes-header > div:last-child > input::placeholder {
   font-size: 16px;
@@ -149,10 +149,10 @@ body.light .nodes-header > div:last-child > input {
   cursor: grab;
   gap: 8px;
 }
-body.light .node {
+/* body.light .node {
   background-color: #d6d6d6;
   color: black;
-}
+} */
 
 .node > p {
   width: 100%;
@@ -183,9 +183,9 @@ body.light .node {
   width: 18px;
   height: 18px;
 }
-body.light .node > div > button > svg {
+/* body.light .node > div > button > svg {
 fill: black;
-}
+} */
 
 .screen-toggle-button {
   width: min-content;

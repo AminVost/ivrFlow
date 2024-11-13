@@ -4,7 +4,7 @@ import { AppContext } from "../../../../../Context/AppContext";
 import ReactFlow, { addEdge } from "reactflow";
 
 const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
-  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf , setChangeChildIf } =
+  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf, setChangeChildIf,setData  } =
     useContext(AppContext);
   const [showDetails, setShowDetails] = useState(false);
   const [updateNewNode, setUpdateNewNode] = useState(false);
@@ -15,25 +15,6 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
   const ivrLabels = ["Label 1", "Label 2", "Label 3", "Label 4", "Label 5", "Label 6"];
 
   console.log("data=>", data);
-
-  useEffect(() => {
-    window.addEventListener('error', e => {
-        if (e.message === 'ResizeObserver loop limit exceeded') {
-            const resizeObserverErrDiv = document.getElementById(
-                'webpack-dev-server-client-overlay-div'
-            );
-            const resizeObserverErr = document.getElementById(
-                'webpack-dev-server-client-overlay'
-            );
-            if (resizeObserverErr) {
-                resizeObserverErr.setAttribute('style', 'display: none');
-            }
-            if (resizeObserverErrDiv) {
-                resizeObserverErrDiv.setAttribute('style', 'display: none');
-            }
-        }
-    });
-}, []);
 
   useEffect(() => {
     data.showInfo = showDetails;
@@ -54,11 +35,32 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
 
   useEffect(() => {
     if (changeChildIf.parentId == data.currentId) {
-      handleChange({ target: { name: 'advanceIvr', value: null } })
+      // handleChange({ target: { name: 'advanceIvr', value: null } })
+      handleChange2({ target: { name: 'advanceIvr', value: null } });
+      setTimeout(() => {
+        reactFlowInstance.setNodes((nodes) => nodes.filter((node) => node.id !== changeChildIf.id));
+      }, 200);
       setChangeChildIf({});
       setLabelType('justLabel');
     }
   }, [changeChildIf]);
+
+  const handleChange2 = (e) => {
+    const { name: key, value } = e.target;
+    const updatedData = { ...data, [key]: value };
+    setData((prevData) => ({ ...prevData, data: updatedData }));
+    setTimeout(() => {
+      reactFlowInstance.setNodes((nodes) =>
+        nodes.map((node) => {
+          if (node.id === data.currentId) {
+            const updatedData = { ...node.data, [key]: value };
+            return { ...node, data: updatedData };
+          }
+          return node;
+        })
+      );
+    }, 50);
+  };
 
   useEffect(() => {
     if (createdNodes && Object.keys(createdNodes).length !== 0) {
@@ -134,13 +136,11 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
           };
 
           const newNode = {
-            // id: uniqueId(7),
             id: `${nodeId}`,
             type: "custom",
             position,
             data: {
               title: `Go To ${value}`,
-              // nodeType: `goTo-${nodeId}`,
               nodeType: `ivrCallFunction`,
               Icon: "RiExternalLinkLine",
               color: "#ff3333",
@@ -161,7 +161,8 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
             target: newNode.id,
             type: "smoothstep",
             animated: true,
-            style: { stroke: "#ff3333" },
+            style: { stroke: "#ff3333",
+              strokeWidth: 2 },
           };
 
           reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
@@ -241,7 +242,8 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
         target: newSelectedNodeId,
         type: "smoothstep",
         animated: true,
-        style: { stroke: "#ff3333" },
+        style: { stroke: "#ff3333",
+          strokeWidth: 2 },
       };
 
       reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
