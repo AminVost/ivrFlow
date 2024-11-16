@@ -33,8 +33,13 @@ const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
   useEffect(() => {
     if (reactFlowInstance) {
       const allNodes = reactFlowInstance.getNodes();
-      setOptions(allNodes.map((node) => ({ id: node.id, title: node.data?.title })));
+      console.log('allNodes :>> ', allNodes);
+      setTimeout(() => {
+        
+        setOptions(allNodes.map((node) => ({ id: node.id, title: node.data.title })));
+      }, 100);
     }
+    console.log('options' , options);
   }, [reactFlowInstance]);
 
   useEffect(() => {

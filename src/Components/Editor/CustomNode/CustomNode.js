@@ -12,6 +12,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 import stringReducer from "../../../utils/stringReducer";
 import getIcons from "../../../utils/getIcons";
 import { AppContext } from "../../../Context/AppContext";
+import Swal from "sweetalert2";
 
 const CustomNode = ({ id }) => {
   const {
@@ -79,152 +80,170 @@ const CustomNode = ({ id }) => {
 
   const deleteNode = useCallback(() => {
     if (id !== "start") {
-      // if (id !== "start" && id !== "end") {
-      if (
-        nodeType == "If" ||
-        nodeType == "Switch" ||
-        nodeType == "GoTo" ||
-        nodeType == "CallFunction"
-      ) {
-        const edges = reactFlowInstance.getEdges();
 
-        const deletionCriteria = {
-          If: (node) => node.data.nodeType?.includes("ifIvr-"),
-          Switch: (node) => node.data.nodeType === "switchIvr",
-          GoTo: (node) => node.data.nodeType === "gotoIvr",
-          CallFunction: (node) => node.data.nodeType === "ivrCallFunction",
-        };
+      Swal.fire({
+        position: "center",
+        title: 'Are you sure you want to delete this node?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#6495ed',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        customClass: {
+          popup: "swal-popup delete",
+          title: "swal-error-title delete",
+          icon: "swal-icon delete",
+        },
+        background: "#27272a",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          if (
+            nodeType == "If" ||
+            nodeType == "Switch" ||
+            nodeType == "GoTo" ||
+            nodeType == "CallFunction"
+          ) {
+            const edges = reactFlowInstance.getEdges();
 
-        const connectedEdges = edges.filter((edge) => edge.source === id);
-        const connectedNodeIds = connectedEdges.map((edge) => edge.target);
+            const deletionCriteria = {
+              If: (node) => node.data.nodeType?.includes("ifIvr-"),
+              Switch: (node) => node.data.nodeType === "switchIvr",
+              GoTo: (node) => node.data.nodeType === "gotoIvr",
+              CallFunction: (node) => node.data.nodeType === "ivrCallFunction",
+            };
 
-        reactFlowInstance.setNodes((nodes) =>
-          nodes.filter(
-            (node) =>
-              node.id !== id &&
-              !(
-                connectedNodeIds.includes(node.id) &&
-                deletionCriteria[nodeType](node)
+            const connectedEdges = edges.filter((edge) => edge.source === id);
+            const connectedNodeIds = connectedEdges.map((edge) => edge.target);
+
+            reactFlowInstance.setNodes((nodes) =>
+              nodes.filter(
+                (node) =>
+                  node.id !== id &&
+                  !(
+                    connectedNodeIds.includes(node.id) &&
+                    deletionCriteria[nodeType](node)
+                  )
               )
-          )
-        );
+            );
 
-        reactFlowInstance.setEdges((edges) =>
-          edges.filter(
-            (edge) =>
-              edge.source !== id &&
-              edge.target !== id &&
-              !connectedNodeIds.includes(edge.target)
-          )
-        );
+            reactFlowInstance.setEdges((edges) =>
+              edges.filter(
+                (edge) =>
+                  edge.source !== id &&
+                  edge.target !== id &&
+                  !connectedNodeIds.includes(edge.target)
+              )
+            );
 
-        setData((prev) => ({ ...prev, status: false }));
-        setActiveEditor(false);
-      } else {
-        // setNodes((nodes) => nodes.filter((node) => node.id !== id));
-        // setData((prev) => ({ ...prev, status: false }));
-        setNodes((nodes) => nodes.filter((node) => node.id !== id));
+            setData((prev) => ({ ...prev, status: false }));
+            setActiveEditor(false);
+          } else {
 
-        reactFlowInstance.setEdges((edges) =>
-          edges.filter((edge) => edge.source !== id && edge.target !== id)
-        );
-      
-        setData((prev) => ({ ...prev, status: false }));
-      }      
+            setNodes((nodes) => nodes.filter((node) => node.id !== id));
+            reactFlowInstance.setEdges((edges) =>
+              edges.filter((edge) => edge.source !== id && edge.target !== id)
+            );
+            setData((prev) => ({ ...prev, status: false }));
+          }
 
-      const currentNode = reactFlowInstance.getNode(id);
-      if (currentNode?.data?.nodeType?.includes("ifIvr")) {
-        console.log('hereeeee')
-        const regex = /^(.*?)-(advanceIvrTrueIf|advanceIvrFalseIf)$/;
-        const match = id.match(regex);
+          const currentNode = reactFlowInstance.getNode(id);
+          if (currentNode?.data?.nodeType?.includes("ifIvr")) {
+            console.log('hereeeee')
+            const regex = /^(.*?)-(advanceIvrTrueIf|advanceIvrFalseIf)$/;
+            const match = id.match(regex);
 
-        if (match) {
-          const parentId = match[1];
-          const conditionType = match[2];
-          const parentNode = reactFlowInstance.getNode(parentId);
+            if (match) {
+              const parentId = match[1];
+              const conditionType = match[2];
+              const parentNode = reactFlowInstance.getNode(parentId);
 
-          setData((prevData) => ({
-            ...prevData,
-            parentId,
-            selected: true,
-            type: parentNode?.type || prevData?.type,
-            data: parentNode?.data || prevData?.data,
-            status: true,
-          }));
+              setData((prevData) => ({
+                ...prevData,
+                parentId,
+                selected: true,
+                type: parentNode?.type || prevData?.type,
+                data: parentNode?.data || prevData?.data,
+                status: true,
+              }));
 
-          setActiveEditor(true);
-          setShowSidebar(true);
-          setShowDrawer(true);
-          setTimeout(() => {
-            setChangeChildIf({
-              id: currentNode.id,
-              parentId: parentId,
-              conditionType: conditionType,
-            });
-          }, 200);
-        }
-      } else if (currentNode?.data?.nodeType == "gotoIvr") {
-        const regex = /^([a-zA-Z0-9]+)-([a-zA-Z]+)$/;
-        const match = id.match(regex);
-        if (match) {
-          const parentId = match[1]; // ID parent
-          const parentNode = reactFlowInstance.getNode(parentId);
-          setData((prevData) => ({
-            ...prevData,
-            parentId,
-            selected: true,
-            type: parentNode.type,
-            data: parentNode.data,
-            status: true,
-          }));
-          // setData((prevData) => ({ ...prevData, data: parentNode.data }));
+              setActiveEditor(true);
+              setShowSidebar(true);
+              setShowDrawer(true);
+              setTimeout(() => {
+                setChangeChildIf({
+                  id: currentNode.id,
+                  parentId: parentId,
+                  conditionType: conditionType,
+                });
+              }, 200);
+            }
+          } else if (currentNode?.data?.nodeType == "gotoIvr") {
+            const regex = /^([a-zA-Z0-9]+)-([a-zA-Z]+)$/;
+            const match = id.match(regex);
+            if (match) {
+              const parentId = match[1]; // ID parent
+              const parentNode = reactFlowInstance.getNode(parentId);
+              setData((prevData) => ({
+                ...prevData,
+                parentId,
+                selected: true,
+                type: parentNode.type,
+                data: parentNode.data,
+                status: true,
+              }));
+              // setData((prevData) => ({ ...prevData, data: parentNode.data }));
 
-          setActiveEditor(true);
-          setShowSidebar(true);
-          setShowDrawer(true);
-          setTimeout(() => {
-            setChangeChildIf({
-              id: currentNode.id,
-              parentId: parentId,
-            });
-          }, 200);
-        }
-      } else if (currentNode?.data?.nodeType == "ivrCallFunction") {
-        const regex = /^([a-zA-Z0-9]+)-([a-zA-Z]+)$/;
-        const match = id.match(regex);
-        if (match) {
-          const parentId = match[1]; // ID parent
-          const parentNode = reactFlowInstance.getNode(parentId);
-          setData({
-            parentId,
-            selected: true,
-            type: parentNode.type,
-            data: parentNode.data,
-            status: true,
-          });
-          // setData((prevData) => ({ ...prevData, data: parentNode.data }));
+              setActiveEditor(true);
+              setShowSidebar(true);
+              setShowDrawer(true);
+              setTimeout(() => {
+                setChangeChildIf({
+                  id: currentNode.id,
+                  parentId: parentId,
+                });
+              }, 200);
+            }
+          } else if (currentNode?.data?.nodeType == "ivrCallFunction") {
+            const regex = /^([a-zA-Z0-9]+)-([a-zA-Z]+)$/;
+            const match = id.match(regex);
+            if (match) {
+              const parentId = match[1]; // ID parent
+              const parentNode = reactFlowInstance.getNode(parentId);
+              setData({
+                parentId,
+                selected: true,
+                type: parentNode.type,
+                data: parentNode.data,
+                status: true,
+              });
+              // setData((prevData) => ({ ...prevData, data: parentNode.data }));
 
-          setActiveEditor(true);
-          setShowSidebar(true);
-          setShowDrawer(true);
-          setTimeout(() => {
-            setChangeChildIf({
-              id: currentNode.id,
-              parentId: parentId,
-            });
-          }, 200);
+              setActiveEditor(true);
+              setShowSidebar(true);
+              setShowDrawer(true);
+              setTimeout(() => {
+                setChangeChildIf({
+                  id: currentNode.id,
+                  parentId: parentId,
+                });
+              }, 200);
+            }
+          }
+
+          const updatedNodes = { ...createdNodes };
+          const nodeKey = Object.keys(updatedNodes).find((key) => key.includes(id));
+          if (nodeKey) {
+            delete updatedNodes[nodeKey];
+            console.log("Updated Nodes:", updatedNodes);
+            localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
+            setCreatedNodes(updatedNodes);
+          }
+          setIsUpdated(true);
         }
       }
-
-      const updatedNodes = { ...createdNodes };
-      const nodeKey = Object.keys(updatedNodes).find((key) => key.includes(id));
-      if (nodeKey) {
-        delete updatedNodes[nodeKey];
-        console.log("Updated Nodes:", updatedNodes);
-        localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
-        setCreatedNodes(updatedNodes);
-      }
-      setIsUpdated(true);
+      )
     }
   }, [
     id,
@@ -246,6 +265,7 @@ const CustomNode = ({ id }) => {
   return (
     <>
       <div className={`nodeItem  ${nodeType}`} data-nodeid={`${id}`}>
+        {/* <p  style={{ color: 'white' }}>{data?.indexPriority}</p> */}
         {nodeType !== "start" &&
           nodeType !== "gotoIvr" &&
           nodeType !== "switchIvr" &&

@@ -15,13 +15,15 @@ import ReactFlow, {
   MiniMap,
   Background,
   Panel,
+  useReactFlow,
 } from "reactflow";
 import "./editor.css";
 import CustomNode from "./CustomNode/CustomNode";
-import CustomEdge from './CustomEdge/CustomEdge';
+import CustomEdge from "./CustomEdge/CustomEdge";
 import uniqueId from "../../utils/uniqueId";
 import ContextMenu from "./ContextMenu/ContextMenu";
-import { RiSaveLine } from "react-icons/ri";
+import { RiSaveLine, RiErrorWarningLine, RiExchange2Line } from "react-icons/ri";
+import getIcons from "../../utils/getIcons";
 import { TbSend } from "react-icons/tb";
 import { parse, stringify, toJSON, fromJSON } from "flatted";
 import { colors, IconButton } from "@mui/material";
@@ -31,13 +33,15 @@ import { AppContext } from "../../Context/AppContext";
 import MenuDrawer from "../Sidebar/MenuDrawer/MenuDrawer";
 import { BsFillCircleFill } from "react-icons/bs";
 import Swal from "sweetalert2";
+import ReactDOMServer from "react-dom/server";
+
 
 // Define the default start node
 const defaultStartNode = {
   id: "start",
   type: "custom", // Ensure 'custom' matches your node type if needed
   position: { x: 250, y: 100 }, // Set initial position
-  color: 'white',
+  color: "white",
   data: {
     title: "START",
     nodeType: "start",
@@ -49,7 +53,7 @@ const defaultEndNode = {
   id: "end",
   type: "custom", // Ensure 'custom' matches your node type if needed
   position: { x: 250, y: 400 }, // Set initial position, adjust as needed
-  color: 'red',
+  color: "red",
   data: {
     title: "END",
     nodeType: "end",
@@ -57,8 +61,18 @@ const defaultEndNode = {
   },
 };
 
+const IconAlert = () => (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <RiExchange2Line style={{ fontSize: "100px", color: "#f27474" }} />
+    <p style={{ marginTop: "20px", fontSize: "18px", color: "#f27474" }}>
+      This node already has a connection from its source.
+    </p>
+  </div>
+);
+
 function Editor() {
   const reactFlowWrapper = useRef(null);
+  const { getNodes, getEdges } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [menu, setMenu] = useState(null);
@@ -77,21 +91,92 @@ function Editor() {
     isUpdated,
     setIsUpdated,
     setData,
-    createdNodes,
-    setCreatedNodes
+    setActiveEditor,
+    theme,
+    setTheme,
   } = useContext(AppContext);
 
   useEffect(() => {
-   console.log('editor createdNodes' , createdNodes)
-  }, [createdNodes, setCreatedNodes]);
+    console.log("theme:", theme);
+
+    document.body.className = theme;
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => {
+      const newTheme = prevTheme === "dark" ? "light" : "dark";
+      document.body.className = newTheme;
+      localStorage.setItem("ivrTheme", newTheme);
+      return newTheme;
+    });
+  };
+  const getNodeById = (id) => {
+    return nodes.find((node) => node.id === id); // Assuming nodes is your state
+  };
 
   const onConnect = useCallback(
     (params) => {
-      console.log('paramsss', params);
+      // console.log("paramsss", params);
       params.type = "smoothstep";
-      // params.label ='label';
-      setEdges((eds) => addEdge(params, eds));
-      setIsUpdated(true);
+      const existingEdges = getEdges();
+      // console.log("existingEdges :>> ", existingEdges);
+
+      // // Retrieve the source and target nodes
+      // console.log('params.source :>> ', params.source);
+      // console.log('params.target :>> ', params.target);
+      // const sourceNode = reactFlowInstance?.getNode(params.source); // Assume getNodeById is a helper function to find a node by its ID
+      // // const targetNode = getNodeById(params.target);
+      // console.log('sourceNode :>> ', sourceNode);
+      
+      // // Check if either the source or target node type is 'If'
+      // if (sourceNode?.type === "If" || targetNode?.type === "If") {
+      //   Swal.fire({
+      //     position: "center",
+      //     html: ReactDOMServer.renderToString(<IconAlert />),
+      //     title: "Connections to or from 'If' nodes are not allowed.",
+      //     showConfirmButton: false,
+      //     timer: 3000,
+      //     customClass: {
+      //       popup: "swal-popup",
+      //       title: "swal-error-title",
+      //       icon: "swal-icon",
+      //     },
+      //     background: "#27272a",
+      //   });
+      //   return; // Exit early if the connection involves an 'If' node
+      // }
+
+
+      const hasSourceHandleConnection = existingEdges.some(
+        (edge) =>
+          edge.sourceHandle === params.sourceHandle &&
+          edge.source === params.source
+      );
+      const hasTargetHandleConnection = existingEdges.some(
+        (edge) =>
+          edge.targetHandle === params.targetHandle &&
+          edge.target === params.target
+      );
+
+      if (!hasSourceHandleConnection && !hasTargetHandleConnection) {
+        setEdges((eds) => addEdge(params, eds));
+        setIsUpdated(true);
+      } else {
+        console.log("This node already has a connection from its source.");
+        Swal.fire({
+          position: "center",
+          html: ReactDOMServer.renderToString(<IconAlert />),
+          // title: "This node already has a connection from its source.",
+          showConfirmButton: false,
+          timer: 3000,
+          customClass: {
+            popup: "swal-popup",
+            title: "swal-error-title",
+            icon: "swal-icon",
+          },
+          background: "#27272a",
+        });
+      }
     },
     [setEdges, setIsUpdated]
   );
@@ -104,24 +189,33 @@ function Editor() {
   const onDrop = useCallback(
     (event) => {
       event.preventDefault();
-      let uniqId = uniqueId(7);
-      const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
       const data = event.dataTransfer.getData("application/reactflow");
       const { type, title, Icon, color } = JSON.parse(data);
-
-      // check if the dropped element is valid
+      console.log('type :>> ', type);
+      let uniqId = type == 'end' ? 'end' : uniqueId(7);
       if (typeof type === "undefined" || !type) {
         return;
       }
-      // console.log('event', event)
+      if (type === 'end' && reactFlowInstance.getNodes().some(node => node.id === 'end')) {
+        Swal.fire({
+          position: "center",
+          icon: "error",
+          title: "You cannot have more than one END node in the flowchart.",
+          showConfirmButton: false,
+          timer: 3000,
+          customClass: {
+            popup: "swal-popup",
+            title: "swal-error-title",
+            icon: "swal-icon",
+          },
+          background: "#27272a",
+        });
+        return;
+      }
       const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX - 105,
         y: event.clientY,
       });
-      // const position = reactFlowInstance.screenToFlowPosition({
-      //   x: event.clientX - reactFlowBounds.left,
-      //   y: event.clientY - reactFlowBounds.top,
-      // });
 
       const newNode = {
         id: uniqId,
@@ -166,7 +260,7 @@ function Editor() {
   const onPaneClick = useCallback(() => setMenu(null), [menu]);
 
   const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
-  const edgeTypes = useMemo(() => ({ 'custom-edge': CustomEdge }), []);
+  const edgeTypes = useMemo(() => ({ "custom-edge": CustomEdge }), []);
   const nodeColor = (node) => {
     return node.data.color;
   };
@@ -189,12 +283,18 @@ function Editor() {
       edges: edges.map((edge) => ({
         id: edge.id,
         source: edge.source,
+        data: edge.data ?? null,
         sourceHandle: edge.sourceHandle ?? null,
         target: edge.target,
         targetHandle: edge.targetHandle ?? null,
         type: edge.type,
         animated: edge.animated ?? false,
         style: edge.style ?? {},
+        label: edge.label ?? null,
+        labelStyle: edge.labelStyle ?? {},
+        labelBgStyle: edge.labelBgStyle ?? {},
+        labelBgPadding: edge.labelBgPadding ?? [],
+        labelBgBorderRadius: edge.labelBgBorderRadius ?? null,
         // Add other necessary properties here
       })),
     };
@@ -231,20 +331,18 @@ function Editor() {
         setNodes(nodes);
         setEdges(edges);
         setInitialized(true);
-        console.log('nodesss', nodes)
-      } else {
+      }
+      else {
         // Add default start node if no nodes are loaded from localStorage
-        setNodes([defaultStartNode, defaultEndNode]);
+        setNodes([defaultStartNode]);
+        // setNodes([defaultStartNode, defaultEndNode]);
       }
     } catch (error) {
       // Add default start node if an error occurs during loading from localStorage
-      setNodes([defaultStartNode, defaultEndNode]);
+      setNodes([defaultStartNode]);
+      // setNodes([defaultStartNode, defaultEndNode]);
     }
   }, [setNodes, setEdges]);
-
-  const onNodesDelete = useCallback((deletedNodes) => {
-    console.log("Deleted nodes: ", deletedNodes);
-  }, []);
 
   return (
     <section className="editor-wrapper" ref={reactFlowWrapper}>
@@ -252,7 +350,7 @@ function Editor() {
         ref={ref}
         nodes={nodes}
         nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
+        // edgeTypes={edgeTypes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -266,15 +364,22 @@ function Editor() {
         deleteKeyCode={null}
         minZoom={0.3}
         maxZoom={1.2}
-        onNodesDelete={onNodesDelete}
       >
-        <Background variant="dots" className="editor-bg" />
+        <Background
+          variant="dots"
+          className="editor-bg"
+          size={theme == "dark" ? 1 : 2}
+          color={theme == "dark" ? "#8f8f98" : "#27272a69"}
+        />
+        {/* <Background variant="dots" className="editor-bg" gap={20} size={2} /> */}
         <LeftPanel
           showSidebar={showSidebar}
           setShowSidebar={setShowSidebar}
           showDrawer={showDrawer}
           setShowDrawer={setShowDrawer}
           width={width}
+          toggleTheme={toggleTheme}
+          theme={theme}
         />
         <RightPanel
           handleWorkflowData={handleWorkflowData}
@@ -283,6 +388,9 @@ function Editor() {
           setData={setData}
           setIsUpdated={setIsUpdated}
           setVisiblePublish={setVisiblePublish}
+          setActiveEditor={setActiveEditor}
+          toggleTheme={toggleTheme}
+          theme={theme}
         />
         <Controls
           className="controls"
@@ -300,29 +408,38 @@ function Editor() {
 export default memo(Editor);
 
 const LeftPanel = memo(
-  ({ showSidebar, setShowSidebar, showDrawer, setShowDrawer, width }) => {
+  ({ showSidebar, setShowSidebar, showDrawer, setShowDrawer, width, toggleTheme, theme }) => {
     return (
       <Panel position="top-left">
-        <div className="left-panel-button">
-          <IconButton
-            disableTouchRipple
-            onClick={() => {
-              setShowSidebar(!showSidebar);
-              setShowDrawer(!showDrawer);
-            }}
-          >
-            {width > 815 ? (
-              !showSidebar ? (
+        <div className="leftPanelContainer">
+          <div className="left-panel-button">
+            <IconButton
+              disableTouchRipple
+              onClick={() => {
+                setShowSidebar(!showSidebar);
+                setShowDrawer(!showDrawer);
+              }}
+            >
+              {width > 815 ? (
+                !showSidebar ? (
+                  <PiSidebarSimpleFill />
+                ) : (
+                  <BiFullscreen />
+                )
+              ) : showSidebar ? (
                 <PiSidebarSimpleFill />
               ) : (
                 <BiFullscreen />
-              )
-            ) : showSidebar ? (
-              <PiSidebarSimpleFill />
-            ) : (
-              <BiFullscreen />
-            )}
-          </IconButton>
+              )}
+            </IconButton>
+          </div>
+          <div className="left-panel-button toggleTheme">
+            <IconButton
+              onClick={toggleTheme}
+            >
+              {theme === "dark" ? getIcons("RiSunFill") : getIcons("TbMoonFilled")}
+            </IconButton>
+          </div>
         </div>
       </Panel>
     );
@@ -337,6 +454,9 @@ const RightPanel = memo(
     setData,
     isPublish,
     setVisiblePublish,
+    setActiveEditor,
+    toggleTheme,
+    theme,
   }) => {
     return (
       <Panel position="top-right">
@@ -373,6 +493,7 @@ const RightPanel = memo(
               setVisiblePublish(true);
               setIsUpdated(false);
               setData((prev) => ({ ...prev, status: false }));
+              setActiveEditor(false);
             }
           }}
         >
@@ -380,6 +501,10 @@ const RightPanel = memo(
           <RiSaveLine />
           <p>Save</p>
         </div>
+
+        {/* <div className="right-panel-button toggleTheme" onClick={toggleTheme}>
+          {theme === "dark" ? getIcons("RiSunFill") : getIcons("TbMoonFilled")}
+        </div> */}
       </Panel>
     );
   }

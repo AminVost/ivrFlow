@@ -219,6 +219,9 @@ body.light .right-panel-button {
   font-size: 18px;
   font-weight: 400;
 }
+.swal-error-title.delete {
+  color: white;
+}
 
 .swal-icon {
   font-size: 24px;

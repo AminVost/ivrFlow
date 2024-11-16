@@ -69,10 +69,18 @@ const IconAlert = () => (
     </p>
   </div>
 );
+const ManualIconAlert = () => (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <RiExchange2Line style={{ fontSize: "100px", color: "#f27474" }} />
+    <p style={{ marginTop: "20px", fontSize: "18px", color: "#f27474" }}>
+      It is not possible to manually connect to this node.
+    </p>
+  </div>
+);
 
 function Editor() {
   const reactFlowWrapper = useRef(null);
-  const { getNodes, getEdges } = useReactFlow();
+  const { getNodes, getEdges, getNode } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [menu, setMenu] = useState(null);
@@ -119,33 +127,29 @@ function Editor() {
       // console.log("paramsss", params);
       params.type = "smoothstep";
       const existingEdges = getEdges();
-      // console.log("existingEdges :>> ", existingEdges);
+      const sourceNode = getNode(params.source);
+      const targetNode = getNode(params.target);
+      console.log('paramasss', params);
+      console.log('sourceNode', sourceNode);
+      console.log('targetNode', targetNode);
 
-      // // Retrieve the source and target nodes
-      // console.log('params.source :>> ', params.source);
-      // console.log('params.target :>> ', params.target);
-      // const sourceNode = reactFlowInstance?.getNode(params.source); // Assume getNodeById is a helper function to find a node by its ID
-      // // const targetNode = getNodeById(params.target);
-      // console.log('sourceNode :>> ', sourceNode);
-      
-      // // Check if either the source or target node type is 'If'
-      // if (sourceNode?.type === "If" || targetNode?.type === "If") {
-      //   Swal.fire({
-      //     position: "center",
-      //     html: ReactDOMServer.renderToString(<IconAlert />),
-      //     title: "Connections to or from 'If' nodes are not allowed.",
-      //     showConfirmButton: false,
-      //     timer: 3000,
-      //     customClass: {
-      //       popup: "swal-popup",
-      //       title: "swal-error-title",
-      //       icon: "swal-icon",
-      //     },
-      //     background: "#27272a",
-      //   });
-      //   return; // Exit early if the connection involves an 'If' node
-      // }
-
+      if (params.sourceHandle && (params.sourceHandle == 'callFunction-source-right' || params.sourceHandle == 'goto-source-right' || params.sourceHandle == 'switch-source-left' || params.sourceHandle == 'switch-source-right' || params.sourceHandle == 'if-false-source-left' || params.sourceHandle == 'if-true-source-right')) {
+        console.log("It is not possible to manually connect to this node.");
+        Swal.fire({
+          position: "center",
+          html: ReactDOMServer.renderToString(<ManualIconAlert />),
+          // title: "This node already has a connection from its source.",
+          showConfirmButton: false,
+          timer: 3000,
+          customClass: {
+            popup: "swal-popup",
+            title: "swal-error-title",
+            icon: "swal-icon",
+          },
+          background: "#27272a",
+        });
+        return;
+      }
 
       const hasSourceHandleConnection = existingEdges.some(
         (edge) =>

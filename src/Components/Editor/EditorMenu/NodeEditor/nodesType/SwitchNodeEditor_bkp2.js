@@ -100,9 +100,10 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
               (c) => c.id === edge.data?.caseId
             );
             if (caseIndex !== -1) {
+              console.log('yeessss', caseIndex + 1)
               return {
                 ...edge,
-                label: `Priority: ` + (caseIndex + 1),
+                label: `Priority: ` + caseIndex + 1,
               };
             }
             return edge;
@@ -387,24 +388,22 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
               </Select>
             </FormControl>
 
-            {!caseItem?.nodeLabel && (
-              <FormControl fullWidth sx={{ mr: 1 }}>
-                <InputLabel id={"switchIvrLabel-" + index}>IvrFlow</InputLabel>
-                <Select
-                  labelId={"switchIvrLabel-" + index}
-                  id={"switchIvr-" + index}
-                  name={"switchIvr-" + index}
-                  label="ivrItem"
-                  variant="outlined"
-                  value={caseItem?.ivrFlow || ""}
-                  onChange={(e) => handleSelectIvrFlowChange(index, e.target.value, caseItem)}
-                >
-                  <MenuItem value={null}>None</MenuItem>
-                  <MenuItem value="Flow 1">Flow 1</MenuItem>
-                  <MenuItem value="Flow 2">Flow 2</MenuItem>
-                </Select>
-              </FormControl>
-            )}
+            <FormControl fullWidth sx={{ mr: 1 }}>
+              <InputLabel id={"switchIvrLabel-" + index}>IvrFlow</InputLabel>
+              <Select
+                labelId={"switchIvrLabel-" + index}
+                id={"switchIvr-" + index}
+                name={"switchIvr-" + index}
+                label="ivrItem"
+                variant="outlined"
+                value={caseItem?.ivrFlow || ""}
+                onChange={(e) => handleSelectIvrFlowChange(index, e.target.value, caseItem)}
+              >
+                <MenuItem value={null}>None</MenuItem>
+                <MenuItem value="Flow 1">Flow 1</MenuItem>
+                <MenuItem value="Flow 2">Flow 2</MenuItem>
+              </Select>
+            </FormControl>
 
             {caseItem?.ivrFlow && caseItem.ivrFlow !== null ? (
               <Autocomplete
@@ -461,24 +460,23 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
                 <MenuItem value="list 2">List 2</MenuItem>
               </Select>
             </FormControl>
-            {!caseItem?.nodeLabel && (
-              <FormControl fullWidth sx={{ mr: 1 }}>
-                <InputLabel>IvrFlow</InputLabel>
-                <Select
-                  labelId={"switchIvrLabel-" + index}
-                  id={"switchIvr-" + index}
-                  name={"switchIvr-" + index}
-                  label="ivrItem"
-                  variant="outlined"
-                  value={caseItem?.ivrFlow || ""}
-                  onChange={(e) => handleSelectIvrFlowChange(index, e.target.value, caseItem)}
-                >
-                  <MenuItem value={null}>None</MenuItem>
-                  <MenuItem value="Flow 1">Flow 1</MenuItem>
-                  <MenuItem value="Flow 2">Flow 2</MenuItem>
-                </Select>
-              </FormControl>
-            )}
+
+            <FormControl fullWidth sx={{ mr: 1 }}>
+              <InputLabel>IvrFlow</InputLabel>
+              <Select
+                labelId={"switchIvrLabel-" + index}
+                id={"switchIvr-" + index}
+                name={"switchIvr-" + index}
+                label="ivrItem"
+                variant="outlined"
+                value={caseItem?.ivrFlow || ""}
+                onChange={(e) => handleSelectIvrFlowChange(index, e.target.value, caseItem)}
+              >
+                <MenuItem value={null}>None</MenuItem>
+                <MenuItem value="Flow 1">Flow 1</MenuItem>
+                <MenuItem value="Flow 2">Flow 2</MenuItem>
+              </Select>
+            </FormControl>
 
             {caseItem?.ivrFlow && caseItem.ivrFlow !== null ? (
               <Autocomplete
@@ -533,25 +531,22 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
               fullWidth
               sx={{ mr: 1 }}
             />
-
-            {!caseItem?.nodeLabel && (
-              <FormControl fullWidth sx={{ mr: 1 }}>
-                <InputLabel>IvrFlow</InputLabel>
-                <Select
-                  labelId={"switchIvrLabel-" + index}
-                  id={"switchIvr-" + index}
-                  name={"switchIvr-" + index}
-                  label="ivrItem"
-                  variant="outlined"
-                  value={caseItem?.ivrFlow || ""}
-                  onChange={(e) => handleSelectIvrFlowChange(index, e.target.value, caseItem)}
-                >
-                  <MenuItem value={null}>None</MenuItem>
-                  <MenuItem value="Flow 1">Flow 1</MenuItem>
-                  <MenuItem value="Flow 2">Flow 2</MenuItem>
-                </Select>
-              </FormControl>
-            )}
+            <FormControl fullWidth sx={{ mr: 1 }}>
+              <InputLabel>IvrFlow</InputLabel>
+              <Select
+                labelId={"switchIvrLabel-" + index}
+                id={"switchIvr-" + index}
+                name={"switchIvr-" + index}
+                label="ivrItem"
+                variant="outlined"
+                value={caseItem?.ivrFlow || ""}
+                onChange={(e) => handleSelectIvrFlowChange(index, e.target.value, caseItem)}
+              >
+                <MenuItem value={null}>None</MenuItem>
+                <MenuItem value="Flow 1">Flow 1</MenuItem>
+                <MenuItem value="Flow 2">Flow 2</MenuItem>
+              </Select>
+            </FormControl>
 
             {caseItem?.ivrFlow && caseItem.ivrFlow !== null ? (
               <Autocomplete
