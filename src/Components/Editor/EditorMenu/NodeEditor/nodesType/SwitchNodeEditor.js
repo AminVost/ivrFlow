@@ -25,6 +25,7 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
     createdNodes,
     setCreatedNodes,
     setData,
+    excludedNodeTypes
   } = useContext(AppContext);
   const reactFlowWrapper = useRef(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -193,8 +194,11 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
 
 
   const renderCaseElements = (caseItem, index) => {
-    const nodeTitles = reactFlowInstance
-      ? reactFlowInstance.getNodes().map((node) => node.data.title)
+    const nodeLabels = reactFlowInstance
+      ? reactFlowInstance
+        .getNodes()
+        .filter((node) => node.data?.label && !excludedNodeTypes.includes(node.data.nodeType))
+        .map((node) => node.data.label)
       : [];
 
     const handleSelectIvrFlowChange = (index, value, caseItem) => {
@@ -293,12 +297,12 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
       }
     };
 
-    const handleSelectNodeTitleChange = (index, value, caseItem) => {
+    const handleSelectNodeLabelChange = (index, value, caseItem) => {
       handleCaseChange(index, "nodeLabel", value, caseItem);
 
       const currentNode = reactFlowInstance.getNode(data.currentId);
       if (value && value !== "") {
-        const targetNode = reactFlowInstance.getNodes().find((node) => node.data.title === value);
+        const targetNode = reactFlowInstance.getNodes().find((node) => node.data?.label === value);
         if (currentNode && targetNode) {
           // Remove any existing edge connected to this caseItem
           const existingEdges = reactFlowInstance.getEdges().filter(
@@ -422,15 +426,24 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
               />
             ) : (
               <Autocomplete
-                options={nodeTitles}
-                value={caseItem?.nodeLabel || ""}
-                onChange={(event, newValue) =>
-                  handleSelectNodeTitleChange(index, newValue, caseItem)
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label="Select Node Title" fullWidth />
-                )}
-              />
+              options={nodeLabels}
+              getOptionLabel={(option) => option || ""}
+              noOptionsText="No label found"
+              value={caseItem?.nodeLabel || ""}
+              onChange={(event, newValue) =>
+                handleSelectNodeLabelChange(index, newValue, caseItem)
+              }
+              renderInput={(params) => (
+                <TextField {...params} label="Select Node by Label" fullWidth />
+              )}
+              filterOptions={(options, { inputValue }) =>
+                options.filter(
+                  (option) =>
+                    option &&
+                    option.toLowerCase().includes(inputValue.toLowerCase())
+                )
+              }
+            />
             )}
           </>
         );
@@ -492,15 +505,25 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
                 )}
               />
             ) : (
+
               <Autocomplete
-                options={nodeTitles}
+                options={nodeLabels}
+                getOptionLabel={(option) => option || ""}
+                noOptionsText="No label found"
                 value={caseItem?.nodeLabel || ""}
                 onChange={(event, newValue) =>
-                  handleSelectNodeTitleChange(index, newValue, caseItem)
+                  handleSelectNodeLabelChange(index, newValue, caseItem)
                 }
                 renderInput={(params) => (
-                  <TextField {...params} label="Select Node Title" fullWidth />
+                  <TextField {...params} label="Select Node by Label" fullWidth />
                 )}
+                filterOptions={(options, { inputValue }) =>
+                  options.filter(
+                    (option) =>
+                      option &&
+                      option.toLowerCase().includes(inputValue.toLowerCase())
+                  )
+                }
               />
             )}
           </>
@@ -566,14 +589,23 @@ const SwitchNodeEditor = ({ data, handleChange, addNode }) => {
               />
             ) : (
               <Autocomplete
-                options={nodeTitles}
+                options={nodeLabels}
+                getOptionLabel={(option) => option || ""}
+                noOptionsText="No label found"
                 value={caseItem?.nodeLabel || ""}
                 onChange={(event, newValue) =>
-                  handleSelectNodeTitleChange(index, newValue, caseItem)
+                  handleSelectNodeLabelChange(index, newValue, caseItem)
                 }
                 renderInput={(params) => (
-                  <TextField {...params} label="Select Node Title" fullWidth />
+                  <TextField {...params} label="Select Node by Label" fullWidth />
                 )}
+                filterOptions={(options, { inputValue }) =>
+                  options.filter(
+                    (option) =>
+                      option &&
+                      option.toLowerCase().includes(inputValue.toLowerCase())
+                  )
+                }
               />
             )}
           </>

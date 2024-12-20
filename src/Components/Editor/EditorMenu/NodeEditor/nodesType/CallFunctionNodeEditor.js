@@ -4,7 +4,7 @@ import { AppContext } from "../../../../../Context/AppContext";
 import ReactFlow, { addEdge } from "reactflow";
 
 const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
-  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf, setChangeChildIf,setData  } =
+  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf, setChangeChildIf,setData,excludedNodeTypes  } =
     useContext(AppContext);
   const [showDetails, setShowDetails] = useState(false);
   const [updateNewNode, setUpdateNewNode] = useState(false);
@@ -23,9 +23,17 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
   useEffect(() => {
     if (reactFlowInstance) {
       const allNodes = reactFlowInstance.getNodes();
-      setOptions(allNodes.map((node) => ({ id: node.id, title: node.data.title })));
+      setOptions(
+        allNodes
+          .filter((node) => node.data?.label && !excludedNodeTypes.includes(node.data.nodeType))
+          .map((node) => ({
+            id: node.id,
+            label: node.data.label,
+          }))
+      );
     }
   }, [reactFlowInstance]);
+  
 
   useEffect(() => {
     if (labelType == 'ivrLabel') {
@@ -232,7 +240,7 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
         );
       }
       await handleChangeAwait({
-        labelValue: selectedNode.title,
+        labelValue: selectedNode.label,
         labelValueId: newSelectedNodeId,
       });
 
@@ -353,10 +361,10 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
         {labelType == 'justLabel' && (
           <Autocomplete
             options={options}
-            getOptionLabel={(option) => option.title || ""}
+            getOptionLabel={(option) => option.label || ""}
             inputValue={inputValue}
             value={
-              options.find((option) => option.title === data.labelValue) || null
+              options.find((option) => option.label === data.labelValue) || null
             }
             onInputChange={(event, value) => setInputValue(value)}
             onChange={handleAutocompleteChange}
@@ -364,10 +372,13 @@ const CallFunctionNodeEditor = ({ data, handleChange, addNode, handleChangeAwait
               <TextField {...params} label="Select Node by Label" variant="outlined" fullWidth sx={{ mb: 1.2 }} />
             )}
             filterOptions={(options, { inputValue }) =>
-              options.filter((option) =>
-                option.title.toLowerCase().includes(inputValue.toLowerCase())
+              options.filter(
+                (option) =>
+                  option.label &&
+                  option.label.toLowerCase().includes(inputValue.toLowerCase())
               )
             }
+            noOptionsText="No label found"
           />
         )}
 

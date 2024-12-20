@@ -23,7 +23,8 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
     setCreatedNodes,
     changeChildIf,
     setChangeChildIf,
-    setData
+    setData,
+    excludedNodeTypes
   } = useContext(AppContext);
   const reactFlowWrapper = useRef(null);
   const [operand, setOperand] = useState(data.operand || "timeFrame");
@@ -41,11 +42,33 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
     data.showInfo = showDetails;
   }, [showDetails, data]);
 
+  // useEffect(() => {
+  //   if (reactFlowInstance) {
+  //     const allNodes = reactFlowInstance.getNodes();
+  //     setOptionsTrue(allNodes.map((node) => ({ id: node.id, title: node.data.title })));
+  //     setOptionsFalse(allNodes.map((node) => ({ id: node.id, title: node.data.title })));
+  //   }
+  // }, [reactFlowInstance]);
+
   useEffect(() => {
     if (reactFlowInstance) {
       const allNodes = reactFlowInstance.getNodes();
-      setOptionsTrue(allNodes.map((node) => ({ id: node.id, title: node.data.title })));
-      setOptionsFalse(allNodes.map((node) => ({ id: node.id, title: node.data.title })));
+      setOptionsTrue(
+        allNodes
+          .filter((node) => node.data?.label  && !excludedNodeTypes.includes(node.data.nodeType))
+          .map((node) => ({
+            id: node.id,
+            label: node.data.label,
+          }))
+      );
+      setOptionsFalse(
+        allNodes
+          .filter((node) => node.data?.label && !excludedNodeTypes.includes(node.data.nodeType))
+          .map((node) => ({
+            id: node.id,
+            label: node.data.label,
+          }))
+      );
     }
   }, [reactFlowInstance]);
 
@@ -224,7 +247,7 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
                 target: newNode.id,
                 type: "smoothstep",
                 animated: true,
-                style: { 
+                style: {
                   stroke: "#ff8333",
                   strokeWidth: 2 // مقدار ضخامت دلخواه
                 },
@@ -364,8 +387,10 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
                 target: newNode.id,
                 type: "smoothstep",
                 animated: true,
-                style: { stroke: "#ff8333",
-                  strokeWidth: 2 },
+                style: {
+                  stroke: "#ff8333",
+                  strokeWidth: 2
+                },
                 label: nodeType,
                 labelStyle: { fill: "black", fontWeight: 600, fontSize: 13 },
                 labelBgStyle: { fill: "white" },
@@ -517,7 +542,7 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
           );
         }
         await handleChangeAwait({
-          trueLabelValue: selectedNode.title,
+          trueLabelValue: selectedNode.label,
           trueLabelValueId: newSelectedNodeId,
         });
 
@@ -528,8 +553,10 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
           target: newSelectedNodeId,
           type: "smoothstep",
           animated: true,
-          style: { stroke: "#ff8333",
-            strokeWidth: 2 },
+          style: {
+            stroke: "#ff8333",
+            strokeWidth: 2
+          },
           label: autoCompleteType,
           labelStyle: { fill: "black", fontWeight: 600, fontSize: 13 },
           labelBgStyle: { fill: "white" },
@@ -563,7 +590,7 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
           );
         }
         await handleChangeAwait({
-          falseLabelValue: selectedNode.title,
+          falseLabelValue: selectedNode.label,
           falseLabelValueId: newSelectedNodeId,
         });
 
@@ -574,8 +601,10 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
           target: newSelectedNodeId,
           type: "smoothstep",
           animated: true,
-          style: { stroke: "#ff8333",
-            strokeWidth: 2 },
+          style: {
+            stroke: "#ff8333",
+            strokeWidth: 2
+          },
           label: autoCompleteType,
           labelStyle: { fill: "black", fontWeight: 600, fontSize: 13 },
           labelBgStyle: { fill: "white" },
@@ -846,10 +875,10 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
           <Autocomplete
             id={`labelAutocompleteTrue-${data.currentId}`}
             options={optionsTrue}
-            getOptionLabel={(option) => option.title || ""}
+            getOptionLabel={(option) => option.label || ""}
             inputValue={inputValueTrue}
             value={
-              optionsTrue.find((option) => option.title === data.trueLabelValue) || null
+              optionsTrue.find((option) => option.label === data.trueLabelValue) || null
             }
             name='trueAutoComplete'
             onInputChange={(event, value) => setInputValueTrue(value)}
@@ -858,10 +887,13 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
               <TextField {...params} label="Select Node by Label" variant="outlined" fullWidth sx={{ mb: 1.2 }} />
             )}
             filterOptions={(options, { inputValue }) =>
-              options.filter((option) =>
-                option.title.toLowerCase().includes(inputValue.toLowerCase())
+              options.filter(
+                (option) =>
+                  option.label &&
+                  option.label.toLowerCase().includes(inputValue.toLowerCase())
               )
             }
+            noOptionsText="No label found"
             disablePortal
           />
         )}
@@ -906,10 +938,10 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
           <Autocomplete
             id={`labelAutocompleteFalse-${data.currentId}`}
             options={optionsFalse}
-            getOptionLabel={(option) => option.title || ""}
+            getOptionLabel={(option) => option.label || ""}
             inputValue={inputValueFalse}
             value={
-              optionsFalse.find((option) => option.title === data.falseLabelValue) || null
+              optionsFalse.find((option) => option.label === data.falseLabelValue) || null
             }
             name='falseAutoComplete'
             onInputChange={(event, value) => setInputValueFalse(value)}
@@ -918,8 +950,10 @@ const IfNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
               <TextField {...params} label="Select Node by Label" variant="outlined" fullWidth sx={{ mb: 1.2 }} />
             )}
             filterOptions={(options, { inputValue }) =>
-              options.filter((option) =>
-                option.title.toLowerCase().includes(inputValue.toLowerCase())
+              options.filter(
+                (option) =>
+                  option.label &&
+                  option.label.toLowerCase().includes(inputValue.toLowerCase())
               )
             }
             disablePortal

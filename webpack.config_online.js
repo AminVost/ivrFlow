@@ -6,7 +6,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '/projects/ivrflow/beta/',
+    publicPath: '/projects/ivrflow/beta2/',
   },
   module: {
     rules: [

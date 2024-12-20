@@ -13,15 +13,16 @@ import {
 import { AppContext } from "../../../../../Context/AppContext";
 import ReactFlow, { addEdge } from "reactflow";
 
-const GoToNodeEditor = ({ data, handleChange, addNode }) => {
-  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf, setChangeChildIf } =
+const GoToNodeEditor = ({ data, handleChange, addNode, handleChangeAwait }) => {
+  const { reactFlowInstance, setIsUpdated, createdNodes, setCreatedNodes, changeChildIf, setChangeChildIf,setData } =
     useContext(AppContext);
   const reactFlowWrapper = useRef(null);
   const [showDetails, setShowDetails] = useState(false);
   const [updateNewNode, setUpdateNewNode] = useState(false);
-  const [labelType, setLabelType] = useState("justLabel");
+  const [labelType, setLabelType] = useState(data?.advanceIvr ? 'ivrLabel' : "justLabel");
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState([]);
+  const ivrLabels = ["Label 1", "Label 2", "Label 3", "Label 4", "Label 5", "Label 6"];
 
   console.log("data=>", data);
 
@@ -32,25 +33,59 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
   useEffect(() => {
     if (reactFlowInstance) {
       const allNodes = reactFlowInstance.getNodes();
-      setOptions(allNodes.map((node) => ({ id: node.id, title: node.data.title })));
+      setOptions(allNodes.map((node) => ({ id: node.id, title: node.data?.title })));
     }
   }, [reactFlowInstance]);
 
   useEffect(() => {
+    if (labelType == 'ivrLabel') {
+      deleteLabelValue();
+    }
+  }, [labelType]);
+
+  useEffect(() => {
     if (changeChildIf.parentId == data.currentId) {
-      // console.log('changeChildIffffff')
-      handleChange({ target: { name: 'advanceIvr', value: null } })
+      handleChange2({ target: { name: 'advanceIvr', value: null } });
+      setTimeout(() => {
+        reactFlowInstance.setNodes((nodes) => nodes.filter((node) => node.id !== changeChildIf.id));
+      }, 50);
       setChangeChildIf({});
       setLabelType('justLabel');
-
     }
   }, [changeChildIf]);
+
+
+  const handleChange2 = (e) => {
+    const { name: key, value } = e.target;
+    const updatedData = { ...data, [key]: value };
+    setData((prevData) => ({ ...prevData, data: updatedData }));
+    setTimeout(() => {
+      reactFlowInstance.setNodes((nodes) =>
+        nodes.map((node) => {
+          if (node.id === data.currentId) {
+            const updatedData = { ...node.data, [key]: value };
+            return { ...node, data: updatedData };
+          }
+          return node;
+        })
+      );
+    }, 50);
+  };
 
   useEffect(() => {
     if (createdNodes && Object.keys(createdNodes).length !== 0) {
       localStorage.setItem("createdNodes", JSON.stringify(createdNodes));
     }
   }, [createdNodes, updateNewNode]);
+
+  const doesNodeExist = (nodeId) => {
+    if (!reactFlowInstance) {
+      console.warn("React Flow instance is not available.");
+      return false;
+    }
+    const allNodes = reactFlowInstance.getNodes();
+    return allNodes.some((node) => node.id === nodeId);
+  };
 
   const handleCheckboxChange = (event) => {
     setShowDetails(event.target.checked);
@@ -71,10 +106,8 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
     const { value, name } = event.target;
     handleChange(event);
     if (name == 'advanceIvr' && !value) {
-      // console.log('nullll :>> ');
       setLabelType('justLabel');
       const goToNodeId = `${data.currentId}-goTo`;
-      // Remove node and edge
       const nodeExists = reactFlowInstance.getNodes().some((node) => node.id === goToNodeId);
 
       if (nodeExists) {
@@ -85,11 +118,11 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
 
         if (nodeKey) {
           delete updatedNodes[nodeKey];
-          console.log("Updated Nodes:", updatedNodes);
+          // console.log("Updated Nodes:", updatedNodes);
           localStorage.setItem("createdNodes", JSON.stringify(updatedNodes));
           setCreatedNodes(updatedNodes);
         }
-        console.log('createdNodes', createdNodes);
+        // console.log('createdNodes', createdNodes);
         setIsUpdated(true);
       }
     } else {
@@ -101,10 +134,13 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
       }
 
       const currentNode = reactFlowInstance?.getNode(data.currentId);
-      console.log("currentNode", currentNode);
+
+      // console.log("currentNode", currentNode);
 
       const createOrUpdateNode = (sourceHandle, value, nodeId) => {
-        if (!createdNodes[nodeId]) {
+        // if (!createdNodes[nodeId] && !doesNodeExist(nodeId)) {
+        if (!doesNodeExist(nodeId)) {
+          console.log('iff');
           const position = {
             x: currentNode.position.x - currentNode.width * 1.5,
             y: currentNode.position.y,
@@ -138,16 +174,18 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
             target: newNode.id,
             type: "smoothstep",
             animated: true,
-            style: { stroke: "#33ff83" },
+            style: { stroke: "#33ff83",
+              strokeWidth: 2 },
           };
 
           reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
-          console.log(
-            `New node and edge added:`,
-            newNode,
-            newEdge
-          );
+          // console.log(
+          //   `New node and edge added:`,
+          //   newNode,
+          //   newEdge
+          // );
         } else {
+          console.log('else');
           reactFlowInstance.setNodes((nds) =>
             nds.map((node) => {
               if (node.id === createdNodes[nodeId].id) {
@@ -185,30 +223,37 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
     }
   };
 
+  const deleteLabelValue = async () => {
+    const currentNodeId = data.currentId;
+    const previousNodeId = data?.labelValueId;
+    if (previousNodeId) {
+      await reactFlowInstance.setEdges((edges) =>
+        edges.filter((edge) => edge.id !== `edge-${currentNodeId}-${previousNodeId}`)
+      );
+      await handleChangeAwait({
+        labelValue: null,
+        labelValueId: null,
+      });
+    }
+  }
 
-  // const handleAutocompleteChange = (event, selectedNode) => {
-  //   if (selectedNode) {
-  //     handleChange({ target: { name: "labelValue", value: selectedNode.title } });
 
-  //   } else {
-  //     handleChange({ target: { name: "labelValue", value: null } });
-  //   }
-  // };
-
-  const handleAutocompleteChange = (event, selectedNode) => {
+  const handleAutocompleteChange = async (event, selectedNode) => {
     const currentNodeId = data.currentId;
     const previousNodeId = data?.labelValueId;
     const newSelectedNodeId = selectedNode?.id;
 
     if (selectedNode) {
-      handleChange({ target: { name: "labelValue", value: selectedNode.title } });
-      handleChange({ target: { name: "labelValueId", value: newSelectedNodeId } });
-      
       if (previousNodeId) {
-        reactFlowInstance.setEdges((edges) =>
+        console.log('previousNodeId', previousNodeId)
+        await reactFlowInstance.setEdges((edges) =>
           edges.filter((edge) => edge.id !== `edge-${currentNodeId}-${previousNodeId}`)
         );
       }
+      await handleChangeAwait({
+        labelValue: selectedNode.title,
+        labelValueId: newSelectedNodeId,
+      });
 
       const newEdge = {
         id: `edge-${currentNodeId}-${newSelectedNodeId}`,
@@ -216,14 +261,18 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
         target: newSelectedNodeId,
         type: "smoothstep",
         animated: true,
-        style: { stroke: "#33ff83" },
+        style: { stroke: "#33ff83",
+          strokeWidth: 2 },
       };
 
       reactFlowInstance.setEdges((edges) => addEdge(newEdge, edges));
     } else {
-
-      handleChange({ target: { name: "labelValue", value: null } });
-      handleChange({ target: { name: "labelValueId", value: null } });
+      await handleChangeAwait({
+        labelValue: null,
+        labelValueId: null,
+        advanceIvrLabel: null
+      });
+      console.log('hereeeeee')
 
       reactFlowInstance.setEdges((edges) =>
         edges.filter((edge) => edge.id !== `edge-${currentNodeId}-${previousNodeId}`)
@@ -231,6 +280,27 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
     }
   };
 
+  useEffect(() => {
+    if (data?.advanceIvrLabel || data?.advanceIvrLabel == null) {
+      const goToNodeId = `${data.currentId}-goTo`;
+      reactFlowInstance.setNodes((nds) =>
+        nds.map((node) => {
+          if (node.id === goToNodeId) {
+            // console.log('newNode', node)
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                label: data.advanceIvrLabel,
+              },
+            };
+          }
+          return node;
+        })
+      );
+      setIsUpdated(true);
+    }
+  }, [data?.advanceIvrLabel, reactFlowInstance]);
 
   return (
     <>
@@ -290,13 +360,21 @@ const GoToNodeEditor = ({ data, handleChange, addNode }) => {
         </FormControl>
 
         {labelType == 'ivrLabel' && (
-          <TextField
-            label="IVR Label"
-            name="ivrLabelValue"
-            value={data.ivrLabelValue || ""}
-            onChange={handleChange}
-            fullWidth
-            sx={{ mb: 1.2 }}
+          // <TextField
+          //   label="IVR Label"
+          //   name="advanceIvrLabel"
+          //   value={data.advanceIvrLabel || ""}
+          //   onChange={handleChange}
+          //   fullWidth
+          //   sx={{ mb: 1.2 }}
+          // />
+          <Autocomplete
+            options={ivrLabels}
+            value={data?.advanceIvrLabel || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: 'advanceIvrLabel', value: newValue } })}
+            renderInput={(params) => (
+              <TextField {...params} label="Select IVR Label" fullWidth />
+            )}
           />
         )}
 

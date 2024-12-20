@@ -18,6 +18,13 @@ export const AppContextProvider = ({ children }) => {
     // Check local storage for theme value
     return localStorage.getItem("ivrTheme") || "dark"; // Default to light if no value found
   });
+  const excludedNodeTypes = [
+    "ifIvr-True",
+    "ifIvr-False",
+    "switchIvr",
+    "gotoIvr",
+    "ivrCallFunction"
+  ];
 
 
   return (
@@ -44,7 +51,8 @@ export const AppContextProvider = ({ children }) => {
         changeChildIf,
         setChangeChildIf,
         theme,
-        setTheme
+        setTheme,
+        excludedNodeTypes
       }}
     >
       {children}
